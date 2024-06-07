@@ -1,6 +1,0 @@
-termf a = get-random(0, 2000)
-termf b = get-random(1, 2)
-
-termf c = multiply(a,b)
-termi d = to-int(a)
-print(c)
