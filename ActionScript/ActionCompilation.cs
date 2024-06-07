@@ -9,16 +9,18 @@ namespace ActionScript;
 
 public class ActionCompiler
 {
-    private static readonly BaseActionLibrary _baseLibrary = new();
-    
+    private static readonly BaseActionLibrary BaseLibrary = new();
+
+    private string _scriptPath;
+    private ILibrary[] _libraries;
     private ActionScript _script;
 
-    public ActionScript CompileScript(string script, params ILibrary[] libraries)
+    public ActionScript CompileScript()
     {
-        _reader = new StringReader(script);
+        _reader = new StringReader(_scriptPath);
         _script = new ActionScript();
-        ImportLibrary(_baseLibrary);
-        foreach (ILibrary library in libraries)
+        ImportLibrary(BaseLibrary);
+        foreach (ILibrary library in _libraries)
         {
             ImportLibrary(library);
         }
@@ -325,4 +327,10 @@ public class ActionCompiler
     }
 
     #endregion
+
+    public ActionCompiler(string path, params ILibrary[] libraries)
+    {
+        _scriptPath = path;
+        _libraries = libraries;
+    }
 }

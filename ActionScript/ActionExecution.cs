@@ -7,8 +7,8 @@ namespace ActionScript
     {
         public static bool ExecuteAction(string action, params ILibrary[] libraries)
         {
-            ActionCompiler compiler = new ActionCompiler();
-            ActionScript script = compiler.CompileScript(action, libraries);
+            ActionCompiler compiler = new ActionCompiler(action, libraries);
+            ActionScript script = compiler.CompileScript();
             script.Execute();
             
             return true;

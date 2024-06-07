@@ -24,12 +24,12 @@ namespace ActionScript.Terms
 
         public string GetAsStr()
         {
-            return _value.ToString();
+            return _value;
         }
 
         public Guid GetAsGuid()
         {
-            if (Guid.TryParse((string)_value, out Guid guid))
+            if (Guid.TryParse(_value, out Guid guid))
             {
                 return guid;
             }
@@ -41,7 +41,7 @@ namespace ActionScript.Terms
 
         public uint GetAsUint()
         {
-            string value = ((string)_value).StartsWith("0x") ? ((string)_value).Replace("0x", "") : ((string)_value);
+            string value = _value.StartsWith("0x") ? _value.Replace("0x", "") : _value;
             
             if (!uint.TryParse(value, NumberStyles.Integer & NumberStyles.HexNumber, new NumberFormatInfo(), out uint i))
             {
@@ -55,7 +55,7 @@ namespace ActionScript.Terms
         
         public int GetAsInt()
         {
-            string value = ((string)_value).StartsWith("0x") ? ((string)_value).Replace("0x", "") : ((string)_value);
+            string value = _value.StartsWith("0x") ? _value.Replace("0x", "") : _value;
             
             if (!int.TryParse(value, NumberStyles.Integer & NumberStyles.HexNumber, new NumberFormatInfo(), out int i))
             {
@@ -73,7 +73,7 @@ namespace ActionScript.Terms
             // We do this to maintain accuracy to the original number, without this we may get values like 2.0 when in reality we have 2 thousand
             if (_value.Contains("."))
             {
-                if (!float.TryParse(((string)_value), NumberStyles.Float, new NumberFormatInfo(), out float i))
+                if (!float.TryParse(_value, NumberStyles.Float, new NumberFormatInfo(), out float i))
                 {
                     return 0;
                 }
@@ -84,7 +84,7 @@ namespace ActionScript.Terms
             }
             else
             {
-                return (float)GetAsInt();
+                return GetAsInt();
             }
         }
         
@@ -94,7 +94,7 @@ namespace ActionScript.Terms
             // We do this to maintain accuracy to the original number, without this we may get values like 2.0 when in reality we have 2 thousand
             if (_value.Contains("."))
             {
-                if (!double.TryParse(((string)_value), NumberStyles.Float, new NumberFormatInfo(), out double i))
+                if (!double.TryParse(_value, NumberStyles.Float, new NumberFormatInfo(), out double i))
                 {
                     return 0;
                 }
@@ -105,13 +105,13 @@ namespace ActionScript.Terms
             }
             else
             {
-                return (double)GetAsInt();
+                return GetAsInt();
             }
         }
         
         public bool GetAsBool()
         {
-            if (bool.TryParse(((string)_value).ToLower(), out bool b))
+            if (bool.TryParse(_value.ToLower(), out bool b))
             {
                 return b;
             }
@@ -139,31 +139,31 @@ namespace ActionScript.Terms
                 case "int":
                 {
                     return GetAsInt();
-                } break;
+                }
                 case "uint":
                 {
                     return GetAsUint();
-                } break;
+                }
                 case "float":
                 {
                     return GetAsFloat();
-                } break;
+                } 
                 case "double":
                 {
                     return GetAsDouble();
-                } break;
+                } 
                 case "bool":
                 {
                     return GetAsInt();
-                } break;
+                } 
                 case "guid":
                 {
                     return GetAsGuid();
-                } break;
+                } 
                 default:
                 {
                     return GetAsStr();
-                } break;
+                } 
             }
         }
 
