@@ -1,6 +1,0 @@
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionScript\bin\Debug\ActionScript.dll
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionScript\bin\Debug\ActionScript.pdb
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionScript\obj\Debug\ActionScript.csproj.AssemblyReference.cache
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionScript\obj\Debug\ActionScript.csproj.CoreCompileInputs.cache
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionScript\obj\Debug\ActionScript.dll
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionScript\obj\Debug\ActionScript.pdb
