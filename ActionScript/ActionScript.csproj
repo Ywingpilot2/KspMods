@@ -40,10 +40,11 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="ActionCompilation.cs" />
+        <Compile Include="ActionExecution.cs" />
         <Compile Include="Library\BaseLibrary.cs" />
         <Compile Include="ActionScript.cs" />
         <Compile Include="Exceptions\FunctionExceptions.cs" />
-        <Compile Include="Execution\ActionExecution.cs" />
         <Compile Include="Functions\Function.cs" />
         <Compile Include="Functions\FunctionCall.cs" />
         <Compile Include="Library\ILibrary.cs" />

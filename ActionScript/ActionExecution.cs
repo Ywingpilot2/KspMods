@@ -1,14 +1,14 @@
 ﻿using System.IO;
 using ActionScript.Library;
 
-namespace ActionScript.Execution
+namespace ActionScript
 {
     public static class ActionExecution
     {
         public static bool ExecuteAction(string action, params ILibrary[] libraries)
         {
-            ActionScript script = new ActionScript(libraries);
-            script.ParseTokens(action);
+            ActionCompiler compiler = new ActionCompiler();
+            ActionScript script = compiler.CompileScript(action, libraries);
             script.Execute();
             
             return true;
