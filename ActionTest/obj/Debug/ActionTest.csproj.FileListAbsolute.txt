@@ -1,0 +1,9 @@
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionTest\bin\Debug\ActionTest.exe
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionTest\bin\Debug\ActionTest.pdb
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionTest\bin\Debug\ActionScript.dll
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionTest\bin\Debug\ActionScript.pdb
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionTest\obj\Debug\ActionTest.csproj.AssemblyReference.cache
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionTest\obj\Debug\ActionTest.csproj.CoreCompileInputs.cache
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionTest\obj\Debug\ActionTest.csproj.CopyComplete
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionTest\obj\Debug\ActionTest.exe
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ActionTest\obj\Debug\ActionTest.pdb
