@@ -2,12 +2,11 @@
 
 namespace ActionScript.Exceptions;
 
-public class CompilationException : Exception
+public class CompilationException : ActionException
 {
-    public int LineNumber { get; set; }
     public override string Message => $"An action script has encountered an error at {LineNumber}!";
         
-    public CompilationException(int lineNumber)
+    public CompilationException(int lineNumber) : base(lineNumber)
     {
         LineNumber = lineNumber;
     }
