@@ -8,7 +8,7 @@ public class BaseToken : IToken
     protected ActionScript Script;
     public int Line { get; set; }
     
-    public Term GetTerm(string name)
+    public BaseTerm GetTerm(string name)
     {
         if (!Script.Terms.ContainsKey(name))
             return null;
@@ -24,8 +24,9 @@ public class BaseToken : IToken
         return Script.Functions[name];
     }
 
-    public BaseToken(ActionScript script)
+    public BaseToken(ActionScript script, int line)
     {
         Script = script;
+        Line = line;
     }
 }

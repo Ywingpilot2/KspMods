@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ActionScript.Exceptions;
+using ActionScript.Library;
 using ActionScript.Terms;
 using ActionScript.Token;
 
@@ -18,9 +20,10 @@ namespace ActionScript.Functions
     {
         public InputType Type { get; }
         private FunctionCall Call { get; }
-        private Term _term;
+        private BaseTerm _term;
+        private ActionScript _script;
 
-        public Term GetValue()
+        public BaseTerm GetValue()
         {
             switch (Type)
             {
@@ -34,9 +37,16 @@ namespace ActionScript.Functions
                     ReturnValue value = Call.Call();
                     if (!value.HasValue)
                         return null;
+                    
+                    //return new BaseTerm(Guid.NewGuid().ToString(), value.Value.ToString(), Call.Function.ValueType);
+                    if (!_script.TermTypeExists(value.Type))
+                        throw new TypeNotExistException(Call.Line, value.Type);
 
-                    return new Term(Guid.NewGuid().ToString(), value.Value.ToString(), Call.Function.ValueType);
+                    TermType type = _script.GetTermType(value.Type);
+                    BaseTerm term = type.Construct(Guid.NewGuid().ToString(), Call.Line);
+                    term.SetValue(value.Value.ToString());
 
+                    return term;
                 } break;
                 default:
                 {
@@ -45,24 +55,18 @@ namespace ActionScript.Functions
             }
         }
 
-        public Input(FunctionCall call)
+        public Input(ActionScript script, FunctionCall call)
         {
             Type = InputType.Call;
             Call = call;
             _term = null;
+            _script = script;
         }
 
-        public Input(Term term)
+        public Input(BaseTerm term)
         {
             Type = InputType.Term;
             _term = term;
-            Call = null;
-        }
-
-        public Input(string value)
-        {
-            Type = InputType.Constant;
-            _term = new Term(Guid.NewGuid().ToString(), value.ToString());
             Call = null;
         }
     }
@@ -71,7 +75,7 @@ namespace ActionScript.Functions
     {
         public abstract ReturnValue Call();
 
-        protected TokenCall(ActionScript script) : base(script)
+        protected TokenCall(ActionScript script, int line) : base(script, line)
         {
         }
     }
@@ -83,7 +87,7 @@ namespace ActionScript.Functions
 
         public override ReturnValue Call()
         {
-            List<Term> terms = new List<Term>();
+            List<BaseTerm> terms = new List<BaseTerm>();
             foreach (Input input in Inputs)
             {
                 terms.Add(input.GetValue());
@@ -92,13 +96,13 @@ namespace ActionScript.Functions
             return Function.ExecuteAction(terms.ToArray());
         }
 
-        public FunctionCall(ActionScript script, Function function, IEnumerable<Input> inputs) : base(script)
+        public FunctionCall(ActionScript script, Function function, IEnumerable<Input> inputs, int line) : base(script, line)
         {
             Function = function;
             Inputs = new List<Input>(inputs);
         }
 
-        public FunctionCall(ActionScript script, Function function, params Input[] inputs) : base(script)
+        public FunctionCall(ActionScript script, Function function, int line, params Input[] inputs) : base(script, line)
         {
             Function = function;
             Inputs = new List<Input>(inputs);
@@ -112,11 +116,14 @@ namespace ActionScript.Functions
 
         public override ReturnValue Call()
         {
-            GetTerm(_term).CopyFrom(Input.GetValue());
+            if (!GetTerm(_term).CopyFrom(Input.GetValue()))
+            {
+                throw new InvalidAssignmentException(Line, GetTerm(_term));
+            }
             return new ReturnValue();
         }
 
-        public AssignmentCall(Term term, Input input, ActionScript script) : base(script)
+        public AssignmentCall(BaseTerm term, Input input, ActionScript script, int line) : base(script, line)
         {
             _term = term.Name;
             Input = input;

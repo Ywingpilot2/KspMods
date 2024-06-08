@@ -9,15 +9,16 @@ namespace ActionTest
 {
     public class ProgramLibrary : ILibrary
     {
-        public IEnumerable<Function> Functions => new[]
+        public IEnumerable<Function> GlobalFunctions => new[]
         {
-            new Function("print", terms =>
+            new Function("print", "string", inputTypes:"string", action: terms =>
             {
-                Console.WriteLine(terms[0].GetAsType().ToString());
+                Console.WriteLine(terms[0].CastToStr());
                 return new ReturnValue();
             })
         };
-        public IEnumerable<Term> GlobalTerms { get; }
+        public IEnumerable<BaseTerm> GlobalTerms { get; }
+        public TypeLibrary TypeLibrary { get; }
     }
     
     internal class Program

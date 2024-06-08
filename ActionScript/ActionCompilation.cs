@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using ActionScript.Exceptions;
 using ActionScript.Functions;
 using ActionScript.Library;
 using ActionScript.Terms;
@@ -9,7 +10,7 @@ namespace ActionScript;
 
 public class ActionCompiler
 {
-    private static readonly BaseActionLibrary BaseLibrary = new();
+    private static readonly ActionLibrary Library = new();
 
     private string _scriptPath;
     private ILibrary[] _libraries;
@@ -19,7 +20,7 @@ public class ActionCompiler
     {
         _reader = new StringReader(_scriptPath);
         _script = new ActionScript();
-        ImportLibrary(BaseLibrary);
+        ImportLibrary(Library);
         foreach (ILibrary library in _libraries)
         {
             ImportLibrary(library);
@@ -27,22 +28,64 @@ public class ActionCompiler
 
         using (_reader)
         {
-            string line = ReadCleanLine();
-            while (line != null)
+            try
             {
-                if (string.IsNullOrEmpty(line))
+                string line = ReadCleanLine();
+                while (line != null)
                 {
-                    line = ReadCleanLine();
-                    continue;
-                }
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        line = ReadCleanLine();
+                        continue;
+                    }
                 
-                ParseToken(line);
-                line = ReadCleanLine();
+                    ParseToken(line);
+                    line = ReadCleanLine();
+                }
+            }
+            catch (ActionException e)
+            {
+                if (e.LineNumber == 0)
+                    e.LineNumber = _currentLine;
+                throw;
             }
         }
 
         return _script;
     }
+
+    #region Types
+
+    public bool TermTypeExists(string name)
+    {
+        foreach (TypeLibrary library in _script.TypeLibraries)
+        {
+            if (library == null)
+                continue;
+            
+            if (library.HasTermType(name))
+                return true;
+        }
+        return false;
+    }
+
+    public TermType GetTermType(string name)
+    {
+        foreach (TypeLibrary library in _script.TypeLibraries)
+        {
+            if (library == null)
+                continue;
+            
+            if (!library.HasTermType(name))
+                continue;
+
+            return library.GetTermType(name, _currentLine);
+        }
+            
+        throw new TypeNotExistException(_currentLine, name);
+    }
+
+    #endregion
     
     #region Tokens
 
@@ -51,39 +94,38 @@ public class ActionCompiler
         if (token.StartsWith("func"))
         {
         }
-        else if (token.StartsWith("term"))
+        else
         {
-            Term term = ParseTermConstant(token);
-
-            if (_script.Terms.ContainsKey(term.Name))
+            string[] split = token.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            if (split.Length == 1 || !TermTypeExists(split[0].Trim()))
             {
-                if (token.EndsWith(")"))
-                {
-                    FunctionCall functionCall = ParseFunctionCall(token.Split(new[] { '=' }, 2)[1].Trim());
-                    _script.TokenCalls.Add(new AssignmentCall(term, new Input(functionCall), _script));
-                }
-                else
-                {
-                    _script.TokenCalls.Add(new AssignmentCall(_script.Terms[term.Name], new Input(term), _script));
-                }
+                FunctionCall call = ParseFunctionCall(token);
+                call.Line = _currentLine;
+                _script.TokenCalls.Add(call);
             }
-            else
+            else if (split.Length == 2 && TermTypeExists(split[0].Trim()))
             {
+                BaseTerm term = ParseTermConstant(token);
                 _script.Terms.Add(term.Name, term);
-                if (token.EndsWith(")"))
+                if (term.Kind == TermKind.Null && token.Split(new []{'='}, 2, StringSplitOptions.RemoveEmptyEntries).Length == 2)
                 {
-                    FunctionCall functionCall = ParseFunctionCall(token.Split(new[] { '=' }, 2)[1].Trim());
-                    _script.TokenCalls.Add(new AssignmentCall(term, new Input(functionCall), _script));
+                    string value = token.Split(new[] { '=' }, 2)[1].Trim();
+                    if (token.EndsWith(")"))
+                    {
+                        FunctionCall functionCall = ParseFunctionCall(value);
+                        _script.TokenCalls.Add(new AssignmentCall(term, new Input(_script, functionCall), _script, _currentLine));
+                    }
+                    else if (_script.Terms.ContainsKey(value))
+                    {
+                        BaseTerm assigningTerm = _script.Terms[value];
+                        _script.TokenCalls.Add(new AssignmentCall(term, new Input(assigningTerm), _script, _currentLine));
+                    }
                 }
             }
-
-            term.Line = _currentLine;
-        }
-        else // Likely a call of some form
-        {
-            FunctionCall call = ParseFunctionCall(token);
-            call.Line = _currentLine;
-            _script.TokenCalls.Add(call);
+            else // TODO: More in depth error logging for this. Should tell them if it was an issue with a function call or type not being found
+            {
+                throw new InvalidCompilationException(_currentLine, $"Could not determine token at line {_currentLine}");
+            }
         }
     }
 
@@ -91,66 +133,36 @@ public class ActionCompiler
 
     #region Terms
 
-    public Term ParseTermConstant(string token)
+    public BaseTerm ParseTermConstant(string token)
     {
-        string[] split = token.Remove(0, 5).Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
-        string name = split[0].Trim();
-            
-        string valueType = null;
+        string[] split = token.Split(new[] { ' ' }, 2);
+        string typeName = split[0].Trim();
+        if (!TermTypeExists(typeName))
+            throw new TypeNotExistException(_currentLine, typeName);
+        
+        TermType termType = GetTermType(typeName);
+        string[] termDat = split[1].Trim().Split(new []{'='}, 2);
+        BaseTerm term = termType.Construct(termDat[0].Trim(), _currentLine);
 
-        // Determine value type
-        string declar = token.Split(new[] { ' ' }, 2)[0].Trim().ToLower();
-        switch (declar)
+        if (termDat.Length == 1 || split[1].EndsWith(")"))
         {
-            case "termi":
-            {
-                valueType = "int";
-            } break;
-            case "termf":
-            {
-                valueType = "float";
-            } break;
-            case "termu":
-            {
-                valueType = "uint";
-            } break;
-            case "termg":
-            {
-                valueType = "guid";
-            } break;
-            case "terms":
-            {
-                valueType = "string";
-            } break;
+            return term;
         }
 
-        if (split.Length == 1 || split[1].EndsWith(")"))
+        if (!term.Parse(termDat[1].Trim()))
         {
-            return new Term(name, null, valueType);
-        }
-        string value = split[1].Trim(' ', '"');
-
-        if (valueType == null) // More type guessing
-        {
-            if (value.EndsWith("\""))
+            if (_script.Terms.ContainsKey(termDat[1].Trim()))
             {
-                valueType = "string";
+                return term;
             }
-            else if (value.Contains("."))
+            else
             {
-                valueType = "float";
-            }
-            else if (value.Contains("-"))
-            {
-                valueType = "guid"; // Thats a bit of a reach there buddy...
-            }
-            else if (value.ToLower() == "true" || value.ToLower() == "false")
-            {
-                valueType = "bool";
+                throw new InvalidCompilationException(_currentLine,
+                    $"Inputted value for {term.Name} was not valid given its type or could not be parsed");
             }
         }
 
-        return new Term(name, value, valueType);
+        return term;
     }
 
     #endregion
@@ -159,7 +171,7 @@ public class ActionCompiler
 
     public FunctionCall ParseFunctionCall(string token)
     {
-        string[] split = token.Split(new []{'('}, 2);
+        string[] split = token.Split(new []{'('}, 2, StringSplitOptions.RemoveEmptyEntries);
         string name = split[0].Trim();
         string prms = split[1].Trim(' ', '\t');
         prms = prms.Remove(prms.Length - 1);
@@ -211,18 +223,33 @@ public class ActionCompiler
             inputs.Add(current.Trim(' ', '\t', '"'));
         }
 
+        Function func = _script.Functions[name];
+        if (inputs.Count != func.InputTypes.Length)
+            throw new InvalidParametersException(_currentLine, func.InputTypes);
+
         // Determine tokens
         List<Input> inputTokens = new List<Input>();
-        foreach (string input in inputs)
+        for (var i = 0; i < inputs.Count; i++)
         {
+            var input = inputs[i];
             if (input.EndsWith(")"))
             {
                 FunctionCall call = ParseFunctionCall(input);
-                inputTokens.Add(new Input(call));
+                if (call.Function.ValueType != func.InputTypes[i])
+                    throw new InvalidParametersException(_currentLine, func.InputTypes);
+
+                inputTokens.Add(new Input(_script, call));
             }
             else if (!_script.Terms.ContainsKey(input))
             {
-                inputTokens.Add(new Input(input));
+                string typeName = func.InputTypes[i];
+                TermType type = GetTermType(typeName);
+                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), _currentLine);
+                if (!term.Parse(input))
+                    throw new InvalidCompilationException(_currentLine,
+                        "Unable to parse specified value, either this constant is of the incorrect type or the value cannot be parsed");
+                
+                inputTokens.Add(new Input(term));
             }
             else
             {
@@ -230,7 +257,7 @@ public class ActionCompiler
             }
         }
 
-        return new FunctionCall(_script, _script.Functions[name], inputTokens);
+        return new FunctionCall(_script, func, inputTokens, _currentLine);
     }
 
     #endregion
@@ -308,21 +335,31 @@ public class ActionCompiler
 
     public void ImportLibrary(ILibrary library)
     {
-        if (library.Functions != null)
+        if (library.GlobalFunctions != null)
         {
-            foreach (Function function in library.Functions)
+            foreach (Function globalFunction in library.GlobalFunctions)
             {
-                if (!_script.Functions.ContainsKey(function.Name)) 
-                    _script.Functions.Add(function.Name, function);
+                if (_script.Functions.ContainsKey(globalFunction.Name))
+                    continue;
+                
+                _script.Functions.Add(globalFunction.Name, globalFunction);
             }
         }
 
         if (library.GlobalTerms != null)
         {
-            foreach (Term term in library.GlobalTerms)
+            foreach (BaseTerm term in library.GlobalTerms)
             {
+                if (_script.Functions.ContainsKey(term.Name))
+                    continue;
+                
                 _script.Terms.Add(term.Name, term);
             }
+        }
+
+        if (library.TypeLibrary != null)
+        {
+            _script.TypeLibraries.Add(library.TypeLibrary);
         }
     }
 
