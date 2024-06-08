@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using ActionScript.Functions;
 
 namespace ActionScript.Terms;
 
@@ -18,6 +20,7 @@ public static class NumberConversion
 public class NumberTerm : BaseTerm
 {
     public override string ValueType => "number-term";
+    public override IEnumerable<Function> Functions { get; }
 
     public override bool Parse(string value)
     {

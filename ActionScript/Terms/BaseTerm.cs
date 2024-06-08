@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using ActionScript.Exceptions;
+using ActionScript.Functions;
 using ActionScript.Library;
 using ActionScript.Token;
 
@@ -15,12 +17,51 @@ public enum TermKind
 
 public abstract class BaseTerm : IToken
 {
+    #region Meta
+
+    public TermKind Kind { get; protected set; }
     public int Line { get; set; }
-    public string Name { get; set; }
     public TypeLibrary TypeLibrary { get; set; }
 
+    #endregion
+
+    #region Basic info
+
+    public string Name { get; set; }
     public abstract string ValueType { get; }
-    public TermKind Kind { get; protected set; }
+
+    #endregion
+
+    #region Functions
+
+    /// <summary>
+    /// An array of all the <see cref="Function"/>s this <see cref="Term"/> has.
+    /// The first <see cref="Term"/> input is always the term this local function belongs to.
+    /// </summary>
+    public abstract IEnumerable<Function> Functions { get; }
+
+    public Function GetFunction(string name)
+    {
+        foreach (Function function in Functions)
+        {
+            if (function.Name == name)
+                return function;
+        }
+        throw new FunctionNotExistException(0, name);
+    }
+
+    public bool HasFunction(string name)
+    {
+        foreach (Function function in Functions)
+        {
+            if (function.Name == name)
+                return true;
+        }
+
+        return false;
+    }
+
+    #endregion
 
     #region Casting
 
@@ -61,6 +102,8 @@ public abstract class BaseTerm : IToken
 
     #endregion
 
+    #region Value manipulation
+
     /// <summary>
     /// Parse the term from a string value
     /// </summary>
@@ -69,13 +112,15 @@ public abstract class BaseTerm : IToken
     public abstract bool Parse(string value);
 
     public abstract bool SetValue(object value);
-
+    
     /// <summary>
     /// Copy another terms 
     /// </summary>
     /// <param name="term"></param>
     /// <returns></returns>
     public abstract bool CopyFrom(BaseTerm term);
+
+    #endregion
 
     public TermType GetTermType()
     {

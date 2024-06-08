@@ -34,6 +34,7 @@ namespace ActionScript.Library
             TermType numberType = new TermType(new NumberTerm(), TypeLibrary, baseType, true);
             TypeLibrary.AddTermType(baseType);
             TypeLibrary.AddTermType(numberType);
+            TypeLibrary.AddTermType(new TermType(new VoidTerm(), TypeLibrary, isAbstract:true));
             TypeLibrary.AddTermType(new TermType(new TermI(), TypeLibrary, numberType));
             TypeLibrary.AddTermType(new TermType(new TermU(), TypeLibrary, numberType));
             TypeLibrary.AddTermType(new TermType(new TermF(), TypeLibrary, numberType));

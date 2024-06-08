@@ -1,11 +1,14 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using ActionScript.Exceptions;
+using ActionScript.Functions;
 
 namespace ActionScript.Terms;
 
 public sealed class BoolTerm : BaseTerm
 {
     public override string ValueType => "bool";
+    public override IEnumerable<Function> Functions { get; }
     private bool _value;
 
     #region Casting

@@ -1,4 +1,5 @@
-﻿using ActionScript.Functions;
+﻿using ActionScript.Exceptions;
+using ActionScript.Functions;
 using ActionScript.Terms;
 
 namespace ActionScript.Token;
@@ -16,13 +17,7 @@ public class BaseToken : IToken
         return Script.Terms[name];
     }
 
-    public Function GetFunc(string name)
-    {
-        if (!Script.Functions.ContainsKey(name))
-            return new Function();
-
-        return Script.Functions[name];
-    }
+    public Function GetFunc(string name) => Script.GetFunction(name);
 
     public BaseToken(ActionScript script, int line)
     {

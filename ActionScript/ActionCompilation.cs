@@ -43,12 +43,16 @@ public class ActionCompiler
                     line = ReadCleanLine();
                 }
             }
+#if !DEBUG
             catch (ActionException e)
             {
                 if (e.LineNumber == 0)
                     e.LineNumber = _currentLine;
                 throw;
             }
+#else
+            finally{}
+#endif
         }
 
         return _script;
@@ -96,20 +100,19 @@ public class ActionCompiler
         }
         else
         {
-            string[] split = token.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
-            if (split.Length == 1 && _script.Functions.ContainsKey(token.Split('(')[0]))
+            string[] split = token.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            if (split.Length == 1)
             {
                 FunctionCall call = ParseFunctionCall(token);
-                call.Line = _currentLine;
                 _script.TokenCalls.Add(call);
             }
-            else if (split.Length == 2 && TermTypeExists(split[0].Trim()))
+            else if (split.Length == 2 && TermTypeExists(split[0].Split(' ')[0].Trim()))
             {
                 BaseTerm term = ParseTermConstant(token);
                 _script.Terms.Add(term.Name, term);
-                if (term.Kind == TermKind.Null && token.Split(new []{'='}, 2, StringSplitOptions.RemoveEmptyEntries).Length == 2)
+                if (term.Kind == TermKind.Null)
                 {
-                    string value = token.Split(new[] { '=' }, 2)[1].Trim();
+                    string value = split[1].Trim();
                     if (token.EndsWith(")"))
                     {
                         FunctionCall functionCall = ParseFunctionCall(value);
@@ -122,11 +125,11 @@ public class ActionCompiler
                     }
                 }
             }
-            else if (split.Length == 2 && _script.Terms.ContainsKey(split[0].Trim()))
+            else if (split.Length == 2 && _script.Terms.ContainsKey(split[0].Split(' ')[0].Trim()))
             {
-                BaseTerm original = _script.Terms[split[0].Trim()];
+                BaseTerm original = _script.Terms[split[0].Split(' ')[0].Trim()];
                 TermType type = original.GetTermType();
-                string value = token.Split(new[] { '=' }, 2)[1].Trim();
+                string value = split[1].Trim();
 
                 if (token.EndsWith(")"))
                 {
@@ -191,11 +194,57 @@ public class ActionCompiler
 
     public FunctionCall ParseFunctionCall(string token)
     {
+        // Is this a global or local function?
+        if (_script.HasFunction(token.Split('(')[0]))
+        {
+            return ParseGlobalCall(token);
+        }
+        else
+        {
+            string[] dets = token.Split(new[] { '.' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            if (dets.Length > 1 && _script.Terms.ContainsKey(dets[0].Trim()))
+            {
+                return ParseLocalCall(token);
+            }
+            else
+            {
+                throw new FunctionNotExistException(_currentLine, token);
+            }
+        }
+    }
+
+    public FunctionCall ParseGlobalCall(string token)
+    {
         string[] split = token.Split(new []{'('}, 2, StringSplitOptions.RemoveEmptyEntries);
         string name = split[0].Trim();
         string prms = split[1].Trim(' ', '\t');
         prms = prms.Remove(prms.Length - 1);
 
+        Function func = _script.GetFunction(name);
+        List<Input> inputTokens = ParseInputTokens(prms, func);
+
+        return new FunctionCall(_script, func, inputTokens, _currentLine);
+    }
+
+    public TermCall ParseLocalCall(string token)
+    {
+        string[] dets = token.Split(new[] { '.' }, 2, StringSplitOptions.RemoveEmptyEntries);
+        BaseTerm term = _script.Terms[dets[0].Trim()];
+
+        string funcToken = dets[1].Trim(' ', '.');
+        string[] split = funcToken.Split(new []{'('}, 2, StringSplitOptions.RemoveEmptyEntries);
+        string name = split[0].Trim();
+        string prms = split[1].Trim();
+        prms = prms.Remove(prms.Length - 1);
+        
+        Function func = term.GetFunction(name);
+        List<Input> inputs = ParseInputTokens(prms, func);
+
+        return new TermCall(_script, _currentLine, func, term.Name, inputs);
+    }
+
+    public List<Input> ParseInputTokens(string prms, Function func)
+    {
         List<string> inputs = new List<string>();
 
         string current = "";
@@ -232,7 +281,7 @@ public class ActionCompiler
                 {
                     current += c;
 
-                    inputs.Add(current.Trim(' ', '\t', '"', ','));
+                    inputs.Add(current.Trim(' ', '\t', ','));
                     current = "";
                 }
             }
@@ -240,10 +289,9 @@ public class ActionCompiler
         else if (prms.Length != 0) // Lazy way to account for single character params lol
         {
             current = prms;
-            inputs.Add(current.Trim(' ', '\t', '"'));
+            inputs.Add(current.Trim(' ', '\t'));
         }
-
-        Function func = _script.Functions[name];
+        
         if (inputs.Count != func.InputTypes.Length)
             throw new InvalidParametersException(_currentLine, func.InputTypes);
 
@@ -288,7 +336,7 @@ public class ActionCompiler
             }
         }
 
-        return new FunctionCall(_script, func, inputTokens, _currentLine);
+        return inputTokens;
     }
 
     #endregion
@@ -370,7 +418,7 @@ public class ActionCompiler
         {
             foreach (Function globalFunction in library.GlobalFunctions)
             {
-                if (_script.Functions.ContainsKey(globalFunction.Name))
+                if (_script.HasFunction(globalFunction.Name))
                     continue;
                 
                 _script.Functions.Add(globalFunction.Name, globalFunction);

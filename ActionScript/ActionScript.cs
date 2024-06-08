@@ -16,6 +16,34 @@ namespace ActionScript
 
         public List<TokenCall> TokenCalls { get; }
 
+        #region Functions
+
+        public Function GetFunction(string name)
+        {
+            if (!Functions.ContainsKey(name))
+                throw new FunctionNotExistException(0, name);
+
+            return Functions[name];
+        }
+
+        public bool HasFunction(string name) => Functions.ContainsKey(name);
+
+        #endregion
+
+        #region Terms
+
+        public BaseTerm GetTerm(string name)
+        {
+            if (!Terms.ContainsKey(name))
+                throw new FunctionNotExistException(0, name);
+
+            return Terms[name];
+        }
+
+        public bool HasTerm(string name) => Terms.ContainsKey(name);
+
+        #endregion
+
         #region Execution
 
         public int CurrentLine;

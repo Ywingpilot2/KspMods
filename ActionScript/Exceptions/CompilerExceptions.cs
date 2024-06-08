@@ -141,3 +141,27 @@ public class TypeNotConstructableException : CompilationException
         _type = type;
     }
 }
+
+public class FunctionNotExistException : CompilationException
+{
+    public override string Message
+    {
+        get
+        {
+            if (_name != null)
+            {
+                return $"Function called at line {LineNumber} does not exist!";
+            }
+            else
+            {
+                return $"Function {_name} called at line {LineNumber} does not exist!";
+            }
+        }
+    }
+    private string _name;
+    
+    public FunctionNotExistException(int lineNumber, string name) : base(lineNumber)
+    {
+        _name = name;
+    }
+}

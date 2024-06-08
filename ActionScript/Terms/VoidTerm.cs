@@ -1,29 +1,28 @@
 ﻿using System.Collections.Generic;
+using ActionScript.Exceptions;
 using ActionScript.Functions;
 
 namespace ActionScript.Terms;
 
 /// <summary>
-/// Represents the base class for a <see cref="BaseTerm"/>
-/// TODO: This should also be used for classes
+/// used by method calls to signal that there is no return value
 /// </summary>
-public class Term : BaseTerm
+public class VoidTerm : BaseTerm
 {
-    public override string ValueType => "term";
+    public override string ValueType => "void";
     public override IEnumerable<Function> Functions { get; }
-
     public override bool Parse(string value)
     {
-        throw new System.NotImplementedException();
+        throw new TypeNotConstructableException(0, ValueType);
     }
 
     public override bool SetValue(object value)
     {
-        throw new System.NotImplementedException();
+        throw new TypeNotConstructableException(0, ValueType);
     }
 
     public override bool CopyFrom(BaseTerm term)
     {
-        throw new System.NotImplementedException();
+        throw new TypeNotConstructableException(0, ValueType);
     }
 }

@@ -82,13 +82,13 @@ namespace ActionScript.Functions
     
     public class FunctionCall : TokenCall
     {
-        public List<Input> Inputs { get; }
+        protected List<Input> _inputs;
         public Function Function { get; }
 
         public override ReturnValue Call()
         {
             List<BaseTerm> terms = new List<BaseTerm>();
-            foreach (Input input in Inputs)
+            foreach (Input input in _inputs)
             {
                 terms.Add(input.GetValue());
             }
@@ -99,13 +99,41 @@ namespace ActionScript.Functions
         public FunctionCall(ActionScript script, Function function, IEnumerable<Input> inputs, int line) : base(script, line)
         {
             Function = function;
-            Inputs = new List<Input>(inputs);
+            _inputs = new List<Input>(inputs);
         }
 
         public FunctionCall(ActionScript script, Function function, int line, params Input[] inputs) : base(script, line)
         {
             Function = function;
-            Inputs = new List<Input>(inputs);
+            _inputs = new List<Input>(inputs);
+        }
+    }
+
+    public class TermCall : FunctionCall
+    {
+        private readonly string _term;
+
+        public override ReturnValue Call()
+        {
+            List<BaseTerm> terms = new List<BaseTerm>();
+            terms.Add(GetTerm(_term));
+            foreach (Input input in _inputs)
+            {
+                terms.Add(input.GetValue());
+            }
+
+            return Function.ExecuteAction(terms.ToArray());
+        }
+
+
+        public TermCall(ActionScript script, int line, Function function, string term, IEnumerable<Input> inputs) : base(script, function, inputs, line)
+        {
+            _term = term;
+        }
+
+        public TermCall(ActionScript script, int line, Function function, string term, params Input[] inputs) : base(script, function, line, inputs)
+        {
+            _term = term;
         }
     }
 

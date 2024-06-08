@@ -1,12 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using ActionScript.Exceptions;
+using ActionScript.Functions;
 
 namespace ActionScript.Terms;
 
 public sealed class StringTerm : BaseTerm
 {
     public override string ValueType => "string";
+
+    public override IEnumerable<Function> Functions => new[]
+    {
+        new Function("upper", "string", terms => new ReturnValue(terms[0].CastToStr().ToUpper(), "string")),
+        new Function("lower", "string", terms => new ReturnValue(terms[0].CastToStr().ToLower(), "string")),
+        new Function("remove", "string", inputTypes:"string", action:terms =>
+        {
+            BaseTerm ths = terms[0];
+            BaseTerm remove = terms[1];
+
+            string str = ths.CastToStr();
+            string rem = remove.CastToStr();
+            if (str.IndexOf(rem, StringComparison.Ordinal) == -1)
+                return new ReturnValue(str, "string");
+            
+            return new ReturnValue(str.Remove(str.IndexOf(rem, StringComparison.Ordinal), rem.Length), "string");
+        }),
+        new Function("replace", "string", inputTypes:new []{"string","string"}, action: terms =>
+        {
+            return new ReturnValue(terms[0].CastToStr().Replace(terms[1].CastToStr(), terms[2].CastToStr()), "string");
+        })
+    };
     private string _value;
 
     #region Casting
@@ -126,7 +150,7 @@ public sealed class StringTerm : BaseTerm
 
         if (value.EndsWith("\""))
         {
-            value = value.Remove(value.LastIndexOf('"') - 1, 1);
+            value = value.Remove(value.LastIndexOf('"'), 1);
         }
         else
         {
@@ -172,6 +196,10 @@ public sealed class StringTerm : BaseTerm
                 }
 
                 escaped += p;
+                if (i + 1 >= value.Length)
+                {
+                    escaped += c;
+                }
             }
         }
         else if(value.Length != 0)
