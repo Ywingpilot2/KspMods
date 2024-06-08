@@ -44,6 +44,7 @@
         <Compile Include="ActionExecution.cs" />
         <Compile Include="Exceptions\ActionException.cs" />
         <Compile Include="Exceptions\CompilerExceptions.cs" />
+        <Compile Include="Extensions\StringExtension.cs" />
         <Compile Include="Library\BaseLibrary.cs" />
         <Compile Include="ActionScript.cs" />
         <Compile Include="Exceptions\ExecutionExceptions.cs" />
