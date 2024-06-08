@@ -97,7 +97,7 @@ public class ActionCompiler
         else
         {
             string[] split = token.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
-            if (split.Length == 1 || !TermTypeExists(split[0].Trim()))
+            if (split.Length == 1 && _script.Functions.ContainsKey(token.Split('(')[0]))
             {
                 FunctionCall call = ParseFunctionCall(token);
                 call.Line = _currentLine;
@@ -120,6 +120,26 @@ public class ActionCompiler
                         BaseTerm assigningTerm = _script.Terms[value];
                         _script.TokenCalls.Add(new AssignmentCall(term, new Input(assigningTerm), _script, _currentLine));
                     }
+                }
+            }
+            else if (split.Length == 2 && _script.Terms.ContainsKey(split[0].Trim()))
+            {
+                BaseTerm original = _script.Terms[split[0].Trim()];
+                TermType type = original.GetTermType();
+                string value = token.Split(new[] { '=' }, 2)[1].Trim();
+
+                if (token.EndsWith(")"))
+                {
+                    FunctionCall functionCall = ParseFunctionCall(value);
+                    _script.TokenCalls.Add(new AssignmentCall(original, new Input(_script, functionCall), _script, _currentLine));
+                }
+                else
+                {
+                    BaseTerm newValue = type.Construct(Guid.NewGuid().ToString(), _currentLine);
+                    if (!newValue.Parse(value))
+                        throw new InvalidAssignmentException(_currentLine, original);
+                
+                    _script.TokenCalls.Add(new AssignmentCall(original, new Input(newValue), _script, _currentLine));
                 }
             }
             else // TODO: More in depth error logging for this. Should tell them if it was an issue with a function call or type not being found
