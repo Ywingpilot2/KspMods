@@ -17,7 +17,7 @@ public static class NumberConversion
 
 public class NumberTerm : BaseTerm
 {
-    public override string ValueType { get; }
+    public override string ValueType => "number-term";
 
     public override bool Parse(string value)
     {

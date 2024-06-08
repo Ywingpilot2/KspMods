@@ -18,7 +18,7 @@ public abstract class BaseTerm : IToken
     public int Line { get; set; }
     public string Name { get; set; }
     public TypeLibrary TypeLibrary { get; set; }
-    
+
     public abstract string ValueType { get; }
     public TermKind Kind { get; protected set; }
 

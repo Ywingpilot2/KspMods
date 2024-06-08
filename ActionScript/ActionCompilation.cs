@@ -235,8 +235,13 @@ public class ActionCompiler
             if (input.EndsWith(")"))
             {
                 FunctionCall call = ParseFunctionCall(input);
+
                 if (call.Function.ValueType != func.InputTypes[i])
-                    throw new InvalidParametersException(_currentLine, func.InputTypes);
+                {
+                    TermType type = GetTermType(call.Function.ValueType);
+                    if (!type.IsSubclassOf(func.InputTypes[i]))
+                        throw new InvalidParametersException(_currentLine, call.Function.InputTypes);
+                }
 
                 inputTokens.Add(new Input(_script, call));
             }
@@ -253,7 +258,13 @@ public class ActionCompiler
             }
             else
             {
-                inputTokens.Add(new Input(_script.Terms[input]));
+                BaseTerm term = _script.Terms[input];
+                if (term.ValueType != func.InputTypes[i])
+                {
+                    if (!term.GetTermType().IsSubclassOf(func.InputTypes[i]))
+                        throw new InvalidParametersException(_currentLine, func.InputTypes);
+                }
+                inputTokens.Add(new Input(term));
             }
         }
 

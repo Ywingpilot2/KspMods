@@ -28,7 +28,10 @@ namespace ActionScript
                 {
                     functionCall.Call();
                 }
-                catch (ActionException e)
+#if DEBUG
+                finally{} // I am too lazy to remove the try catch entirely when on debug
+#else
+catch (ActionException e)
                 {
                     if (e.LineNumber == 0)
                     {
@@ -38,12 +41,9 @@ namespace ActionScript
                 }
                 catch (Exception e)
                 {
-#if DEBUG
                     throw new InvalidActionException(functionCall.Line, $"Internal error occured at {functionCall.Line}: \n{e.Message}\n{e.StackTrace}");
-#else
-                    throw new InvalidActionException(functionCall.Line, $"Internal error occured at {functionCall.Line}: \n{e.Message}");
-#endif
                 }
+#endif
             }
         }
 

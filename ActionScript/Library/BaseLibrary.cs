@@ -10,23 +10,36 @@ namespace ActionScript.Library
     {
         public IEnumerable<Function> GlobalFunctions { get; } = new[]
         {
-            new Function("to-string", "string", inputTypes: "term", action: terms => new ReturnValue(terms[0].CastToStr(), "string"))
+            new Function("to-string", "string", inputTypes: "term", action: terms =>
+            {
+                try
+                {
+                    return new ReturnValue(terms[0].CastToStr(), "string");
+                }
+                catch (Exception e)
+                {
+                    return new ReturnValue(terms[0].GetTermType().Name, "string");
+                }
+            })
         };
 
         public IEnumerable<BaseTerm> GlobalTerms { get; }
-
-        public IEnumerable<TermType> Types { get; }
         public TypeLibrary TypeLibrary { get; }
         
         public ActionLibrary()
         {
             TypeLibrary = new TypeLibrary();
-            TypeLibrary.AddTermType(new TermType(new TermI(), TypeLibrary));
-            TypeLibrary.AddTermType(new TermType(new TermU(), TypeLibrary));
-            TypeLibrary.AddTermType(new TermType(new TermF(), TypeLibrary));
-            TypeLibrary.AddTermType(new TermType(new TermD(), TypeLibrary));
-            TypeLibrary.AddTermType(new TermType(new StringTerm(), TypeLibrary));
-            TypeLibrary.AddTermType(new TermType(new BoolTerm(), TypeLibrary));
+
+            TermType baseType = new TermType(new Term(), TypeLibrary, isAbstract:true);
+            TermType numberType = new TermType(new NumberTerm(), TypeLibrary, baseType, true);
+            TypeLibrary.AddTermType(baseType);
+            TypeLibrary.AddTermType(numberType);
+            TypeLibrary.AddTermType(new TermType(new TermI(), TypeLibrary, numberType));
+            TypeLibrary.AddTermType(new TermType(new TermU(), TypeLibrary, numberType));
+            TypeLibrary.AddTermType(new TermType(new TermF(), TypeLibrary, numberType));
+            TypeLibrary.AddTermType(new TermType(new TermD(), TypeLibrary, numberType));
+            TypeLibrary.AddTermType(new TermType(new StringTerm(), TypeLibrary, baseType));
+            TypeLibrary.AddTermType(new TermType(new BoolTerm(), TypeLibrary, baseType));
         }
     }
 }

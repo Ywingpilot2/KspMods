@@ -6,27 +6,47 @@ using ActionScript.Terms;
 
 namespace ActionScript.Library;
 
-public struct TermType
+public class TermType
 {
     public string Name => Term.ValueType;
-    public TermKind Kind { get; }
+    public TermType BaseClass { get; }
+    public bool IsAbstract { get; }
     public TypeLibrary Library { get; }
-    public BaseTerm Term { get; }
+    private BaseTerm Term { get; }
 
     public BaseTerm Construct(string name, int line)
     {
+        if (IsAbstract)
+            throw new TypeNotConstructableException(line, Name);
+        
         BaseTerm copy = (BaseTerm)Activator.CreateInstance(Term.GetType());
         copy.Name = name;
         copy.Line = line;
         copy.TypeLibrary = Library;
         return copy;
     }
+    
+    public bool IsSubclassOf(string name)
+    {
+        TermType current = BaseClass;
 
-    public TermType(BaseTerm term, TypeLibrary library)
+        while (current != null)
+        {
+            if (current.Name == name)
+                return true;
+
+            current = current.BaseClass;
+        }
+
+        return false;
+    }
+
+    public TermType(BaseTerm term, TypeLibrary library, TermType baseClass = null, bool isAbstract = false)
     {
         Term = term;
-        Kind = TermKind.Basic;
         Library = library;
+        BaseClass = baseClass;
+        IsAbstract = isAbstract;
     }
 }
 
@@ -49,9 +69,6 @@ public class TypeLibrary
 
     public void AddTermType(TermType type)
     {
-        if (type.Kind == TermKind.Null)
-            return;
-        
         if (HasTermType(type.Name))
             return;
         

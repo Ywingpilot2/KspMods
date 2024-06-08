@@ -121,3 +121,24 @@ public class TypeNotExistException : CompilationException
         _typeName = typeName;
     }
 }
+
+public class TypeNotConstructableException : CompilationException
+{
+    private string _type;
+
+    public override string Message
+    {
+        get
+        {
+            if (_type == null)
+                return $"Term constructed at {LineNumber} is not a constructable type(e.g is abstract)";
+            else
+                return $"Term of type {_type} at {LineNumber} cannot be constructed(e.g is abstract)";
+        }
+    }
+
+    public TypeNotConstructableException(int lineNumber, string type) : base(lineNumber)
+    {
+        _type = type;
+    }
+}

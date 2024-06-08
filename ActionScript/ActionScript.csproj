@@ -56,6 +56,7 @@
         <Compile Include="Terms\NumberTerms.cs" />
         <Compile Include="Terms\BoolTerm.cs" />
         <Compile Include="Terms\StringTerm.cs" />
+        <Compile Include="Terms\Term.cs" />
         <Compile Include="Token\BaseToken.cs" />
         <Compile Include="Token\IToken.cs" />
     </ItemGroup>
