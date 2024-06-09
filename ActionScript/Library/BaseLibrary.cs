@@ -8,7 +8,7 @@ namespace ActionScript.Library
 {
     public class ActionLibrary : ILibrary
     {
-        public IEnumerable<Function> GlobalFunctions { get; } = new[]
+        public IEnumerable<IFunction> GlobalFunctions { get; } = new IFunction[]
         {
             new Function("to-string", "string", inputTypes: "term", action: terms =>
             {

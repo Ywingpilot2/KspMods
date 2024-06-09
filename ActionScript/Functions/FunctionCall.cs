@@ -21,7 +21,7 @@ namespace ActionScript.Functions
         public InputType Type { get; }
         private FunctionCall Call { get; }
         private BaseTerm _term;
-        private ActionScript _script;
+        private ITokenHolder _script;
 
         public BaseTerm GetValue()
         {
@@ -55,7 +55,7 @@ namespace ActionScript.Functions
             }
         }
 
-        public Input(ActionScript script, FunctionCall call)
+        public Input(ITokenHolder script, FunctionCall call)
         {
             Type = InputType.Call;
             Call = call;
@@ -75,7 +75,7 @@ namespace ActionScript.Functions
     {
         public abstract ReturnValue Call();
 
-        protected TokenCall(ActionScript script, int line) : base(script, line)
+        protected TokenCall(ITokenHolder script, int line) : base(script, line)
         {
         }
     }
@@ -83,7 +83,7 @@ namespace ActionScript.Functions
     public class FunctionCall : TokenCall
     {
         protected List<Input> _inputs;
-        public Function Function { get; }
+        public IFunction Function { get; }
 
         public override ReturnValue Call()
         {
@@ -93,16 +93,16 @@ namespace ActionScript.Functions
                 terms.Add(input.GetValue());
             }
 
-            return Function.ExecuteAction(terms.ToArray());
+            return Function.Execute(terms.ToArray());
         }
 
-        public FunctionCall(ActionScript script, Function function, IEnumerable<Input> inputs, int line) : base(script, line)
+        public FunctionCall(ITokenHolder script, IFunction function, IEnumerable<Input> inputs, int line) : base(script, line)
         {
             Function = function;
             _inputs = new List<Input>(inputs);
         }
 
-        public FunctionCall(ActionScript script, Function function, int line, params Input[] inputs) : base(script, line)
+        public FunctionCall(ITokenHolder script, IFunction function, int line, params Input[] inputs) : base(script, line)
         {
             Function = function;
             _inputs = new List<Input>(inputs);
@@ -122,16 +122,16 @@ namespace ActionScript.Functions
                 terms.Add(input.GetValue());
             }
 
-            return Function.ExecuteAction(terms.ToArray());
+            return Function.Execute(terms.ToArray());
         }
 
 
-        public TermCall(ActionScript script, int line, Function function, string term, IEnumerable<Input> inputs) : base(script, function, inputs, line)
+        public TermCall(ITokenHolder script, int line, IFunction function, string term, IEnumerable<Input> inputs) : base(script, function, inputs, line)
         {
             _term = term;
         }
 
-        public TermCall(ActionScript script, int line, Function function, string term, params Input[] inputs) : base(script, function, line, inputs)
+        public TermCall(ITokenHolder script, int line, IFunction function, string term, params Input[] inputs) : base(script, function, line, inputs)
         {
             _term = term;
         }
@@ -151,7 +151,7 @@ namespace ActionScript.Functions
             return new ReturnValue();
         }
 
-        public AssignmentCall(BaseTerm term, Input input, ActionScript script, int line) : base(script, line)
+        public AssignmentCall(BaseTerm term, Input input, ITokenHolder script, int line) : base(script, line)
         {
             _term = term.Name;
             Input = input;

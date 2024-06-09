@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ActionScript.Exceptions;
 using ActionScript.Functions;
 
 namespace ActionScript.Terms;
@@ -10,7 +11,7 @@ namespace ActionScript.Terms;
 public class Term : BaseTerm
 {
     public override string ValueType => "term";
-    public override IEnumerable<Function> Functions { get; }
+    public override IEnumerable<IFunction> Functions { get; }
 
     public override bool Parse(string value)
     {
@@ -25,5 +26,10 @@ public class Term : BaseTerm
     public override bool CopyFrom(BaseTerm term)
     {
         throw new System.NotImplementedException();
+    }
+
+    public override object GetValue()
+    {
+        throw new TypeNotConstructableException(0, "term");
     }
 }

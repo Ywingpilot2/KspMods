@@ -6,7 +6,7 @@ namespace ActionScript.Library;
 
 public interface ILibrary
 {
-    public IEnumerable<Function> GlobalFunctions { get; }
+    public IEnumerable<IFunction> GlobalFunctions { get; }
     public IEnumerable<BaseTerm> GlobalTerms { get; }
     public TypeLibrary TypeLibrary { get; }
 }

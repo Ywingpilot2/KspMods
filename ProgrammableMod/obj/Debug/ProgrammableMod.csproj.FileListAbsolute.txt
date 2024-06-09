@@ -67,6 +67,7 @@ C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\Deb
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\Debug\KSPAssets.XmlSerializers.dll
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\obj\Debug\ProgrammableMod.csproj.AssemblyReference.cache
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\obj\Debug\ProgrammableMod.csproj.CoreCompileInputs.cache
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\obj\Debug\ProgrammableMod.csproj.CopyComplete
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\obj\Debug\ProgrammableMod.dll
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\obj\Debug\ProgrammableMod.pdb
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\ProgrammableMod.dll
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\ProgrammableMod.pdb

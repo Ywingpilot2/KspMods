@@ -9,7 +9,7 @@ namespace ActionTest
 {
     public class ProgramLibrary : ILibrary
     {
-        public IEnumerable<Function> GlobalFunctions => new[]
+        public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
         {
             new Function("print", "string", inputTypes:"string", action: terms =>
             {

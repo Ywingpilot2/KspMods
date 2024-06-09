@@ -38,11 +38,11 @@ public abstract class BaseTerm : IToken
     /// An array of all the <see cref="Function"/>s this <see cref="Term"/> has.
     /// The first <see cref="Term"/> input is always the term this local function belongs to.
     /// </summary>
-    public abstract IEnumerable<Function> Functions { get; }
+    public abstract IEnumerable<IFunction> Functions { get; }
 
-    public Function GetFunction(string name)
+    public IFunction GetFunction(string name)
     {
-        foreach (Function function in Functions)
+        foreach (IFunction function in Functions)
         {
             if (function.Name == name)
                 return function;
@@ -52,7 +52,7 @@ public abstract class BaseTerm : IToken
 
     public bool HasFunction(string name)
     {
-        foreach (Function function in Functions)
+        foreach (IFunction function in Functions)
         {
             if (function.Name == name)
                 return true;
@@ -119,6 +119,12 @@ public abstract class BaseTerm : IToken
     /// <param name="term"></param>
     /// <returns></returns>
     public abstract bool CopyFrom(BaseTerm term);
+
+    /// <summary>
+    /// Get the raw value of this term
+    /// </summary>
+    /// <returns>The raw, or C# representation of this terms value</returns>
+    public abstract object GetValue();
 
     #endregion
 

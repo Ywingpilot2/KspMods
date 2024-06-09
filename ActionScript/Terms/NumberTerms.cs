@@ -20,7 +20,7 @@ public static class NumberConversion
 public class NumberTerm : BaseTerm
 {
     public override string ValueType => "number-term";
-    public override IEnumerable<Function> Functions { get; }
+    public override IEnumerable<IFunction> Functions { get; }
 
     public override bool Parse(string value)
     {
@@ -89,6 +89,11 @@ public class NumberTerm : BaseTerm
         Kind = num.Kind;
 
         return true;
+    }
+    
+    public override object GetValue()
+    {
+        return Number;
     }
 }
 

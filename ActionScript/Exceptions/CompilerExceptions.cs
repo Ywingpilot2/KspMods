@@ -165,3 +165,138 @@ public class FunctionNotExistException : CompilationException
         _name = name;
     }
 }
+
+public class TermAlreadyExistsException : CompilationException
+{
+    private string _name;
+
+    public override string Message
+    {
+        get
+        {
+            if (_name == null)
+            {
+                return $"Term at line {LineNumber} already exists therefore cannot be declared, did you mean to re-assign it?";
+            }
+            else
+            {
+                return $"Term {_name} at line {LineNumber} already exists therefore cannot be declared, did you mean to re-assign it?";
+            }
+        }
+    }
+
+    public TermAlreadyExistsException(int lineNumber, string name) : base(lineNumber)
+    {
+    }
+}
+
+public class TermNotExistException : CompilationException
+{
+    public override string Message
+    {
+        get
+        {
+            if (_name != null)
+            {
+                return $"Term called at line {LineNumber} does not exist!";
+            }
+            else
+            {
+                return $"Term {_name} called at line {LineNumber} does not exist!";
+            }
+        }
+    }
+    private string _name;
+    
+    public TermNotExistException(int lineNumber, string name) : base(lineNumber)
+    {
+        _name = name;
+    }
+}
+
+public class FunctionReturnsVoidException : CompilationException
+{
+    private string _function;
+
+    public override string Message
+    {
+        get
+        {
+            if (_function == null)
+            {
+                return $"Function called at line {LineNumber} returns void, meaning it can't be used for assignment.";
+            }
+            else
+            {
+                return $"{_function} called at line {LineNumber} returns void, meaning it can't be used for assignment.";
+            }
+        }
+    }
+
+    public FunctionReturnsVoidException(int lineNumber, string function) : base(lineNumber)
+    {
+        _function = function;
+    }
+}
+
+public class FunctionParamsInvalidException : CompilationException
+{
+    private string _token;
+
+    public override string Message
+    {
+        get
+        {
+            if (_token != null)
+            {
+                return $"Function {_token} at line {LineNumber} has invalid parameters";
+            }
+            else
+            {
+                return $"Function at {LineNumber} has invalid parameters";
+            }
+        }
+    }
+
+    public FunctionParamsInvalidException(int lineNumber, string token) : base(lineNumber)
+    {
+        _token = token;
+    }
+}
+
+public class FunctionLacksEndException : CompilationException
+{
+    private string _token;
+
+    public override string Message
+    {
+        get
+        {
+            if (_token != null)
+            {
+                return $"Function {_token} at line {LineNumber} does not have or has an invalid declared body, are you sure you added curly brackets to the end?";
+            }
+            else
+            {
+                return $"Function at line {LineNumber} does not have or has an invalid declared body, are you sure you added curly brackets to the end?";
+            }
+        }
+    }
+
+    public FunctionLacksEndException(int lineNumber, string token) : base(lineNumber)
+    {
+        _token = token;
+    }
+}
+
+public class FunctionExistsException : CompilationException
+{
+    private string _name;
+
+    public override string Message => $"Function {_name} has already been declared";
+
+    public FunctionExistsException(int lineNumber, string name) : base(lineNumber)
+    {
+        _name = name;
+    }
+}

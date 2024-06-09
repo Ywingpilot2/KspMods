@@ -8,7 +8,7 @@ namespace ActionScript.Terms;
 public sealed class BoolTerm : BaseTerm
 {
     public override string ValueType => "bool";
-    public override IEnumerable<Function> Functions { get; }
+    public override IEnumerable<IFunction> Functions { get; }
     private bool _value;
 
     #region Casting
@@ -88,5 +88,10 @@ public sealed class BoolTerm : BaseTerm
         }
 
         return false;
+    }
+
+    public override object GetValue()
+    {
+        return _value;
     }
 }

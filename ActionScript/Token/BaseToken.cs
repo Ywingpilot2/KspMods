@@ -6,20 +6,14 @@ namespace ActionScript.Token;
 
 public class BaseToken : IToken
 {
-    protected ActionScript Script;
+    protected ITokenHolder Script;
     public int Line { get; set; }
-    
-    public BaseTerm GetTerm(string name)
-    {
-        if (!Script.Terms.ContainsKey(name))
-            return null;
-        
-        return Script.Terms[name];
-    }
 
-    public Function GetFunc(string name) => Script.GetFunction(name);
+    public BaseTerm GetTerm(string name) => Script.GetTerm(name);
 
-    public BaseToken(ActionScript script, int line)
+    public IFunction GetFunc(string name) => Script.GetFunction(name);
+
+    public BaseToken(ITokenHolder script, int line)
     {
         Script = script;
         Line = line;

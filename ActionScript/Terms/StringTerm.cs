@@ -10,7 +10,7 @@ public sealed class StringTerm : BaseTerm
 {
     public override string ValueType => "string";
 
-    public override IEnumerable<Function> Functions => new[]
+    public override IEnumerable<IFunction> Functions => new IFunction[]
     {
         new Function("upper", "string", terms => new ReturnValue(terms[0].CastToStr().ToUpper(), "string")),
         new Function("lower", "string", terms => new ReturnValue(terms[0].CastToStr().ToLower(), "string")),
@@ -217,6 +217,11 @@ public sealed class StringTerm : BaseTerm
     {
         _value = value.ToString();
         return true;
+    }
+    
+    public override object GetValue()
+    {
+        return _value;
     }
 
     public override bool CopyFrom(BaseTerm term)

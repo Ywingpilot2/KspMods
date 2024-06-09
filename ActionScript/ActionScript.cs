@@ -5,12 +5,13 @@ using ActionScript.Exceptions;
 using ActionScript.Functions;
 using ActionScript.Library;
 using ActionScript.Terms;
+using ActionScript.Token;
 
 namespace ActionScript
 {
-    public class ActionScript
+    public class ActionScript : ITokenHolder
     {
-        public Dictionary<string, Function> Functions { get; }
+        public Dictionary<string, IFunction> Functions { get; }
         public Dictionary<string, BaseTerm> Terms { get; }
         public List<TypeLibrary> TypeLibraries { get; }
 
@@ -18,7 +19,7 @@ namespace ActionScript
 
         #region Functions
 
-        public Function GetFunction(string name)
+        public IFunction GetFunction(string name)
         {
             if (!Functions.ContainsKey(name))
                 throw new FunctionNotExistException(0, name);
@@ -27,6 +28,19 @@ namespace ActionScript
         }
 
         public bool HasFunction(string name) => Functions.ContainsKey(name);
+        
+        public void AddCall(TokenCall call)
+        {
+            TokenCalls.Add(call);
+        }
+        
+        public void AddFunc(IFunction function)
+        {
+            if (Functions.ContainsKey(function.Name))
+                throw new FunctionExistsException(0, function.Name);
+            
+            Functions.Add(function.Name, function);
+        }
 
         #endregion
 
@@ -41,6 +55,14 @@ namespace ActionScript
         }
 
         public bool HasTerm(string name) => Terms.ContainsKey(name);
+
+        public void AddTerm(BaseTerm term)
+        {
+            if (Terms.ContainsKey(term.Name))
+                throw new TermAlreadyExistsException(0, term.Name);
+            
+            Terms.Add(term.Name, term);
+        }
 
         #endregion
 
@@ -108,7 +130,7 @@ catch (ActionException e)
 
         public ActionScript()
         {
-            Functions = new Dictionary<string, Function>();
+            Functions = new Dictionary<string, IFunction>();
             Terms = new Dictionary<string, BaseTerm>();
             TokenCalls = new List<TokenCall>();
             TypeLibraries = new List<TypeLibrary>();

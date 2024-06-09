@@ -12,13 +12,13 @@
         <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <DefineConstants>DEBUG;TRACE;ENABLE_PROFILER</DefineConstants>
+        <OutputPath>bin\GameData\Plugins</OutputPath>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
         <DebugSymbols>true</DebugSymbols>
         <DebugType>portable</DebugType>
         <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
@@ -27,7 +27,6 @@
         <PlatformTarget>AnyCPU</PlatformTarget>
         <DebugType>portable</DebugType>
         <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
@@ -35,6 +34,7 @@
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
             <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
@@ -42,12 +42,15 @@
         <Reference Include="System.Xml" />
         <Reference Include="UnityEngine">
             <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.PhysicsModule">
             <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -65,8 +68,7 @@
     -->
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\Y wing steam games\steamapps\common\Kerbal Space Program\GameData\ProgrammableModules\Plugins" />
-        <Copy SourceFiles="C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\Debug\ProgrammableMod.pdb" DestinationFolder="D:\Y wing steam games\steamapps\common\Kerbal Space Program\GameData\ProgrammableModules\Plugins" />
+        <Exec Command="xcopy &quot;$(ProjectDir)bin\GameData\*.*&quot; &quot;D:\Y wing steam games\steamapps\common\Kerbal Space Program\GameData\ProgrammableModules&quot; /Y /I /E"/>
     </Target>
 
 </Project>

@@ -10,7 +10,7 @@ namespace ActionScript.Terms;
 public class VoidTerm : BaseTerm
 {
     public override string ValueType => "void";
-    public override IEnumerable<Function> Functions { get; }
+    public override IEnumerable<IFunction> Functions { get; }
     public override bool Parse(string value)
     {
         throw new TypeNotConstructableException(0, ValueType);
@@ -24,5 +24,10 @@ public class VoidTerm : BaseTerm
     public override bool CopyFrom(BaseTerm term)
     {
         throw new TypeNotConstructableException(0, ValueType);
+    }
+    
+    public override object GetValue()
+    {
+        throw new TypeNotConstructableException(0, "term");
     }
 }
