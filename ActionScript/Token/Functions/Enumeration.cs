@@ -14,7 +14,7 @@ public class BreakCall : TokenCall
 
     public override ReturnValue Call()
     {
-        return new ReturnValue();
+        return new ReturnValue(this, "keyword");
     }
 }
 
@@ -30,6 +30,6 @@ public class ContinueCall : TokenCall
 
     public override ReturnValue Call()
     {
-        return new ReturnValue();
+        return new ReturnValue(this, "keyword");
     }
 }

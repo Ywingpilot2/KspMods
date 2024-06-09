@@ -51,7 +51,7 @@ namespace ActionScript
         public BaseTerm GetTerm(string name)
         {
             if (!Terms.ContainsKey(name))
-                throw new FunctionNotExistException(0, name);
+                throw new TermNotExistException(0, name);
 
             return Terms[name];
         }

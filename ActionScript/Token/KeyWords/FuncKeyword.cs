@@ -25,10 +25,10 @@ public struct FuncKeyword : IKeyword
     
     public UserFunction ParseFunction(string token)
     {
-        string[] split = token.SmartSplit(' ', 3);
+        string[] split = token.SanitizedSplit(' ', 3);
         string returnType = split[1].Trim();
 
-        string[] value = split[2].Trim().SmartSplit('(', 2);
+        string[] value = split[2].Trim().SanitizedSplit('(', 2);
         string name = value[0];
         string prms = value[1].Trim(')', ' ');
 
@@ -37,7 +37,7 @@ public struct FuncKeyword : IKeyword
         Dictionary<string, string> inputMapping = new Dictionary<string, string>();
         foreach (string inputToken in inputTokens)
         {
-            string[] inTs = inputToken.SmartSplit(' ', 2);
+            string[] inTs = inputToken.SanitizedSplit(' ', 2);
             if (inTs.Length != 2)
                 throw new FunctionParamsInvalidException(_compiler.CurrentLine, token);
             
@@ -99,7 +99,7 @@ public struct FuncKeyword : IKeyword
 
     private Input ParseReturn(string token, UserFunction function)
     {
-        string[] split = token.SmartSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        string[] split = token.SanitizedSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
         string value = split[1].Trim();
         
         if (token.EndsWith(")"))

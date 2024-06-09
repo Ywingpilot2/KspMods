@@ -9,6 +9,7 @@ using ActionScript.Token.Functions;
 using ActionScript.Token.Interaction;
 using ActionScript.Token.KeyWords;
 using ActionScript.Token.Terms;
+using ActionScript.Utils;
 
 namespace ActionScript;
 
@@ -109,7 +110,7 @@ public class ActionCompiler : ITokenHolder
         }
         else
         {
-            string[] split = token.SmartSplit('=', 2, StringSplitOptions.RemoveEmptyEntries);
+            string[] split = token.SanitizedSplit('=', 2, StringSplitOptions.RemoveEmptyEntries);
             if (split.Length == 1)
             {
                 FunctionCall call = ParseFunctionCall(token, holder);
@@ -117,17 +118,7 @@ public class ActionCompiler : ITokenHolder
             }
             else if (split.Length == 2)
             {
-                BaseTerm term = ParseTerm(token, holder, out TokenCall call);
-                if (term != null)
-                {
-                    if (holder.HasTerm(term.Name))
-                        throw new TermAlreadyExistsException(CurrentLine, term.Name);
-                    holder.AddTerm(term);
-                }
-                if (call != null)
-                {
-                    holder.AddCall(call);
-                }
+                ParseTerm(token, holder);
             }
             else // TODO: More in depth error logging for this. Should tell them if it was an issue with a function call or type not being found
             {
@@ -140,90 +131,51 @@ public class ActionCompiler : ITokenHolder
 
     #region Terms
 
-    public BaseTerm ParseTerm(string token, ITokenHolder holder, out TokenCall assignmentCall)
+    public void ParseTerm(string token, ITokenHolder holder)
     {
-        assignmentCall = null;
-        string[] split = token.SmartSplit('=', 2, StringSplitOptions.RemoveEmptyEntries);
-        if (TermTypeExists(split[0].Split(' ')[0].Trim()))
-        {
-            BaseTerm term = ParseTermConstant(token, holder);
-            if (term.Kind == TermKind.Null)
-            {
-                string value = split[1].Trim();
-                if (token.EndsWith(")")) // T a = call()
-                {
-                    FunctionCall functionCall = ParseFunctionCall(value, holder);
-                    if (functionCall.Function.ReturnType == "void")
-                        throw new FunctionReturnsVoidException(CurrentLine, functionCall.Function.Name);
-                    assignmentCall = new AssignmentCall(term, new Input(holder, functionCall), holder, CurrentLine);
-                }
-                else if (holder.HasTerm(value)) // T a = b
-                {
-                    BaseTerm assigningTerm = holder.GetTerm(value);
-                    assignmentCall = new AssignmentCall(term, new Input(assigningTerm), holder, CurrentLine);
-                }
-            }
-
-            return term;
-        }
-        else if (holder.HasTerm(split[0].Split(' ')[0].Trim()))
-        {
-            BaseTerm original = holder.GetTerm(split[0].Split(' ')[0].Trim());
-            TermType type = original.GetTermType();
-            string value = split[1].Trim();
-
-            if (token.EndsWith(")"))
-            {
-                FunctionCall functionCall = ParseFunctionCall(value, holder);
-                if (functionCall.Function.ReturnType == "void")
-                    throw new FunctionReturnsVoidException(CurrentLine, functionCall.Function.Name);
-                assignmentCall = new AssignmentCall(original, new Input(holder, functionCall), holder, CurrentLine);
-            }
-            else
-            {
-                BaseTerm newValue = type.Construct(Guid.NewGuid().ToString(), CurrentLine);
-                if (!newValue.Parse(value))
-                    throw new InvalidAssignmentException(CurrentLine, original);
-
-                assignmentCall = new AssignmentCall(original, new Input(newValue), holder, CurrentLine);
-            }
-
-            return null;
-        }
-
-        throw new InvalidAssignmentException(CurrentLine);
-    }
-
-    private BaseTerm ParseTermConstant(string token, ITokenHolder holder)
-    {
-        string[] split = token.Split(new[] { ' ' }, 2);
-        string typeName = split[0].Trim();
-        if (!TermTypeExists(typeName))
-            throw new TypeNotExistException(CurrentLine, typeName);
+        AssignmentKind kind = CompileUtils.DetermineAssignment(token, holder);
+        string[] values = CompileUtils.GetTermValues(token);
         
-        TermType termType = GetTermType(typeName);
-        string[] termDat = split[1].Trim().Split(new []{'='}, 2);
-        BaseTerm term = termType.Construct(termDat[0].Trim(), CurrentLine);
-
-        if (termDat.Length == 1 || split[1].EndsWith(")"))
+        switch (kind)
         {
-            return term;
-        }
-
-        if (!term.Parse(termDat[1].Trim()))
-        {
-            if (holder.HasTerm(termDat[1].Trim()))
+            case AssignmentKind.Constant:
             {
-                return term;
-            }
-            else
+                TermType type = GetTermType(values[0]);
+                BaseTerm term = type.Construct(values[1], CurrentLine);
+                if (!term.Parse(values[2]))
+                    throw new InvalidAssignmentException(CurrentLine, term);
+                
+                holder.AddTerm(term);
+            } break;
+            case AssignmentKind.Term:
             {
-                throw new InvalidCompilationException(CurrentLine,
-                    $"Inputted value for {term.Name} was not valid given its type or could not be parsed");
-            }
-        }
+                TermType type = GetTermType(values[0]);
+                BaseTerm from = holder.GetTerm(values[2]);
+                BaseTerm term = type.Construct(values[1], CurrentLine);
+                Input input = new Input(from);
 
-        return term;
+                AssignmentCall assignmentCall = new AssignmentCall(term, input, holder, CurrentLine);
+                holder.AddTerm(term);
+                holder.AddCall(assignmentCall);
+            } break;
+            case AssignmentKind.Function:
+            {
+                TermType type = GetTermType(values[0]);
+                BaseTerm term = type.Construct(values[1], CurrentLine);
+                Input input = CompileUtils.HandleToken(values[2], type.Name, holder, this);
+                AssignmentCall call = new AssignmentCall(term, input, holder, CurrentLine);
+                holder.AddTerm(term);
+                holder.AddCall(call);
+            } break;
+            case AssignmentKind.Assignment:
+            {
+                BaseTerm term = holder.GetTerm(values[0]);
+                string type = term.ValueType;
+                Input input = CompileUtils.HandleToken(values[1], type, holder, this);
+                AssignmentCall call = new AssignmentCall(term, input, holder, CurrentLine);
+                holder.AddCall(call);
+            } break;
+        }
     }
 
     #endregion
@@ -239,7 +191,7 @@ public class ActionCompiler : ITokenHolder
         }
         else
         {
-            string[] dets = token.SmartSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
+            string[] dets = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
             if (dets.Length > 1 && holder.HasTerm(dets[0].Trim()))
             {
                 return ParseLocalCall(token, holder);
@@ -253,7 +205,7 @@ public class ActionCompiler : ITokenHolder
 
     private FunctionCall ParseGlobalCall(string token, ITokenHolder holder)
     {
-        string[] split = token.SmartSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
+        string[] split = token.SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
         string name = split[0].Trim();
         string prms = split[1].Trim(' ', '\t');
         prms = prms.Remove(prms.Length - 1);
@@ -266,11 +218,11 @@ public class ActionCompiler : ITokenHolder
 
     private TermCall ParseLocalCall(string token, ITokenHolder holder)
     {
-        string[] dets = token.SmartSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
+        string[] dets = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
         BaseTerm term = holder.GetTerm(dets[0].Trim());
 
         string funcToken = dets[1].Trim(' ', '.');
-        string[] split = funcToken.SmartSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
+        string[] split = funcToken.SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
         string name = split[0].Trim();
         string prms = split[1].Trim();
         prms = prms.Remove(prms.Length - 1);
@@ -293,77 +245,12 @@ public class ActionCompiler : ITokenHolder
         for (var i = 0; i < inputs.Count; i++)
         {
             var input = inputs[i];
-            if (input.EndsWith(")"))
-            {
-                FunctionCall call = ParseFunctionCall(input, holder);
-
-                if (call.Function.ReturnType != func.InputTypes[i])
-                {
-                    TermType type = holder.GetTermType(call.Function.ReturnType);
-                    if (!type.IsSubclassOf(func.InputTypes[i]))
-                        throw new InvalidParametersException(CurrentLine, call.Function.InputTypes);
-                }
-
-                inputTokens.Add(new Input(holder, call));
-            }
-            else if (!holder.HasTerm(input))
-            {
-                string typeName = func.InputTypes[i];
-                TermType type;
-                if (typeName == "term") // we are gonna try to parse it as a literal
-                {
-                    // TODO: We should put this into its own class or something
-                    if (input.StartsWith("\"") && input.EndsWith("\"")) // is a string
-                    {
-                        type = GetTermType("string");
-                    }
-                    else if (int.TryParse(input, out _))
-                    {
-                        type = GetTermType("int");
-                    }
-                    else if (float.TryParse(input, out _))
-                    {
-                        type = GetTermType("float");
-                    }
-                    else if (bool.TryParse(input, out _))
-                    {
-                        type = GetTermType("bool");
-                    }
-                    else
-                    {
-                        throw new InvalidCompilationException(CurrentLine,
-                            "Unable to parse specified value, either this constant is of the incorrect type or the value cannot be parsed");
-                    }
-                }
-                else
-                {
-                    type = GetTermType(typeName);
-                }
-                
-                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), CurrentLine);
-                if (!term.Parse(input))
-                    throw new InvalidCompilationException(CurrentLine,
-                        "Unable to parse specified value, either this constant is of the incorrect type or the value cannot be parsed");
-                
-                inputTokens.Add(new Input(term));
-            }
-            else
-            {
-                BaseTerm term = holder.GetTerm(input);
-                if (term.ValueType != func.InputTypes[i])
-                {
-                    if (!term.GetTermType().IsSubclassOf(func.InputTypes[i]))
-                        throw new InvalidParametersException(CurrentLine, func.InputTypes);
-                }
-                inputTokens.Add(new Input(term));
-            }
+            inputTokens.Add(CompileUtils.HandleToken(input, func.InputTypes[i], holder, this));
         }
 
         return inputTokens;
     }
-
     
-
     #endregion
 
     #region Inputs

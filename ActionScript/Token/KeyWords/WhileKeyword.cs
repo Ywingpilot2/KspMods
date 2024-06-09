@@ -5,6 +5,7 @@ using ActionScript.Library;
 using ActionScript.Token.Functions;
 using ActionScript.Token.Interaction;
 using ActionScript.Token.Terms;
+using ActionScript.Utils;
 
 namespace ActionScript.Token.KeyWords;
 
@@ -20,29 +21,11 @@ public struct WhileKeyword : IKeyword
         _compiler = compiler;
         _script = script;
 
-        string[] split = token.SmartSplit('(', 2);
+        string[] split = token.SanitizedSplit('(', 2);
         string prms = split[1].Trim();
         prms = prms.Remove(prms.Length - 1);
 
-        Input condition;
-        if (prms.EndsWith(")"))
-        {
-            FunctionCall functionCall = _compiler.ParseFunctionCall(prms, holder);
-            condition = new Input(holder, functionCall);
-        }
-        else if (holder.HasTerm(prms))
-        {
-            BaseTerm term = holder.GetTerm(prms);
-            condition = new Input(term);
-        }
-        else
-        {
-            TermType boolType = _script.GetTermType("bool");
-            BaseTerm term = boolType.Construct(Guid.NewGuid().ToString(), compiler.CurrentLine);
-            if (!term.Parse(prms))
-                throw new InvalidCompilationException(_compiler.CurrentLine, $"Condition in while statement is not a valid bool");
-            condition = new Input(term);
-        }
+        Input condition = CompileUtils.HandleToken(prms, "bool", holder, compiler);
 
         WhileFunction whileFunction = new WhileFunction(condition, holder);
         ParseWhileTokens(token, whileFunction);
@@ -72,18 +55,7 @@ public struct WhileKeyword : IKeyword
                 continue;
             }
 
-            if (line.StartsWith("break"))
-            {
-                whileFunction.AddCall(new BreakCall(whileFunction, _compiler.CurrentLine));
-            }
-            else if (line.StartsWith("continue"))
-            {
-                whileFunction.AddCall(new ContinueCall(whileFunction, _compiler.CurrentLine));
-            }
-            else
-            {
-                _compiler.ParseToken(line, whileFunction);
-            }
+            _compiler.ParseToken(line, whileFunction);
             
             line = _compiler.ReadCleanLine();
         }

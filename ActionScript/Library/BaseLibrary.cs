@@ -44,7 +44,9 @@ namespace ActionScript.Library
         public IEnumerable<IKeyword> Keywords => new IKeyword[]
         {
             new FuncKeyword(),
-            new WhileKeyword()
+            new WhileKeyword(),
+            new BreakKeyword(),
+            new ContinueKeyword()
         };
         public TypeLibrary TypeLibrary { get; }
         

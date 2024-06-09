@@ -60,6 +60,8 @@
         <Compile Include="Token\Interaction\ReturnValue.cs" />
         <Compile Include="Token\IToken.cs" />
         <Compile Include="Token\ITokenHolder.cs" />
+        <Compile Include="Token\KeyWords\BreakKeyword.cs" />
+        <Compile Include="Token\KeyWords\ContinueKeyword.cs" />
         <Compile Include="Token\KeyWords\FuncKeyword.cs" />
         <Compile Include="Token\KeyWords\IKeyword.cs" />
         <Compile Include="Token\KeyWords\WhileKeyword.cs" />
@@ -69,6 +71,7 @@
         <Compile Include="Token\Terms\StringTerm.cs" />
         <Compile Include="Token\Terms\Term.cs" />
         <Compile Include="Token\Terms\VoidTerm.cs" />
+        <Compile Include="Utils\Utils.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
