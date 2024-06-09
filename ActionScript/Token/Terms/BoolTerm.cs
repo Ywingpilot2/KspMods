@@ -7,7 +7,6 @@ namespace ActionScript.Token.Terms;
 public sealed class BoolTerm : BaseTerm
 {
     public override string ValueType => "bool";
-    public override IEnumerable<IFunction> Functions { get; }
     private bool _value;
 
     #region Casting
@@ -69,6 +68,7 @@ public sealed class BoolTerm : BaseTerm
             return false;
         
         _value = b;
+        Kind = TermKind.Basic;
         return true;
     }
 

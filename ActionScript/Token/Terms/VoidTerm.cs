@@ -10,7 +10,6 @@ namespace ActionScript.Token.Terms;
 public class VoidTerm : BaseTerm
 {
     public override string ValueType => "void";
-    public override IEnumerable<IFunction> Functions { get; }
     public override bool Parse(string value)
     {
         throw new TypeNotConstructableException(0, ValueType);

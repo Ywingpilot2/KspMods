@@ -42,7 +42,10 @@ public struct Input
 
                 TermType type = _script.GetTermType(value.Type);
                 BaseTerm term = type.Construct(Guid.NewGuid().ToString(), Call.Line);
-                term.SetValue(value.Value);
+                if (term.SetValue(value.Value) && term.Kind == TermKind.Null)
+                {
+                    term.Kind = TermKind.Basic;
+                }
 
                 return term;
             } break;

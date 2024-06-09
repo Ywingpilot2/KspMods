@@ -309,7 +309,37 @@ public class ActionCompiler : ITokenHolder
             else if (!holder.HasTerm(input))
             {
                 string typeName = func.InputTypes[i];
-                TermType type = GetTermType(typeName);
+                TermType type;
+                if (typeName == "term") // we are gonna try to parse it as a literal
+                {
+                    // TODO: We should put this into its own class or something
+                    if (input.StartsWith("\"") && input.EndsWith("\"")) // is a string
+                    {
+                        type = GetTermType("string");
+                    }
+                    else if (int.TryParse(input, out _))
+                    {
+                        type = GetTermType("int");
+                    }
+                    else if (float.TryParse(input, out _))
+                    {
+                        type = GetTermType("float");
+                    }
+                    else if (bool.TryParse(input, out _))
+                    {
+                        type = GetTermType("bool");
+                    }
+                    else
+                    {
+                        throw new InvalidCompilationException(CurrentLine,
+                            "Unable to parse specified value, either this constant is of the incorrect type or the value cannot be parsed");
+                    }
+                }
+                else
+                {
+                    type = GetTermType(typeName);
+                }
+                
                 BaseTerm term = type.Construct(Guid.NewGuid().ToString(), CurrentLine);
                 if (!term.Parse(input))
                     throw new InvalidCompilationException(CurrentLine,

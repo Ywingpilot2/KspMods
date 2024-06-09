@@ -19,7 +19,6 @@ public static class NumberConversion
 public class NumberTerm : BaseTerm
 {
     public override string ValueType => "number-term";
-    public override IEnumerable<IFunction> Functions { get; }
 
     public override bool Parse(string value)
     {
@@ -102,9 +101,7 @@ public class TermI : NumberTerm
     
     public override bool Parse(string value)
     {
-        value = value.StartsWith("0x") ? value.Replace("0x", "") : value;
-
-        if (int.TryParse(value, NumberStyles.Integer & NumberStyles.HexNumber, new NumberFormatInfo(), out int i))
+        if (int.TryParse(value, NumberStyles.Integer & NumberStyles.AllowLeadingSign, new NumberFormatInfo(), out int i))
         {
             Number = i;
             Kind = TermKind.Basic;
@@ -122,6 +119,7 @@ public class TermI : NumberTerm
             return false;
 
         Number = i;
+        Kind = TermKind.Basic;
         return true;
     }
 }
@@ -152,6 +150,7 @@ public class TermF : NumberTerm
             return false;
 
         Number = i;
+        Kind = TermKind.Basic;
         return true;
     }
 }
@@ -182,6 +181,7 @@ public class TermU : NumberTerm
             return false;
 
         Number = i;
+        Kind = TermKind.Basic;
         return true;
     }
 }
@@ -212,6 +212,7 @@ public class TermD : NumberTerm
             return false;
 
         Number = i;
+        Kind = TermKind.Basic;
         return true;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ActionScript.Exceptions;
 using ActionScript.Library;
 using ActionScript.Token.Functions;
+using ActionScript.Token.Interaction;
 
 namespace ActionScript.Token.Terms;
 
@@ -17,7 +18,7 @@ public abstract class BaseTerm : IToken
 {
     #region Meta
 
-    public TermKind Kind { get; protected set; }
+    public TermKind Kind { get; set; }
     public int Line { get; set; }
     public TypeLibrary TypeLibrary { get; set; }
 
@@ -32,15 +33,33 @@ public abstract class BaseTerm : IToken
 
     #region Functions
 
+    private readonly IEnumerable<IFunction> _functions = new IFunction[]
+    {
+        new Function("equals", "bool", inputTypes:new []{"term"}, action: terms =>
+        {
+            object a = terms[0].GetValue();
+            object b = terms[1].GetValue();
+            return new ReturnValue(a.Equals(b), "bool");
+        }),
+        new Function("to-string", "string", terms => new ReturnValue(terms[0].GetValue().ToString(), "string"))
+    };
+    
     /// <summary>
-    /// An array of all the <see cref="Function"/>s this <see cref="Term"/> has.
-    /// The first <see cref="Term"/> input is always the term this local function belongs to.
+    /// This method enumerates over all of the <see cref="IFunction"/>s this Term has.
+    /// It is suggested to iterate over the base.GetFunctions as well, that way functions such as Equals are included in the enumeration
     /// </summary>
-    public abstract IEnumerable<IFunction> Functions { get; }
+    /// <returns>An enumerable which provides the terms functions</returns>
+    public virtual IEnumerable<IFunction> GetFunctions()
+    {
+        foreach (IFunction function in _functions)
+        {
+            yield return function;
+        }
+    }
 
     public IFunction GetFunction(string name)
     {
-        foreach (IFunction function in Functions)
+        foreach (IFunction function in GetFunctions())
         {
             if (function.Name == name)
                 return function;
@@ -50,7 +69,7 @@ public abstract class BaseTerm : IToken
 
     public bool HasFunction(string name)
     {
-        foreach (IFunction function in Functions)
+        foreach (IFunction function in GetFunctions())
         {
             if (function.Name == name)
                 return true;

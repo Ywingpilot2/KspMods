@@ -31,18 +31,12 @@ namespace ActionScript.Library
                 object b = terms[0].GetValue();
                 return new ReturnValue(a == b, "bool");
             }),
-            new Function("random", "int", terms =>
-            {
-                return new ReturnValue(_rng.Next(), "int");
-            }),
-            new Function("randon-max", "int",inputTypes:new []{"int"}, action:terms =>
-            {
-                return new ReturnValue(_rng.Next(terms[0].CastToInt()), "int");
-            }),
-            new Function("random-interval", "int", inputTypes:new []{"int","int"}, action:terms =>
-            {
-                return new ReturnValue(_rng.Next(terms[0].CastToInt(), terms[1].CastToInt()), "int");
-            })
+            new Function("random", "int", _ => new ReturnValue(_rng.Next(), "int")),
+            new Function("randon-max", "int",inputTypes:new []{"int"}, action:terms => new ReturnValue(_rng.Next(terms[0].CastToInt()), "int")),
+            new Function("random-interval", "int", inputTypes:new []{"int","int"}, action:terms => new ReturnValue(_rng.Next(terms[0].CastToInt(), terms[1].CastToInt()), "int")),
+            new Function("not", "bool", inputTypes:new []{"bool"}, action: terms => new ReturnValue(!terms[0].CastToBool(), "bool")),
+            new Function("and", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() && terms[1].CastToBool(), "bool")),
+            new Function("or", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() || terms[1].CastToBool(), "bool"))
         };
 
         public IEnumerable<BaseTerm> GlobalTerms { get; }

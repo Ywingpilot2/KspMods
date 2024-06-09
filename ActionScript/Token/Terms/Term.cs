@@ -11,8 +11,6 @@ namespace ActionScript.Token.Terms;
 public class Term : BaseTerm
 {
     public override string ValueType => "term";
-    public override IEnumerable<IFunction> Functions { get; }
-
     public override bool Parse(string value)
     {
         throw new System.NotImplementedException();
