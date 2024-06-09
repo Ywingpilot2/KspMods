@@ -10,6 +10,8 @@ namespace ActionScript.Library
 {
     public class ActionLibrary : ILibrary
     {
+        static Random _rng = new();
+        
         public IEnumerable<IFunction> GlobalFunctions { get; } = new IFunction[]
         {
             new Function("to-string", "string", inputTypes: "term", action: terms =>
@@ -22,6 +24,24 @@ namespace ActionScript.Library
                 {
                     return new ReturnValue(terms[0].GetTermType().Name, "string");
                 }
+            }),
+            new Function("equals", "bool", inputTypes:new []{"term", "term"}, action: terms =>
+            {
+                object a = terms[0].GetValue();
+                object b = terms[0].GetValue();
+                return new ReturnValue(a == b, "bool");
+            }),
+            new Function("random", "int", terms =>
+            {
+                return new ReturnValue(_rng.Next(), "int");
+            }),
+            new Function("randon-max", "int",inputTypes:new []{"int"}, action:terms =>
+            {
+                return new ReturnValue(_rng.Next(terms[0].CastToInt()), "int");
+            }),
+            new Function("random-interval", "int", inputTypes:new []{"int","int"}, action:terms =>
+            {
+                return new ReturnValue(_rng.Next(terms[0].CastToInt(), terms[1].CastToInt()), "int");
             })
         };
 
