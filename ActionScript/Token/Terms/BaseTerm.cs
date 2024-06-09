@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using ActionScript.Exceptions;
-using ActionScript.Functions;
 using ActionScript.Library;
-using ActionScript.Token;
+using ActionScript.Token.Functions;
 
-namespace ActionScript.Terms;
+namespace ActionScript.Token.Terms;
 
 public enum TermKind
 {

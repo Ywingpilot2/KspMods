@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using ActionScript.Exceptions;
-using ActionScript.Functions;
 using ActionScript.Library;
-using ActionScript.Terms;
 using ActionScript.Token;
+using ActionScript.Token.Functions;
+using ActionScript.Token.KeyWords;
+using ActionScript.Token.Terms;
 
 namespace ActionScript
 {
@@ -14,6 +15,7 @@ namespace ActionScript
         public Dictionary<string, IFunction> Functions { get; }
         public Dictionary<string, BaseTerm> Terms { get; }
         public List<TypeLibrary> TypeLibraries { get; }
+        public Dictionary<string, IKeyword> Keywords { get; }
 
         public List<TokenCall> TokenCalls { get; }
 
@@ -123,6 +125,20 @@ catch (ActionException e)
             
             throw new TypeNotExistException(CurrentLine, name);
         }
+        
+        #endregion
+
+        #region Keywords
+
+        public bool HasKeyword(string name) => Keywords.ContainsKey(name);
+
+        public IKeyword GetKeyword(string name)
+        {
+            if (!HasKeyword(name))
+                throw new InvalidCompilationException(0, $"Keyword {name} does not exist");
+
+            return Keywords[name];
+        }
 
         #endregion
 
@@ -134,6 +150,7 @@ catch (ActionException e)
             Terms = new Dictionary<string, BaseTerm>();
             TokenCalls = new List<TokenCall>();
             TypeLibraries = new List<TypeLibrary>();
+            Keywords = new Dictionary<string, IKeyword>();
         }
 
         #endregion

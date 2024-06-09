@@ -1,6 +1,6 @@
 ﻿using ActionScript.Exceptions;
-using ActionScript.Functions;
-using ActionScript.Terms;
+using ActionScript.Token.Functions;
+using ActionScript.Token.Terms;
 
 namespace ActionScript.Token;
 

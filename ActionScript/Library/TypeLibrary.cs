@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ActionScript.Exceptions;
-using ActionScript.Functions;
-using ActionScript.Terms;
+using ActionScript.Token.Terms;
 
 namespace ActionScript.Library;
 
@@ -47,6 +46,11 @@ public class TermType
         Library = library;
         BaseClass = baseClass;
         IsAbstract = isAbstract;
+    }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }
 

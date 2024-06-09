@@ -3,31 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using ActionScript.Exceptions;
 using ActionScript.Library;
-using ActionScript.Terms;
-using ActionScript.Token;
+using ActionScript.Token.Interaction;
+using ActionScript.Token.KeyWords;
+using ActionScript.Token.Terms;
 
-namespace ActionScript.Functions
+namespace ActionScript.Token.Functions
 {
-    public struct ReturnValue
-    {
-        public bool HasValue => Value != null;
-        public string Type { get; }
-        public object Value { get; }
-
-        public ReturnValue(object value, string type)
-        {
-            Value = value;
-            Type = type;
-        }
-    }
-
     public interface IFunction
     {
         public string Name { get; }
         public string ReturnType { get; }
         public string[] InputTypes { get; }
+        public bool AnyCount { get; }
 
         public ReturnValue Execute(params BaseTerm[] terms);
+        public bool InputIsValid(string type, int idx, ITokenHolder holder);
     }
     
     public struct Function : IFunction
@@ -35,11 +25,61 @@ namespace ActionScript.Functions
         public string Name { get; }
         public string ReturnType { get; }
         public string[] InputTypes { get; }
+        public bool AnyCount { get; }
         private Func<BaseTerm[], ReturnValue> Action { get; }
 
         public ReturnValue Execute(params BaseTerm[] terms)
         {
             return Action.Invoke(terms);
+        }
+
+        public bool InputIsValid(string type, int idx, ITokenHolder holder)
+        {
+            if (InputTypes.Length == 0)
+                return false;
+            
+            if (AnyCount)
+            {
+                if (idx >= InputTypes.Length)
+                {
+                    string last = InputTypes.Last();
+                    if (last != type)
+                    {
+                        TermType termType = holder.GetTermType(last);
+                        return termType.IsSubclassOf(type);
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    string at = InputTypes.ElementAtOrDefault(idx);
+                    if (string.IsNullOrEmpty(at))
+                        return false;
+
+                    if (at != type)
+                    {
+                        TermType termType = holder.GetTermType(at);
+                        return termType.IsSubclassOf(type);
+                    }
+
+                    return true;
+                }
+            }
+            else
+            {
+                string at = InputTypes.ElementAtOrDefault(idx);
+                if (string.IsNullOrEmpty(at))
+                    return false;
+
+                if (at != type)
+                {
+                    TermType termType = holder.GetTermType(at);
+                    return termType.IsSubclassOf(type);
+                }
+
+                return true;
+            }
         }
 
         public Function(string name, string returnType, Func<BaseTerm[], ReturnValue> action, params string[] inputTypes)
@@ -49,6 +89,15 @@ namespace ActionScript.Functions
             InputTypes = inputTypes;
             Action = action;
         }
+        
+        public Function(string name, string returnType, Func<BaseTerm[], ReturnValue> action, bool anyCount, params string[] inputTypes)
+        {
+            Name = name;
+            ReturnType = returnType;
+            InputTypes = inputTypes;
+            AnyCount = anyCount;
+            Action = action;
+        }
     }
     
     public class UserFunction : IFunction, ITokenHolder
@@ -56,6 +105,7 @@ namespace ActionScript.Functions
         public string Name { get; }
         public string ReturnType { get; }
         public string[] InputTypes { get; }
+        public bool AnyCount { get; }
 
         private Dictionary<string, BaseTerm> _baseTerms;
         private List<TokenCall> _calls;
@@ -86,6 +136,55 @@ namespace ActionScript.Functions
             {
                 BaseTerm term = _return.GetValue();
                 return new ReturnValue(term.GetValue(), term.ValueType);
+            }
+        }
+
+        public bool InputIsValid(string type, int idx, ITokenHolder holder)
+        {
+            if (InputTypes.Length == 0)
+                return false;
+            
+            if (AnyCount)
+            {
+                if (idx >= InputTypes.Length)
+                {
+                    string last = InputTypes.Last();
+                    if (last != type)
+                    {
+                        TermType termType = holder.GetTermType(last);
+                        return termType.IsSubclassOf(type);
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    string at = InputTypes.ElementAtOrDefault(idx);
+                    if (string.IsNullOrEmpty(at))
+                        return false;
+
+                    if (at != type)
+                    {
+                        TermType termType = holder.GetTermType(at);
+                        return termType.IsSubclassOf(type);
+                    }
+
+                    return true;
+                }
+            }
+            else
+            {
+                string at = InputTypes.ElementAtOrDefault(idx);
+                if (string.IsNullOrEmpty(at))
+                    return false;
+
+                if (at != type)
+                {
+                    TermType termType = holder.GetTermType(at);
+                    return termType.IsSubclassOf(type);
+                }
+
+                return true;
             }
         }
 
@@ -155,5 +254,8 @@ namespace ActionScript.Functions
         public bool TermTypeExists(string name) => _script.TermTypeExists(name);
 
         public TermType GetTermType(string name) => _script.GetTermType(name);
+        public bool HasKeyword(string name) => _script.HasKeyword(name);
+
+        public IKeyword GetKeyword(string name) => _script.GetKeyword(name);
     }
 }

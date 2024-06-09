@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using ActionScript.Functions;
+using ActionScript.Token.Functions;
 
-namespace ActionScript.Terms;
+namespace ActionScript.Token.Terms;
 
 public static class NumberConversion
 {

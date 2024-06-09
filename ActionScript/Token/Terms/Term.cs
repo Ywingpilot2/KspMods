@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using ActionScript.Exceptions;
-using ActionScript.Functions;
+using ActionScript.Token.Functions;
 
-namespace ActionScript.Terms;
+namespace ActionScript.Token.Terms;
 
 /// <summary>
 /// Represents the base class for a <see cref="BaseTerm"/>

@@ -1,6 +1,7 @@
-﻿using ActionScript.Functions;
-using ActionScript.Library;
-using ActionScript.Terms;
+﻿using ActionScript.Library;
+using ActionScript.Token.Functions;
+using ActionScript.Token.KeyWords;
+using ActionScript.Token.Terms;
 
 namespace ActionScript.Token;
 
@@ -21,4 +22,7 @@ public interface ITokenHolder
 
     public bool TermTypeExists(string name);
     public TermType GetTermType(string name);
+
+    public bool HasKeyword(string name);
+    public IKeyword GetKeyword(string name);
 }

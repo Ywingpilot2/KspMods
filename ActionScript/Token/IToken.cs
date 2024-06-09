@@ -1,7 +1,4 @@
-﻿using ActionScript.Functions;
-using ActionScript.Terms;
-
-namespace ActionScript.Token
+﻿namespace ActionScript.Token
 {
     public interface IToken
     {

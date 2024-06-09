@@ -1,5 +1,5 @@
 ﻿using System;
-using ActionScript.Terms;
+using ActionScript.Token.Terms;
 
 namespace ActionScript.Exceptions
 {

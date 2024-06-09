@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using ActionScript.Functions;
-using ActionScript.Terms;
+using ActionScript.Token.Functions;
+using ActionScript.Token.Interaction;
+using ActionScript.Token.KeyWords;
+using ActionScript.Token.Terms;
 
 namespace ActionScript.Library
 {
@@ -24,6 +26,12 @@ namespace ActionScript.Library
         };
 
         public IEnumerable<BaseTerm> GlobalTerms { get; }
+
+        public IEnumerable<IKeyword> Keywords => new IKeyword[]
+        {
+            new FuncKeyword(),
+            new WhileKeyword()
+        };
         public TypeLibrary TypeLibrary { get; }
         
         public ActionLibrary()

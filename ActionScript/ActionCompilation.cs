@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using ActionScript.Exceptions;
 using ActionScript.Extensions;
-using ActionScript.Functions;
 using ActionScript.Library;
-using ActionScript.Terms;
 using ActionScript.Token;
+using ActionScript.Token.Functions;
+using ActionScript.Token.Interaction;
+using ActionScript.Token.KeyWords;
+using ActionScript.Token.Terms;
 
 namespace ActionScript;
 
-public class ActionCompiler
+public class ActionCompiler : ITokenHolder
 {
     private static readonly ActionLibrary Library = new();
 
@@ -85,11 +87,13 @@ public class ActionCompiler
             if (!library.HasTermType(name))
                 continue;
 
-            return library.GetTermType(name, _currentLine);
+            return library.GetTermType(name, CurrentLine);
         }
             
-        throw new TypeNotExistException(_currentLine, name);
+        throw new TypeNotExistException(CurrentLine, name);
     }
+
+    
 
     #endregion
     
@@ -97,10 +101,11 @@ public class ActionCompiler
 
     public void ParseToken(string token, ITokenHolder holder)
     {
-        if (token.StartsWith("func"))
+        string keywordName = token.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
+        if (HasKeyword(keywordName))
         {
-            UserFunction function = ParseFunction(token);
-            _script.AddFunc(function);
+            IKeyword keyword = GetKeyword(keywordName);
+            keyword.CompileKeyword(token, this, _script, holder);
         }
         else
         {
@@ -116,7 +121,7 @@ public class ActionCompiler
                 if (term != null)
                 {
                     if (holder.HasTerm(term.Name))
-                        throw new TermAlreadyExistsException(_currentLine, term.Name);
+                        throw new TermAlreadyExistsException(CurrentLine, term.Name);
                     holder.AddTerm(term);
                 }
                 if (call != null)
@@ -126,7 +131,7 @@ public class ActionCompiler
             }
             else // TODO: More in depth error logging for this. Should tell them if it was an issue with a function call or type not being found
             {
-                throw new InvalidCompilationException(_currentLine, $"Could not determine token at line {_currentLine}");
+                throw new InvalidCompilationException(CurrentLine, $"Could not determine token at line {CurrentLine}");
             }
         }
     }
@@ -149,13 +154,13 @@ public class ActionCompiler
                 {
                     FunctionCall functionCall = ParseFunctionCall(value, holder);
                     if (functionCall.Function.ReturnType == "void")
-                        throw new FunctionReturnsVoidException(_currentLine, functionCall.Function.Name);
-                    assignmentCall = new AssignmentCall(term, new Input(holder, functionCall), holder, _currentLine);
+                        throw new FunctionReturnsVoidException(CurrentLine, functionCall.Function.Name);
+                    assignmentCall = new AssignmentCall(term, new Input(holder, functionCall), holder, CurrentLine);
                 }
                 else if (holder.HasTerm(value)) // T a = b
                 {
                     BaseTerm assigningTerm = holder.GetTerm(value);
-                    assignmentCall = new AssignmentCall(term, new Input(assigningTerm), holder, _currentLine);
+                    assignmentCall = new AssignmentCall(term, new Input(assigningTerm), holder, CurrentLine);
                 }
             }
 
@@ -171,34 +176,34 @@ public class ActionCompiler
             {
                 FunctionCall functionCall = ParseFunctionCall(value, holder);
                 if (functionCall.Function.ReturnType == "void")
-                    throw new FunctionReturnsVoidException(_currentLine, functionCall.Function.Name);
-                assignmentCall = new AssignmentCall(original, new Input(holder, functionCall), holder, _currentLine);
+                    throw new FunctionReturnsVoidException(CurrentLine, functionCall.Function.Name);
+                assignmentCall = new AssignmentCall(original, new Input(holder, functionCall), holder, CurrentLine);
             }
             else
             {
-                BaseTerm newValue = type.Construct(Guid.NewGuid().ToString(), _currentLine);
+                BaseTerm newValue = type.Construct(Guid.NewGuid().ToString(), CurrentLine);
                 if (!newValue.Parse(value))
-                    throw new InvalidAssignmentException(_currentLine, original);
+                    throw new InvalidAssignmentException(CurrentLine, original);
 
-                assignmentCall = new AssignmentCall(original, new Input(newValue), holder, _currentLine);
+                assignmentCall = new AssignmentCall(original, new Input(newValue), holder, CurrentLine);
             }
 
             return null;
         }
 
-        throw new InvalidAssignmentException(_currentLine);
+        throw new InvalidAssignmentException(CurrentLine);
     }
 
-    public BaseTerm ParseTermConstant(string token, ITokenHolder holder)
+    private BaseTerm ParseTermConstant(string token, ITokenHolder holder)
     {
         string[] split = token.Split(new[] { ' ' }, 2);
         string typeName = split[0].Trim();
         if (!TermTypeExists(typeName))
-            throw new TypeNotExistException(_currentLine, typeName);
+            throw new TypeNotExistException(CurrentLine, typeName);
         
         TermType termType = GetTermType(typeName);
         string[] termDat = split[1].Trim().Split(new []{'='}, 2);
-        BaseTerm term = termType.Construct(termDat[0].Trim(), _currentLine);
+        BaseTerm term = termType.Construct(termDat[0].Trim(), CurrentLine);
 
         if (termDat.Length == 1 || split[1].EndsWith(")"))
         {
@@ -213,7 +218,7 @@ public class ActionCompiler
             }
             else
             {
-                throw new InvalidCompilationException(_currentLine,
+                throw new InvalidCompilationException(CurrentLine,
                     $"Inputted value for {term.Name} was not valid given its type or could not be parsed");
             }
         }
@@ -223,112 +228,9 @@ public class ActionCompiler
 
     #endregion
 
-    #region Function Declaration
-
-    private UserFunction ParseFunction(string token)
-    {
-        string[] split = token.SmartSplit(' ', 3, StringSplitOptions.RemoveEmptyEntries);
-        string returnType = split[1].Trim();
-
-        string[] value = split[2].Trim().Split('(');
-        string name = value[0];
-        string prms = value[1].Trim(')', ' ');
-
-        List<string> inputTokens = ParseInputs(prms);
-
-        Dictionary<string, string> inputMapping = new Dictionary<string, string>();
-        foreach (string inputToken in inputTokens)
-        {
-            string[] inTs = inputToken.SmartSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-            if (inTs.Length != 2)
-                throw new FunctionParamsInvalidException(_currentLine, token);
-            
-            inputMapping.Add(inTs[1], inTs[0]);
-        }
-
-        UserFunction function = new UserFunction(name, returnType, inputMapping, _script);
-        ParseFunctionTokens(token, function);
-
-        return function;
-    }
-
-    private void ParseFunctionTokens(string funcToken, UserFunction function)
-    {
-        string line = ReadCleanLine();
-        while (line != "{")
-        {
-            line = ReadCleanLine();
-            if (line == null)
-                throw new FunctionLacksEndException(_currentLine, funcToken);
-        }
-
-        line = ReadCleanLine();
-        bool hasReturned = false;
-        while (line != "}")
-        {
-            if (line == null)
-                throw new FunctionLacksEndException(_currentLine, funcToken);
-
-            if (line == "" || hasReturned)
-            {
-                line = ReadCleanLine();
-                continue;
-            }
-
-            if (line.StartsWith("return"))
-            {
-                hasReturned = true;
-                if (TermTypeExists(function.ReturnType))
-                {
-                    if (function.ReturnType == "void")
-                        continue;
-                    
-                    function.SetReturnValue(ParseReturn(line, function));
-                }
-                else
-                {
-                    throw new TypeNotExistException(_currentLine, function.ReturnType);
-                }
-            }
-            else
-            {
-                ParseToken(line, function);
-            }
-            
-            line = ReadCleanLine();
-        }
-    }
-
-    private Input ParseReturn(string token, UserFunction function)
-    {
-        string[] split = token.SmartSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-        string value = split[1].Trim();
-        
-        if (token.EndsWith(")"))
-        {
-            FunctionCall functionCall = ParseFunctionCall(value, function);
-            return new Input(function, functionCall);
-        }
-        else if (function.HasTerm(value))
-        {
-            return new Input(function.GetTerm(value));
-        }
-        else // hopefully a constant, try parsing it
-        {
-            TermType type = GetTermType(function.ReturnType);
-            BaseTerm term = type.Construct(Guid.NewGuid().ToString(), _currentLine);
-            if (!term.Parse(value))
-                throw new InvalidCompilationException(_currentLine, $"Return at line {_currentLine} returns an invalid value");
-
-            return new Input(term);
-        }
-    }
-
-    #endregion
-
     #region Function Calls
 
-    private FunctionCall ParseFunctionCall(string token, ITokenHolder holder)
+    public FunctionCall ParseFunctionCall(string token, ITokenHolder holder)
     {
         // Is this a global or local function?
         if (holder.HasFunction(token.Split('(')[0]))
@@ -344,7 +246,7 @@ public class ActionCompiler
             }
             else
             {
-                throw new FunctionNotExistException(_currentLine, token);
+                throw new FunctionNotExistException(CurrentLine, token);
             }
         }
     }
@@ -359,7 +261,7 @@ public class ActionCompiler
         IFunction func = holder.GetFunction(name);
         List<Input> inputTokens = ParseInputTokens(prms, func, holder);
 
-        return new FunctionCall(holder, func, inputTokens, _currentLine);
+        return new FunctionCall(holder, func, inputTokens, CurrentLine);
     }
 
     private TermCall ParseLocalCall(string token, ITokenHolder holder)
@@ -376,15 +278,15 @@ public class ActionCompiler
         IFunction func = term.GetFunction(name);
         List<Input> inputs = ParseInputTokens(prms, func, holder);
 
-        return new TermCall(holder, _currentLine, func, term.Name, inputs);
+        return new TermCall(holder, CurrentLine, func, term.Name, inputs);
     }
 
     private List<Input> ParseInputTokens(string prms, IFunction func, ITokenHolder holder)
     {
-        List<string> inputs =  ParseInputs(prms);
+        List<string> inputs =  ParseCallInputs(prms);
         
-        if (inputs.Count != func.InputTypes.Length)
-            throw new InvalidParametersException(_currentLine, func.InputTypes);
+        if (inputs.Count != func.InputTypes.Length && !func.AnyCount)
+            throw new InvalidParametersException(CurrentLine, func.InputTypes);
 
         // Determine tokens
         List<Input> inputTokens = new List<Input>();
@@ -399,7 +301,7 @@ public class ActionCompiler
                 {
                     TermType type = holder.GetTermType(call.Function.ReturnType);
                     if (!type.IsSubclassOf(func.InputTypes[i]))
-                        throw new InvalidParametersException(_currentLine, call.Function.InputTypes);
+                        throw new InvalidParametersException(CurrentLine, call.Function.InputTypes);
                 }
 
                 inputTokens.Add(new Input(holder, call));
@@ -408,9 +310,9 @@ public class ActionCompiler
             {
                 string typeName = func.InputTypes[i];
                 TermType type = GetTermType(typeName);
-                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), _currentLine);
+                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), CurrentLine);
                 if (!term.Parse(input))
-                    throw new InvalidCompilationException(_currentLine,
+                    throw new InvalidCompilationException(CurrentLine,
                         "Unable to parse specified value, either this constant is of the incorrect type or the value cannot be parsed");
                 
                 inputTokens.Add(new Input(term));
@@ -421,7 +323,7 @@ public class ActionCompiler
                 if (term.ValueType != func.InputTypes[i])
                 {
                     if (!term.GetTermType().IsSubclassOf(func.InputTypes[i]))
-                        throw new InvalidParametersException(_currentLine, func.InputTypes);
+                        throw new InvalidParametersException(CurrentLine, func.InputTypes);
                 }
                 inputTokens.Add(new Input(term));
             }
@@ -430,7 +332,13 @@ public class ActionCompiler
         return inputTokens;
     }
 
-    private List<string> ParseInputs(string prms)
+    
+
+    #endregion
+
+    #region Inputs
+
+    public List<string> ParseCallInputs(string prms)
     {
         List<string> inputs = new List<string>();
 
@@ -486,16 +394,16 @@ public class ActionCompiler
 
     #region Reading
     
-    private int _currentLine;
+    public int CurrentLine;
     private TextReader _reader;
 
-    private string ReadCleanLine()
+    public string ReadCleanLine()
     {
-        _currentLine++;
+        CurrentLine++;
         return CleanLine(_reader.ReadLine());
     }
     
-    private string CleanLine(string line)
+    public string CleanLine(string line)
     {
         if (line == null) return null;
         
@@ -579,11 +487,41 @@ public class ActionCompiler
             }
         }
 
+        if (library.Keywords != null)
+        {
+            foreach (IKeyword keyword in library.Keywords)
+            {
+                _script.Keywords.Add(keyword.Name, keyword);
+            }
+        }
+        
         if (library.TypeLibrary != null)
         {
             _script.TypeLibraries.Add(library.TypeLibrary);
         }
     }
+
+    #endregion
+
+    #region Token Holder
+
+    public IFunction GetFunction(string name) => _script.GetFunction(name);
+
+    public bool HasFunction(string name) => _script.HasFunction(name);
+
+    public BaseTerm GetTerm(string name) => _script.GetTerm(name);
+
+    public bool HasTerm(string name) => _script.HasTerm(name);
+
+    public void AddCall(TokenCall call) => _script.AddCall(call);
+
+    public void AddTerm(BaseTerm term) => _script.AddTerm(term);
+
+    public void AddFunc(IFunction function) => _script.AddFunc(function);
+
+    public bool HasKeyword(string name) => _script.HasKeyword(name);
+
+    public IKeyword GetKeyword(string name) => _script.GetKeyword(name);
 
     #endregion
 

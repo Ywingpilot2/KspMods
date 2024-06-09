@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using ActionScript.Exceptions;
-using ActionScript.Functions;
+using ActionScript.Token.Functions;
+using ActionScript.Token.Interaction;
 
-namespace ActionScript.Terms;
+namespace ActionScript.Token.Terms;
 
 public sealed class StringTerm : BaseTerm
 {

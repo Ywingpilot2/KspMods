@@ -13,7 +13,7 @@ public static class StringExtension
     /// <param name="count">The maximum number of splits</param>
     /// <param name="options">string split options</param>
     /// <returns>The split string</returns>
-    public static string[] SmartSplit(this string self, char splitter, int count, StringSplitOptions options)
+    public static string[] SmartSplit(this string self, char splitter, int count, StringSplitOptions options = StringSplitOptions.None)
     {
         List<string> splits = new List<string>(); // TODO: Use an array instead
 
