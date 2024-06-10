@@ -221,6 +221,32 @@ namespace ActionScript.Token.Functions
             _calls = new List<TokenCall>();
             Container = script;
         }
+        
+        public IEnumerable<TokenCall> EnumerateCalls()
+        {
+            foreach (TokenCall call in Container.EnumerateCalls())
+            {
+                yield return call;
+            }
+
+            foreach (TokenCall call in _calls)
+            {
+                yield return call;
+            }
+        }
+
+        public IEnumerable<BaseTerm> EnumerateTerms()
+        {
+            foreach (BaseTerm term in Container.EnumerateTerms())
+            {
+                yield return term;
+            }
+
+            foreach (BaseTerm term in _baseTerms.Values)
+            {
+                yield return term;
+            }
+        }
 
         public IFunction GetFunction(string name) => _script.GetFunction(name);
 

@@ -13,12 +13,20 @@ namespace ActionScript
     public class ActionScript : ITokenHolder
     {
         public ITokenHolder Container { get; }
+
         public Dictionary<string, IFunction> Functions { get; }
         public Dictionary<string, BaseTerm> Terms { get; }
         public List<TypeLibrary> TypeLibraries { get; }
         public Dictionary<string, IKeyword> Keywords { get; }
-
         public List<TokenCall> TokenCalls { get; }
+
+        #region Enumeration
+
+        public IEnumerable<TokenCall> EnumerateCalls() => TokenCalls;
+
+        public IEnumerable<BaseTerm> EnumerateTerms() => Terms.Values;
+
+        #endregion
 
         #region Functions
 

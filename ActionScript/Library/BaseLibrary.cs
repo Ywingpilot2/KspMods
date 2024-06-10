@@ -29,12 +29,22 @@ namespace ActionScript.Library
             {
                 object a = terms[0].GetValue();
                 object b = terms[1].GetValue();
+                
+                if (a == null && b == null) // both values are null therefore technically equal
+                {
+                    return new ReturnValue(true, "bool");
+                }
                 return new ReturnValue(Equals(a, b), "bool");
             }),
             new Function("not-equal", "bool", inputTypes:new []{"term","term"}, action: terms =>
             {
                 object a = terms[0].GetValue();
                 object b = terms[1].GetValue();
+
+                if (a == null && b == null) // both values are null therefore technically equal
+                {
+                    return new ReturnValue(false, "bool");
+                }
                 return new ReturnValue(!Equals(a, b), "bool");
             }),
             new Function("greater", "bool", terms =>
@@ -80,7 +90,7 @@ namespace ActionScript.Library
 
         public IEnumerable<BaseTerm> GlobalTerms => new[]
         {
-            new VoidTerm
+            new NullTerm
             {
                 Name = "null",
                 Kind = TermKind.Null,
@@ -96,7 +106,10 @@ namespace ActionScript.Library
             new BreakKeyword(),
             new ContinueKeyword(),
             new ReturnKeyword(),
-            new ThrowKeyword()
+            new ThrowKeyword(),
+            new IfKeyword(),
+            new ElseIfKeyword(),
+            new ElseKeyword()
         };
         public TypeLibrary TypeLibrary { get; }
         
@@ -109,6 +122,7 @@ namespace ActionScript.Library
             TypeLibrary.AddTermType(baseType);
             TypeLibrary.AddTermType(numberType);
             TypeLibrary.AddTermType(new TermType(new VoidTerm(), TypeLibrary, isAbstract:true));
+            TypeLibrary.AddTermType(new TermType(new NullTerm(), TypeLibrary, baseType, isAbstract:true));
             TypeLibrary.AddTermType(new TermType(new TermI(), TypeLibrary, numberType));
             TypeLibrary.AddTermType(new TermType(new TermU(), TypeLibrary, numberType));
             TypeLibrary.AddTermType(new TermType(new TermF(), TypeLibrary, numberType));

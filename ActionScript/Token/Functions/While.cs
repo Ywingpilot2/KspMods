@@ -22,16 +22,11 @@ public class WhileCall : TokenCall
     }
 }
 
-public class WhileFunction : ITokenHolder, IExecutable
+public class WhileFunction : BaseExecutable
 {
-    private ITokenHolder _holder;
-    public ITokenHolder Container => _holder;
     private Input _condition;
-    
-    private Dictionary<string, BaseTerm> _baseTerms;
-    private List<TokenCall> _calls;
-    
-    public ReturnValue Execute(params BaseTerm[] terms)
+
+    public override ReturnValue Execute(params BaseTerm[] terms)
     {
         bool shouldBreak = false;
         while (_condition.GetValue().CastToBool())
@@ -39,7 +34,7 @@ public class WhileFunction : ITokenHolder, IExecutable
             if (shouldBreak)
                 break;
             
-            foreach (TokenCall call in _calls)
+            foreach (TokenCall call in Calls)
             {
                 if (call is BreakCall)
                 {
@@ -76,57 +71,8 @@ public class WhileFunction : ITokenHolder, IExecutable
         return new ReturnValue();
     }
 
-    public WhileFunction(Input condition, ITokenHolder holder)
+    public WhileFunction(Input condition, ITokenHolder holder) : base(holder)
     {
         _condition = condition;
-        _holder = holder;
-        _baseTerms = new Dictionary<string, BaseTerm>();
-        _calls = new List<TokenCall>();
     }
-
-    public IFunction GetFunction(string name) => _holder.GetFunction(name);
-
-    public bool HasFunction(string name) => _holder.HasFunction(name);
-
-    public BaseTerm GetTerm(string name)
-    {
-        if (!_baseTerms.ContainsKey(name))
-            return _holder.GetTerm(name);
-
-        return _baseTerms[name];
-    }
-
-    public bool HasTerm(string name)
-    {
-        if (!_baseTerms.ContainsKey(name))
-            return _holder.HasTerm(name);
-        
-        return true;
-    }
-
-    public void AddCall(TokenCall call)
-    {
-        _calls.Add(call);
-    }
-
-    public void AddTerm(BaseTerm term)
-    {
-        if (HasTerm(term.Name))
-            throw new TermAlreadyExistsException(0, term.Name);
-        
-        _baseTerms.Add(term.Name, term);
-    }
-
-    public void AddFunc(IFunction function)
-    {
-        throw new InvalidCompilationException(0, "Cannot declare a function within a while statement");
-    }
-
-    public bool TermTypeExists(string name) => _holder.TermTypeExists(name);
-
-    public TermType GetTermType(string name) => _holder.GetTermType(name);
-
-    public bool HasKeyword(string name) => _holder.HasKeyword(name);
-
-    public IKeyword GetKeyword(string name) => _holder.GetKeyword(name);
 }

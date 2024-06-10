@@ -300,3 +300,21 @@ public class FunctionExistsException : CompilationException
         _name = name;
     }
 }
+
+public class ElseBranchMissingRootException : CompilationException
+{
+    public override string Message => $"Could not find if statement associated with else at line {LineNumber}";
+
+    public ElseBranchMissingRootException(int lineNumber) : base(lineNumber)
+    {
+    }
+}
+
+public class AlreadyHasElseBranchException : CompilationException
+{
+    public override string Message => $"Else statement at {LineNumber} is invalid because the If branch it belongs to already has an Else statement";
+
+    public AlreadyHasElseBranchException(int lineNumber) : base(lineNumber)
+    {
+    }
+}

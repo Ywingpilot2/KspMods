@@ -1,4 +1,5 @@
-﻿using ActionScript.Library;
+﻿using System.Collections.Generic;
+using ActionScript.Library;
 using ActionScript.Token.Functions;
 using ActionScript.Token.KeyWords;
 using ActionScript.Token.Terms;
@@ -18,10 +19,13 @@ public interface IFunctionHolder
 public interface ITokenHolder : IFunctionHolder
 {
     public ITokenHolder Container { get; }
+
+    public IEnumerable<TokenCall> EnumerateCalls();
+    public IEnumerable<BaseTerm> EnumerateTerms();
     
     public BaseTerm GetTerm(string name);
     public bool HasTerm(string name);
-
+    
     public void AddCall(TokenCall call);
     public void AddTerm(BaseTerm term);
 

@@ -245,6 +245,12 @@ public sealed class StringTerm : BaseTerm
             _value = stringTerm._value;
             return true;
         }
+        else if (term is NullTerm)
+        {
+            _value = null;
+            Kind = TermKind.Null;
+            return true;
+        }
 
         return false;
     }
