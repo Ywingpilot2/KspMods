@@ -426,6 +426,7 @@ public class ActionCompiler : ITokenHolder
 
     public bool HasFunction(string name) => _script.HasFunction(name);
 
+    public ITokenHolder Container { get; }
     public BaseTerm GetTerm(string name) => _script.GetTerm(name);
 
     public bool HasTerm(string name) => _script.HasTerm(name);

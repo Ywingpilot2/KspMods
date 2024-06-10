@@ -151,6 +151,11 @@ public static class StringExtension
 
             if (c == '"' && p != '\\')
                 isStr = !isStr;
+            
+            if (i + 1 >= self.Length && c != '"')
+            {
+                sanitized += c;
+            }
         }
 
         return sanitized;

@@ -18,21 +18,20 @@ public class WhileCall : TokenCall
 
     public override ReturnValue Call()
     {
-        _while.Execute();
-        
-        return new ReturnValue(); // TODO: this sucks lol
+        return _while.Execute();
     }
 }
 
-public class WhileFunction : ITokenHolder
+public class WhileFunction : ITokenHolder, IExecutable
 {
     private ITokenHolder _holder;
+    public ITokenHolder Container => _holder;
     private Input _condition;
     
     private Dictionary<string, BaseTerm> _baseTerms;
     private List<TokenCall> _calls;
     
-    public void Execute()
+    public ReturnValue Execute(params BaseTerm[] terms)
     {
         bool shouldBreak = false;
         while (_condition.GetValue().CastToBool())
@@ -50,20 +49,31 @@ public class WhileFunction : ITokenHolder
                 
                 if (call is ContinueCall)
                     break; // This will break the foreach causing us to skip to the next call
+
+                if (call is ReturnCall)
+                    return new ReturnValue(call, "return");
                 
                 // TODO HACK: In order to break when in lower functions, lower functions(e.g ifs) return a break/continue up the chain
                 // This is annoying. We should find a better system asap!
                 ReturnValue returnValue = call.Call();
-                if (returnValue.HasValue && returnValue.Value is BreakCall)
+                if (returnValue.HasValue)
                 {
-                    shouldBreak = true;
-                    break;
-                }
+                    if (returnValue.Value is BreakCall)
+                    {
+                        shouldBreak = true;
+                        break;
+                    }
                 
-                if (returnValue.HasValue && returnValue.Value is ContinueCall)
-                    break;
+                    if (returnValue.Value is ContinueCall)
+                        break;
+
+                    if (returnValue.Value is ReturnCall)
+                        return returnValue;
+                }
             }
         }
+
+        return new ReturnValue();
     }
 
     public WhileFunction(Input condition, ITokenHolder holder)

@@ -4,7 +4,7 @@ namespace ActionScript.Exceptions;
 
 public class CompilationException : ActionException
 {
-    public override string Message => $"An action script has encountered an error at {LineNumber}!";
+    public override string Message => $"An action script has encountered an error at line {LineNumber}!";
         
     public CompilationException(int lineNumber) : base(lineNumber)
     {
@@ -16,7 +16,7 @@ public class InvalidCompilationException : CompilationException
 {
     private string _message;
 
-    public override string Message => _message ?? $"An unknown error occured at {LineNumber}";
+    public override string Message => _message ?? $"An unknown error occured at line {LineNumber}";
 
     public InvalidCompilationException(int lineNumber, string message) : base(lineNumber)
     {

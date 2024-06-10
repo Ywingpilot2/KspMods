@@ -12,6 +12,7 @@ namespace ActionScript
 {
     public class ActionScript : ITokenHolder
     {
+        public ITokenHolder Container { get; }
         public Dictionary<string, IFunction> Functions { get; }
         public Dictionary<string, BaseTerm> Terms { get; }
         public List<TypeLibrary> TypeLibraries { get; }

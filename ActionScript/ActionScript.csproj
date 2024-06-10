@@ -55,6 +55,7 @@
         <Compile Include="Token\Functions\Enumeration.cs" />
         <Compile Include="Token\Functions\Function.cs" />
         <Compile Include="Token\Functions\FunctionCall.cs" />
+        <Compile Include="Token\Functions\Throw.cs" />
         <Compile Include="Token\Functions\While.cs" />
         <Compile Include="Token\Interaction\Input.cs" />
         <Compile Include="Token\Interaction\ReturnValue.cs" />
@@ -64,6 +65,8 @@
         <Compile Include="Token\KeyWords\ContinueKeyword.cs" />
         <Compile Include="Token\KeyWords\FuncKeyword.cs" />
         <Compile Include="Token\KeyWords\IKeyword.cs" />
+        <Compile Include="Token\KeyWords\ReturnKeyword.cs" />
+        <Compile Include="Token\KeyWords\ThrowKeyword.cs" />
         <Compile Include="Token\KeyWords\WhileKeyword.cs" />
         <Compile Include="Token\Terms\BaseTerm.cs" />
         <Compile Include="Token\Terms\BoolTerm.cs" />

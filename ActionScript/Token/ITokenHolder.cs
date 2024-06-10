@@ -17,6 +17,8 @@ public interface IFunctionHolder
 /// </summary>
 public interface ITokenHolder : IFunctionHolder
 {
+    public ITokenHolder Container { get; }
+    
     public BaseTerm GetTerm(string name);
     public bool HasTerm(string name);
 

@@ -1,4 +1,5 @@
 ﻿using ActionScript.Token.Interaction;
+using ActionScript.Token.Terms;
 
 namespace ActionScript.Token.Functions;
 
@@ -31,5 +32,21 @@ public class ContinueCall : TokenCall
     public override ReturnValue Call()
     {
         return new ReturnValue(this, "keyword");
+    }
+}
+
+public class ReturnCall : TokenCall
+{
+    private Input _returnValue;
+    
+    public ReturnCall(ITokenHolder script, int line, Input input) : base(script, line)
+    {
+        _returnValue = input;
+    }
+
+    public override ReturnValue Call()
+    {
+        BaseTerm term = _returnValue.GetValue();
+        return new ReturnValue(term.GetValue(), term.ValueType);
     }
 }

@@ -76,49 +76,11 @@ public struct FuncKeyword : IKeyword
             if (line.StartsWith("return"))
             {
                 hasReturned = true;
-                if (_compiler.TermTypeExists(function.ReturnType))
-                {
-                    if (function.ReturnType == "void")
-                        continue;
-                    
-                    function.SetReturnValue(ParseReturn(line, function));
-                }
-                else
-                {
-                    throw new TypeNotExistException(_compiler.CurrentLine, function.ReturnType);
-                }
+                
             }
-            else
-            {
-                _compiler.ParseToken(line, function);
-            }
+            _compiler.ParseToken(line, function);
             
             line = _compiler.ReadCleanLine();
-        }
-    }
-
-    private Input ParseReturn(string token, UserFunction function)
-    {
-        string[] split = token.SanitizedSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-        string value = split[1].Trim();
-        
-        if (token.EndsWith(")"))
-        {
-            FunctionCall functionCall = _compiler.ParseFunctionCall(value, function);
-            return new Input(function, functionCall);
-        }
-        else if (function.HasTerm(value))
-        {
-            return new Input(function.GetTerm(value));
-        }
-        else // hopefully a constant, try parsing it
-        {
-            TermType type = _compiler.GetTermType(function.ReturnType);
-            BaseTerm term = type.Construct(Guid.NewGuid().ToString(), _compiler.CurrentLine);
-            if (!term.Parse(value))
-                throw new InvalidCompilationException(_compiler.CurrentLine, $"Return at line {_compiler.CurrentLine} returns an invalid value");
-
-            return new Input(term);
         }
     }
 }

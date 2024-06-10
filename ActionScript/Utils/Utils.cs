@@ -19,6 +19,16 @@ public enum ConditionType
     And = 1
 }
 
+public enum ComparisonType
+{
+    Equal = 0,
+    NotEqual = 1,
+    Greater = 2,
+    GreaterEqual = 3,
+    Lesser = 4,
+    LesserEqual = 5
+}
+
 public enum AssignmentKind
 {
     Constant = 0,
@@ -37,7 +47,11 @@ public static class CompileUtils
         "=",
         "!=",
         ")",
-        "=="
+        "==",
+        "<",
+        ">",
+        "<=",
+        ">="
     };
 
     public static string[] GetTermValues(string token)
@@ -83,22 +97,15 @@ public static class CompileUtils
 
         string type = typeName[0].Trim();
         string value = split[1].Trim();
-        if (value.SanitizedContains("&"))
+        if (value.SanitizedContains("&") || value.SanitizedContains("|") || value.SanitizedContains("==") || value.SanitizedContains("!=")
+            || value.SanitizedContains("<=") || value.SanitizedContains(">="))
         {
             if (type != "bool")
                 throw new InvalidCompilationException(0, $"Cannot use boolean operations on type {type}");
 
             return AssignmentKind.Function;
         }
-        
-        if (value.SanitizedContains("|"))
-        {
-            if (type != "bool")
-                throw new InvalidCompilationException(0, $"Cannot use boolean operations on type {type}");
 
-            return AssignmentKind.Function;
-        }
-        
         if (value.StartsWith("!"))
         {
             return AssignmentKind.Function;
@@ -144,6 +151,79 @@ public static class CompileUtils
             FunctionCall call = HandleConditionOperation(input, ConditionType.Or, holder, compiler);
             return new Input(holder, call);
         }
+
+        if (input.SanitizedContains("!="))
+        {
+            if (expectedType != "bool")
+            {
+                TermType bType = holder.GetTermType("bool");
+                if (!bType.IsSubclassOf(expectedType))
+                    throw new InvalidParametersException(compiler.CurrentLine);
+            }
+
+            return new Input(holder, HandleComparisonOperation(input, ComparisonType.NotEqual, holder, compiler));
+        }
+        
+        if (input.SanitizedContains("=="))
+        {
+            if (expectedType != "bool")
+            {
+                TermType bType = holder.GetTermType("bool");
+                if (!bType.IsSubclassOf(expectedType))
+                    throw new InvalidParametersException(compiler.CurrentLine);
+            }
+
+            return new Input(holder, HandleComparisonOperation(input, ComparisonType.Equal, holder, compiler));
+        }
+        
+        if (input.SanitizedContains(">="))
+        {
+            if (expectedType != "bool")
+            {
+                TermType bType = holder.GetTermType("bool");
+                if (!bType.IsSubclassOf(expectedType))
+                    throw new InvalidParametersException(compiler.CurrentLine);
+            }
+
+            return new Input(holder, HandleComparisonOperation(input, ComparisonType.GreaterEqual, holder, compiler));
+        }
+        
+        if (input.SanitizedContains("<="))
+        {
+            if (expectedType != "bool")
+            {
+                TermType bType = holder.GetTermType("bool");
+                if (!bType.IsSubclassOf(expectedType))
+                    throw new InvalidParametersException(compiler.CurrentLine);
+            }
+
+            return new Input(holder, HandleComparisonOperation(input, ComparisonType.LesserEqual, holder, compiler));
+        }
+        
+        if (input.SanitizedContains(">"))
+        {
+            if (expectedType != "bool")
+            {
+                TermType bType = holder.GetTermType("bool");
+                if (!bType.IsSubclassOf(expectedType))
+                    throw new InvalidParametersException(compiler.CurrentLine);
+            }
+
+            return new Input(holder, HandleComparisonOperation(input, ComparisonType.Greater, holder, compiler));
+        }
+        
+        if (input.SanitizedContains("<"))
+        {
+            if (expectedType != "bool")
+            {
+                TermType bType = holder.GetTermType("bool");
+                if (!bType.IsSubclassOf(expectedType))
+                    throw new InvalidParametersException(compiler.CurrentLine);
+            }
+
+            return new Input(holder, HandleComparisonOperation(input, ComparisonType.Lesser, holder, compiler));
+        }
+
         if (input.EndsWith(")"))
         {
             FunctionCall call = compiler.ParseFunctionCall(input, holder);
@@ -221,6 +301,58 @@ public static class CompileUtils
 
             return new FunctionCall(holder, holder.GetFunction("or"), compiler.CurrentLine, a, b);
         }
+    }
+
+    public static FunctionCall HandleComparisonOperation(string token, ComparisonType type, ITokenHolder holder,
+        ActionCompiler compiler)
+    {
+        string sanitized = token.SanitizeQuotes();
+        string callName;
+        string comparison;
+        switch (type)
+        {
+            case ComparisonType.Equal:
+            {
+                callName = "equal";
+                comparison = "==";
+            } break;
+            case ComparisonType.NotEqual:
+            {
+                callName = "not-equal";
+                comparison = "!=";
+            } break;
+            case ComparisonType.Greater:
+            {
+                callName = "greater";
+                comparison = ">";
+            } break;
+            case ComparisonType.GreaterEqual:
+            {
+                callName = "greater-equal";
+                comparison = ">=";
+            } break;
+            case ComparisonType.Lesser:
+            {
+                callName = "lesser";
+                comparison = "<";
+            } break;
+            case ComparisonType.LesserEqual:
+            {
+                callName = "lesser-equal";
+                comparison = "<=";
+            } break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, "Comparison operation was invalid");
+        }
+        
+        string[] split = sanitized.Split(new[] { comparison }, 2, StringSplitOptions.RemoveEmptyEntries);
+        if (split.Length != 2)
+            throw new InvalidParametersException(compiler.CurrentLine, new []{"term","term"});
+
+        FunctionCall call = new FunctionCall(holder, compiler.GetFunction(callName), compiler.CurrentLine,
+            HandleToken(split[0].Trim(), "term", holder, compiler),
+            HandleToken(split[1].Trim(), "term", holder, compiler));
+        return call;
     }
 
     public static TermType GetTypeFromConstant(string token, ITokenHolder holder)

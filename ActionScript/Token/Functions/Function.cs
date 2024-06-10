@@ -9,14 +9,18 @@ using ActionScript.Token.Terms;
 
 namespace ActionScript.Token.Functions
 {
-    public interface IFunction
+    public interface IExecutable
+    {
+        public ReturnValue Execute(params BaseTerm[] terms);
+    }
+    
+    public interface IFunction : IExecutable
     {
         public string Name { get; }
         public string ReturnType { get; }
         public string[] InputTypes { get; }
         public bool AnyCount { get; }
-
-        public ReturnValue Execute(params BaseTerm[] terms);
+        
         public bool InputIsValid(string type, int idx, ITokenHolder holder);
     }
     
@@ -106,10 +110,12 @@ namespace ActionScript.Token.Functions
         public string ReturnType { get; }
         public string[] InputTypes { get; }
         public bool AnyCount { get; }
+        
+        public ITokenHolder Container { get; }
 
         private Dictionary<string, BaseTerm> _baseTerms;
         private List<TokenCall> _calls;
-        private Input _return;
+        private ReturnCall _return;
         private readonly string[] _inputNames;
 
         private ActionScript _script;
@@ -125,7 +131,16 @@ namespace ActionScript.Token.Functions
 
             foreach (TokenCall call in _calls)
             {
-                call.Call();
+                if (call is ReturnCall)
+                    return call.Call();
+                
+                ReturnValue returnValue = call.Call();
+
+                if (returnValue.HasValue)
+                {
+                    if (returnValue.Value is ReturnCall returnCall)
+                        return returnCall.Call();
+                }
             }
 
             if (ReturnType == "void")
@@ -133,10 +148,7 @@ namespace ActionScript.Token.Functions
                 return new ReturnValue();
             }
             else
-            {
-                BaseTerm term = _return.GetValue();
-                return new ReturnValue(term.GetValue(), term.ValueType);
-            }
+                throw new FunctionLacksReturnException(0, this);
         }
 
         public bool InputIsValid(string type, int idx, ITokenHolder holder)
@@ -207,16 +219,7 @@ namespace ActionScript.Token.Functions
 
             _script = script;
             _calls = new List<TokenCall>();
-        }
-
-        public bool HasReturnValue()
-        {
-            return _return.Type != InputType.Null;
-        }
-
-        public void SetReturnValue(Input input)
-        {
-            _return = input;
+            Container = script;
         }
 
         public IFunction GetFunction(string name) => _script.GetFunction(name);

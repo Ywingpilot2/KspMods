@@ -50,22 +50,22 @@ public class NumberTerm : BaseTerm
 
     public override int CastToInt()
     {
-        return (int)Number;
+        return Convert.ToInt32(Number);
     }
     
     public override uint CastToUint()
     {
-        return (uint)Math.Abs((int)Number);
+        return (uint)Math.Abs(Convert.ToInt32(Number));
     }
     
     public override double CastToDouble()
     {
-        return (double)Number;
+        return Convert.ToDouble(Number);
     }
     
     public override float CastToFloat()
     {
-        return (float)Number;
+        return Convert.ToSingle(Number);
     }
 
     public override string CastToStr()
