@@ -41,7 +41,17 @@ public abstract class BaseTerm : IToken
             object b = terms[1].GetValue();
             return new ReturnValue(a.Equals(b), "bool");
         }),
-        new Function("to-string", "string", terms => new ReturnValue(terms[0].GetValue().ToString(), "string"))
+        new Function("to-string", "string", terms =>
+        {
+            if (terms[0].CanImplicitCastToStr)
+            {
+                return new ReturnValue(terms[0].CastToStr(), "string");
+            }
+            else
+            {
+                return new ReturnValue(terms[0].GetValue().ToString(), "string");
+            }
+        })
     };
     
     /// <summary>
@@ -82,39 +92,121 @@ public abstract class BaseTerm : IToken
 
     #region Casting
 
+    public virtual bool CanImplicitCastToStr => false;
+
     public virtual string CastToStr()
     {
         throw new InvalidTermCastException(Line, ValueType, "string");
     }
 
+    public virtual bool CanImplicitCastToGuid => false;
     public virtual Guid CastToGuid()
     {
         throw new InvalidTermCastException(Line, ValueType, "guid");
     }
     
+    public virtual bool CanImplicitCastToUint => false;
     public virtual uint CastToUint()
     {
         throw new InvalidTermCastException(Line, ValueType, "uint");
     }
     
+    public virtual bool CanImplicitCastToInt => false;
     public virtual int CastToInt()
     {
         throw new InvalidTermCastException(Line, ValueType, "int");
     }
     
+    public virtual bool CanImplicitCastToFloat => false;
     public virtual float CastToFloat()
     {
         throw new InvalidTermCastException(Line, ValueType, "float");
     }
     
+    public virtual bool CanImplicitCastToDouble => false;
     public virtual double CastToDouble()
     {
         throw new InvalidTermCastException(Line, ValueType, "double");
     }
     
+    public virtual bool CanImplicitCastToBool => false;
     public virtual bool CastToBool()
     {
         throw new InvalidTermCastException(Line, ValueType, "bool");
+    }
+
+    public virtual bool CanImplicitCastToType(string name)
+    {
+        switch (name)
+        {
+            case "bool":
+            {
+                return CanImplicitCastToBool;
+            }
+            case "double":
+            {
+                return CanImplicitCastToDouble;
+            }
+            case "float":
+            {
+                return CanImplicitCastToFloat;
+            }
+            case "int":
+            {
+                return CanImplicitCastToInt;
+            }
+            case "uint":
+            {
+                return CanImplicitCastToUint;
+            }
+            case "guid":
+            {
+                return CanImplicitCastToGuid;
+            }
+            case "string":
+            {
+                return CanImplicitCastToStr;
+            }
+        }
+        
+        return false;
+    }
+    
+    public virtual object CastToType(string name)
+    {
+        switch (name)
+        {
+            case "bool":
+            {
+                return CastToBool();
+            }
+            case "double":
+            {
+                return CastToDouble();
+            }
+            case "float":
+            {
+                return CastToFloat();
+            }
+            case "int":
+            {
+                return CastToInt();
+            }
+            case "uint":
+            {
+                return CastToUint();
+            }
+            case "guid":
+            {
+                return CastToGuid();
+            }
+            case "string":
+            {
+                return CastToStr();
+            }
+        }
+        
+        return false;
     }
 
     #endregion

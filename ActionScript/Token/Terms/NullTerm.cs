@@ -10,6 +10,8 @@ public class NullTerm : BaseTerm
         throw new TypeNotConstructableException(0, "null-type");
     }
 
+    public override bool CanImplicitCastToStr => true;
+
     public override bool SetValue(object value)
     {
         throw new System.NotImplementedException();

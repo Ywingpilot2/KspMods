@@ -151,7 +151,19 @@ public class ActionCompiler : ITokenHolder
             {
                 TermType type = GetTermType(values[0]);
                 BaseTerm from = holder.GetTerm(values[2]);
-                BaseTerm term = type.Construct(values[1], CurrentLine);
+                if (!from.CanImplicitCastToType(type.Name) && !from.GetTermType().IsSubclassOf(type.Name))
+                    throw new InvalidAssignmentException(CurrentLine);
+
+                BaseTerm term;
+                if (from.GetTermType().IsSubclassOf(type.Name))
+                {
+                    TermType constructType = from.GetTermType();
+                    term = constructType.Construct(values[1], CurrentLine);
+                }
+                else
+                {
+                    term = type.Construct(values[1], CurrentLine);
+                }
                 Input input = new Input(from);
 
                 AssignmentCall assignmentCall = new AssignmentCall(term, input, holder, CurrentLine);
@@ -415,6 +427,15 @@ public class ActionCompiler : ITokenHolder
         if (library.TypeLibrary != null)
         {
             _script.TypeLibraries.Add(library.TypeLibrary);
+        }
+    }
+
+    public IEnumerable<ILibrary> EnumerateLibraries()
+    {
+        yield return Library;
+        foreach (ILibrary library in _libraries)
+        {
+            yield return library;
         }
     }
 

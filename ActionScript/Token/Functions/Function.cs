@@ -237,11 +237,6 @@ namespace ActionScript.Token.Functions
 
         public IEnumerable<BaseTerm> EnumerateTerms()
         {
-            foreach (BaseTerm term in Container.EnumerateTerms())
-            {
-                yield return term;
-            }
-
             foreach (BaseTerm term in _baseTerms.Values)
             {
                 yield return term;

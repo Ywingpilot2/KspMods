@@ -40,6 +40,8 @@ public class TermType
         return false;
     }
 
+    public bool CanImplicitCastTo(string name) => Term.CanImplicitCastToType(name);
+
     public TermType(BaseTerm term, TypeLibrary library, TermType baseClass = null, bool isAbstract = false)
     {
         Term = term;

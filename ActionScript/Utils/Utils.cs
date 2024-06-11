@@ -98,7 +98,7 @@ public static class CompileUtils
         string type = typeName[0].Trim();
         string value = split[1].Trim();
         if (value.SanitizedContains("&") || value.SanitizedContains("|") || value.SanitizedContains("==") || value.SanitizedContains("!=")
-            || value.SanitizedContains("<=") || value.SanitizedContains(">="))
+            || value.SanitizedContains("<=") || value.SanitizedContains(">=") || value.StartsWith("!"))
         {
             if (type != "bool")
                 throw new InvalidCompilationException(0, $"Cannot use boolean operations on type {type}");
@@ -106,7 +106,7 @@ public static class CompileUtils
             return AssignmentKind.Function;
         }
 
-        if (value.StartsWith("!"))
+        if (value.SanitizedContains(" as "))
         {
             return AssignmentKind.Function;
         }
@@ -123,7 +123,7 @@ public static class CompileUtils
         
         return AssignmentKind.Constant;
     }
-    
+
     public static Input HandleToken(string input, string expectedType, ITokenHolder holder, ActionCompiler compiler)
     {
         if (input.SanitizedContains("&"))
@@ -131,7 +131,7 @@ public static class CompileUtils
             if (expectedType != "bool")
             {
                 TermType bType = holder.GetTermType("bool");
-                if (!bType.IsSubclassOf(expectedType))
+                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine);
             }
             
@@ -144,7 +144,7 @@ public static class CompileUtils
             if (expectedType != "bool")
             {
                 TermType bType = holder.GetTermType("bool");
-                if (!bType.IsSubclassOf(expectedType))
+                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine);
             }
             
@@ -157,7 +157,7 @@ public static class CompileUtils
             if (expectedType != "bool")
             {
                 TermType bType = holder.GetTermType("bool");
-                if (!bType.IsSubclassOf(expectedType))
+                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine);
             }
 
@@ -169,7 +169,7 @@ public static class CompileUtils
             if (expectedType != "bool")
             {
                 TermType bType = holder.GetTermType("bool");
-                if (!bType.IsSubclassOf(expectedType))
+                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine);
             }
 
@@ -181,7 +181,7 @@ public static class CompileUtils
             if (expectedType != "bool")
             {
                 TermType bType = holder.GetTermType("bool");
-                if (!bType.IsSubclassOf(expectedType))
+                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine);
             }
 
@@ -193,7 +193,7 @@ public static class CompileUtils
             if (expectedType != "bool")
             {
                 TermType bType = holder.GetTermType("bool");
-                if (!bType.IsSubclassOf(expectedType))
+                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine);
             }
 
@@ -205,7 +205,7 @@ public static class CompileUtils
             if (expectedType != "bool")
             {
                 TermType bType = holder.GetTermType("bool");
-                if (!bType.IsSubclassOf(expectedType))
+                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine);
             }
 
@@ -217,11 +217,36 @@ public static class CompileUtils
             if (expectedType != "bool")
             {
                 TermType bType = holder.GetTermType("bool");
-                if (!bType.IsSubclassOf(expectedType))
+                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine);
             }
 
             return new Input(holder, HandleComparisonOperation(input, ComparisonType.Lesser, holder, compiler));
+        }
+
+        if (input.SanitizedContains(" as "))
+        {
+            string[] split = input.SanitizeQuotes().Split(new[] { " as " }, 2, StringSplitOptions.RemoveEmptyEntries);
+            if (split.Length != 2)
+                throw new InvalidParametersException(compiler.CurrentLine, new[] { "base-term","string" });
+
+            TermType type = holder.GetTermType(split[1].Trim());
+            Input convert = HandleToken(split[0].Trim(), "term", holder, compiler);
+            CastCall castCall = new CastCall(holder, compiler.CurrentLine, convert, type.Name);
+            return new Input(holder, castCall);
+        }
+        
+        if (input.StartsWith("!"))
+        {
+            if (expectedType != "bool")
+            {
+                TermType bType = holder.GetTermType("bool");
+                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
+                    throw new InvalidParametersException(compiler.CurrentLine);
+            }
+
+            FunctionCall call = new FunctionCall(holder, holder.GetFunction("not"), compiler.CurrentLine, HandleToken(input.Remove(0,1), "bool", holder, compiler));
+            return new Input(holder, call);
         }
 
         if (input.EndsWith(")"))
@@ -231,23 +256,10 @@ public static class CompileUtils
             if (call.Function.ReturnType != expectedType)
             {
                 TermType type = holder.GetTermType(call.Function.ReturnType);
-                if (!type.IsSubclassOf(expectedType))
+                if (!type.CanImplicitCastTo(expectedType) && !type.IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine, call.Function.InputTypes);
             }
 
-            return new Input(holder, call);
-        }
-
-        if (input.StartsWith("!"))
-        {
-            if (expectedType != "bool")
-            {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-
-            FunctionCall call = new FunctionCall(holder, holder.GetFunction("not"), compiler.CurrentLine, HandleToken(input.Remove(0,1), "bool", holder, compiler));
             return new Input(holder, call);
         }
 
@@ -276,7 +288,7 @@ public static class CompileUtils
             BaseTerm term = holder.GetTerm(input);
             if (term.ValueType != expectedType)
             {
-                if (!term.GetTermType().IsSubclassOf(expectedType))
+                if (!term.CanImplicitCastToType(expectedType) && !term.GetTermType().IsSubclassOf(expectedType))
                     throw new InvalidParametersException(compiler.CurrentLine);
             }
             return new Input(term);

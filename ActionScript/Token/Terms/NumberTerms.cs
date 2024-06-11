@@ -42,6 +42,10 @@ public class NumberTerm : BaseTerm
 
     #region Casting
 
+    public override bool CanImplicitCastToInt => true;
+    public override bool CanImplicitCastToFloat => true;
+    public override bool CanImplicitCastToDouble => true;
+
     public override bool CastToBool()
     {
         int value = (int)Number;
@@ -83,7 +87,7 @@ public class NumberTerm : BaseTerm
         if (term is not NumberTerm num)
             return false;
 
-        Number = num.Number;
+        Number = (ValueType)num.CastToType(ValueType);
         Kind = num.Kind;
 
         return true;
@@ -98,7 +102,9 @@ public class NumberTerm : BaseTerm
 public class TermI : NumberTerm
 {
     public override string ValueType => "int";
-    
+
+    public override bool CanImplicitCastToBool => true;
+
     public override bool Parse(string value)
     {
         if (int.TryParse(value, NumberStyles.Integer & NumberStyles.AllowLeadingSign, new NumberFormatInfo(), out int i))
@@ -115,12 +121,14 @@ public class TermI : NumberTerm
 
     public override bool SetValue(object value)
     {
-        if (value is not int i)
-            return false;
+        if (value is IConvertible convertible)
+        {
+            Number = convertible.ToInt32(new NumberFormatInfo());
+            Kind = TermKind.Basic;
+            return true;
+        }
 
-        Number = i;
-        Kind = TermKind.Basic;
-        return true;
+        return false;
     }
 }
 
@@ -146,19 +154,23 @@ public class TermF : NumberTerm
     
     public override bool SetValue(object value)
     {
-        if (value is not float i)
-            return false;
+        if (value is IConvertible convertible)
+        {
+            Number = convertible.ToSingle(new NumberFormatInfo());
+            Kind = TermKind.Basic;
+            return true;
+        }
 
-        Number = i;
-        Kind = TermKind.Basic;
-        return true;
+        return false;
     }
 }
 
 public class TermU : NumberTerm
 {
     public override string ValueType => "uint";
-    
+
+    public override bool CanImplicitCastToBool => true;
+
     public override bool Parse(string value)
     {
         value = value.StartsWith("0x") ? value.Replace("0x", "") : value;

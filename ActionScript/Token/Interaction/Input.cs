@@ -17,7 +17,7 @@ public enum InputType
 public struct Input
 {
     public InputType Type { get; }
-    private FunctionCall Call { get; }
+    private TokenCall Call { get; }
     private BaseTerm _term;
     private ITokenHolder _script;
 
@@ -34,7 +34,7 @@ public struct Input
             {
                 ReturnValue value = Call.Call();
                 if (!value.HasValue)
-                    return null;
+                    return new NullTerm();
                     
                 //return new BaseTerm(Guid.NewGuid().ToString(), value.Value.ToString(), Call.Function.ValueType);
                 if (!_script.TermTypeExists(value.Type))
@@ -56,7 +56,7 @@ public struct Input
         }
     }
 
-    public Input(ITokenHolder script, FunctionCall call)
+    public Input(ITokenHolder script, TokenCall call)
     {
         Type = InputType.Call;
         Call = call;

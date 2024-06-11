@@ -45,6 +45,18 @@ public struct FuncKeyword : IKeyword
         }
 
         UserFunction function = new UserFunction(name, returnType, inputMapping, _script);
+        // first add global terms from the compiler
+        foreach (ILibrary library in _compiler.EnumerateLibraries())
+        {
+            if (library.GlobalTerms == null)
+                continue;
+
+            foreach (BaseTerm globalTerm in library.GlobalTerms)
+            {
+                function.AddTerm(globalTerm);
+            }
+        }
+        
         ParseFunctionTokens(token, function);
 
         return function;

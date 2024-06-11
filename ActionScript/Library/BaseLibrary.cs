@@ -84,8 +84,8 @@ namespace ActionScript.Library
             new Function("is-null", "bool", terms =>
             {
                 BaseTerm term = terms[0];
-                return term.Kind != TermKind.Null ? new ReturnValue(term.GetValue() != null, "bool") : new ReturnValue(false, "bool");
-            })
+                return term.Kind == TermKind.Null ? new ReturnValue(term.GetValue() == null, "bool") : new ReturnValue(false, "bool");
+            }),
         };
 
         public IEnumerable<BaseTerm> GlobalTerms => new[]
