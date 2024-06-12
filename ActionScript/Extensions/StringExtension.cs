@@ -86,12 +86,10 @@ public static class StringExtension
         List<string> splits = new List<string>(); // TODO: Use an array instead
 
         string current = "";
-        bool isStr = false;
-        bool isEsc = false;
-        for (int i = 0; i < idx; i++)
+        for (int i = 0; i < self.Length; i++)
         {
             char c = self[i];
-            self += c;
+            current += c;
 
             if (i != idx) continue;
             if (splits.Count + 1 > count)
@@ -104,6 +102,7 @@ public static class StringExtension
             else
             {
                 splits.Add(current);
+                current = "";
             }
         }
 
@@ -188,9 +187,22 @@ public static class StringExtension
         return clean.Contains(check);
     }
 
-    public static int SanitizedIndexOf(this string self, string check, StringComparison comparison)
+    public static int SanitizedIndexOf(this string self, string check, StringComparison comparison = StringComparison.Ordinal)
     {
         string santize = SanitizeQuotes(self);
         return santize.IndexOf(check, comparison);
+    }
+
+    public static string SanitizedReplace(this string self, string replace, string with)
+    {
+        string updated = self;
+        while (self.SanitizedContains(replace))
+        {
+            int idx = SanitizedIndexOf(updated, replace);
+            updated = updated.Remove(idx, replace.Length);
+            updated = updated.Insert(idx, with);
+        }
+
+        return updated;
     }
 }

@@ -13,10 +13,15 @@ namespace ActionTest
     {
         public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
         {
-            new Function("print", "string", inputTypes:"string", action: terms =>
+            new Function("print", "void", inputTypes:"string", action: terms =>
             {
                 Console.WriteLine(terms[0].CastToStr());
                 return new ReturnValue();
+            }),
+            new Function("read", "string", terms =>
+            {
+                string read = Console.ReadLine();
+                return new ReturnValue(read, "string");
             })
         };
         public IEnumerable<BaseTerm> GlobalTerms { get; }

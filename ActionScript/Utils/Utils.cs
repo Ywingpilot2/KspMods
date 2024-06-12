@@ -227,7 +227,7 @@ public static class CompileUtils
             } break;
             case ComparisonType.NotEqual:
             {
-                callName = "not-equal";
+                callName = "not_equal";
                 comparison = "!=";
             } break;
             case ComparisonType.Greater:
@@ -237,7 +237,7 @@ public static class CompileUtils
             } break;
             case ComparisonType.GreaterEqual:
             {
-                callName = "greater-equal";
+                callName = "greater_equal";
                 comparison = ">=";
             } break;
             case ComparisonType.Lesser:
@@ -247,20 +247,20 @@ public static class CompileUtils
             } break;
             case ComparisonType.LesserEqual:
             {
-                callName = "lesser-equal";
+                callName = "lesser_equal";
                 comparison = "<=";
             } break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, "Comparison operation was invalid");
         }
-        
-        string[] split = sanitized.Split(new[] { comparison }, 2, StringSplitOptions.RemoveEmptyEntries);
+
+        string[] split = token.SplitAt(sanitized.IndexOf(comparison, StringComparison.Ordinal), 2);
         if (split.Length != 2)
             throw new InvalidParametersException(compiler.CurrentLine, new []{"term","term"});
 
         FunctionCall call = new FunctionCall(holder, compiler.GetFunction(callName), compiler.CurrentLine,
-            HandleToken(split[0].Trim(), "term", holder, compiler),
-            HandleToken(split[1].Trim(), "term", holder, compiler));
+            HandleToken(split[0].Remove(split[0].Length - 1).Trim(), "term", holder, compiler),
+            HandleToken(split[1].Remove(0,1).Trim(), "term", holder, compiler));
         return call;
     }
 
