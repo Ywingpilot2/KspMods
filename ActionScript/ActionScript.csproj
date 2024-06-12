@@ -58,6 +58,7 @@
         <Compile Include="Token\Functions\Function.cs" />
         <Compile Include="Token\Functions\FunctionCall.cs" />
         <Compile Include="Token\Functions\IfFunctions.cs" />
+        <Compile Include="Token\Functions\OperatorCall.cs" />
         <Compile Include="Token\Functions\Throw.cs" />
         <Compile Include="Token\Functions\While.cs" />
         <Compile Include="Token\Interaction\Input.cs" />
@@ -79,6 +80,7 @@
         <Compile Include="Token\Terms\StringTerm.cs" />
         <Compile Include="Token\Terms\Term.cs" />
         <Compile Include="Token\Terms\VoidTerm.cs" />
+        <Compile Include="Token\TokenKind.cs" />
         <Compile Include="Utils\Utils.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

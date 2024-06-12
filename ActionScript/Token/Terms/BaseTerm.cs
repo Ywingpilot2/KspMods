@@ -4,6 +4,7 @@ using ActionScript.Exceptions;
 using ActionScript.Library;
 using ActionScript.Token.Functions;
 using ActionScript.Token.Interaction;
+using ActionScript.Utils;
 
 namespace ActionScript.Token.Terms;
 
@@ -207,6 +208,17 @@ public abstract class BaseTerm : IToken
         }
         
         return false;
+    }
+
+    #endregion
+
+    #region Operators
+
+    public virtual OperatorKind[] AllowedOperators { get; }
+
+    public virtual object ConductOperation(OperatorKind kind, BaseTerm subject)
+    {
+        throw new NotImplementedException("This term does not support any operators");
     }
 
     #endregion

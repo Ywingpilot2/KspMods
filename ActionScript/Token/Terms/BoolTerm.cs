@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using ActionScript.Token.Functions;
+using ActionScript.Utils;
 
 namespace ActionScript.Token.Terms;
 
@@ -42,6 +43,21 @@ public sealed class BoolTerm : BaseTerm
     }
 
     #endregion
+
+    public override OperatorKind[] AllowedOperators => new[]
+    {
+        OperatorKind.And,
+        OperatorKind.Or
+    };
+
+    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    {
+        bool b = subject.CastToBool();
+        if (kind == OperatorKind.And)
+            return _value && b;
+        else
+            return _value || b;
+    }
 
     public override bool Parse(string value)
     {

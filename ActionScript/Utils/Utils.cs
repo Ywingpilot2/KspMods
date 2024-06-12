@@ -13,12 +13,6 @@ using ActionScript.Token.Terms;
 
 namespace ActionScript.Utils;
 
-public enum ConditionType
-{
-    Or = 0,
-    And = 1
-}
-
 public enum ComparisonType
 {
     Equal = 0,
@@ -27,6 +21,18 @@ public enum ComparisonType
     GreaterEqual = 3,
     Lesser = 4,
     LesserEqual = 5
+}
+
+public enum OperatorKind
+{
+    And = 0,
+    Or = 1,
+    Add = 2,
+    Subtract = 3,
+    Multiply = 4,
+    Divide = 5,
+    Power = 6,
+    Remaining = 7
 }
 
 public enum AssignmentKind
@@ -39,6 +45,8 @@ public enum AssignmentKind
 
 public static class CompileUtils
 {
+    #region operator stuff
+
     public static readonly string[] InvalidNames = 
     {
         "|",
@@ -53,6 +61,32 @@ public static class CompileUtils
         "<=",
         ">="
     };
+
+    public static readonly string[] Comparisons =
+    {
+        "==",
+        "!=",
+        "<",
+        ">",
+        "<=",
+        ">="
+    };
+
+    public static readonly string[] Operators =
+    {
+        "|",
+        "&",
+        "+",
+        "-",
+        "/",
+        "*",
+        "^",
+        "%"
+    };
+
+    #endregion
+
+    #region Terms
 
     public static string[] GetTermValues(string token)
     {
@@ -124,196 +158,67 @@ public static class CompileUtils
         return AssignmentKind.Constant;
     }
 
-    public static Input HandleToken(string input, string expectedType, ITokenHolder holder, ActionCompiler compiler)
+    #endregion
+
+    public static Input HandleToken(string token, string expectedType, ITokenHolder holder, ActionCompiler compiler)
     {
-        if (input.SanitizedContains("&"))
-        {
-            if (expectedType != "bool")
-            {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-            
-            FunctionCall call = HandleConditionOperation(input, ConditionType.And, holder, compiler);
-            return new Input(holder, call);
-        }
-
-        if (input.SanitizedContains("|"))
-        {
-            if (expectedType != "bool")
-            {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-            
-            FunctionCall call = HandleConditionOperation(input, ConditionType.Or, holder, compiler);
-            return new Input(holder, call);
-        }
-
-        if (input.SanitizedContains("!="))
-        {
-            if (expectedType != "bool")
-            {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-
-            return new Input(holder, HandleComparisonOperation(input, ComparisonType.NotEqual, holder, compiler));
-        }
+        TokenKind kind = GetTokenKind(token, holder);
+        TermType type = GetTypeFromToken(token, holder, kind);
+        if (type.Name != expectedType && !type.CanImplicitCastTo(expectedType) && !type.IsSubclassOf(expectedType))
+            throw new InvalidTermCastException(compiler.CurrentLine, type.Name, expectedType);
         
-        if (input.SanitizedContains("=="))
+        switch (kind)
         {
-            if (expectedType != "bool")
+            case TokenKind.Constant:
             {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-
-            return new Input(holder, HandleComparisonOperation(input, ComparisonType.Equal, holder, compiler));
-        }
-        
-        if (input.SanitizedContains(">="))
-        {
-            if (expectedType != "bool")
-            {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-
-            return new Input(holder, HandleComparisonOperation(input, ComparisonType.GreaterEqual, holder, compiler));
-        }
-        
-        if (input.SanitizedContains("<="))
-        {
-            if (expectedType != "bool")
-            {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-
-            return new Input(holder, HandleComparisonOperation(input, ComparisonType.LesserEqual, holder, compiler));
-        }
-        
-        if (input.SanitizedContains(">"))
-        {
-            if (expectedType != "bool")
-            {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-
-            return new Input(holder, HandleComparisonOperation(input, ComparisonType.Greater, holder, compiler));
-        }
-        
-        if (input.SanitizedContains("<"))
-        {
-            if (expectedType != "bool")
-            {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-
-            return new Input(holder, HandleComparisonOperation(input, ComparisonType.Lesser, holder, compiler));
-        }
-
-        if (input.SanitizedContains(" as "))
-        {
-            string[] split = input.SanitizeQuotes().Split(new[] { " as " }, 2, StringSplitOptions.RemoveEmptyEntries);
-            if (split.Length != 2)
-                throw new InvalidParametersException(compiler.CurrentLine, new[] { "base-term","string" });
-
-            TermType type = holder.GetTermType(split[1].Trim());
-            Input convert = HandleToken(split[0].Trim(), "term", holder, compiler);
-            CastCall castCall = new CastCall(holder, compiler.CurrentLine, convert, type.Name);
-            return new Input(holder, castCall);
-        }
-        
-        if (input.StartsWith("!"))
-        {
-            if (expectedType != "bool")
-            {
-                TermType bType = holder.GetTermType("bool");
-                if (!bType.CanImplicitCastTo(expectedType) && !bType.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
-            }
-
-            FunctionCall call = new FunctionCall(holder, holder.GetFunction("not"), compiler.CurrentLine, HandleToken(input.Remove(0,1), "bool", holder, compiler));
-            return new Input(holder, call);
-        }
-
-        if (input.EndsWith(")"))
-        {
-            FunctionCall call = compiler.ParseFunctionCall(input, holder);
-
-            if (call.Function.ReturnType != expectedType)
-            {
-                TermType type = holder.GetTermType(call.Function.ReturnType);
-                if (!type.CanImplicitCastTo(expectedType) && !type.IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine, call.Function.InputTypes);
-            }
-
-            return new Input(holder, call);
-        }
-
-        if (!holder.HasTerm(input))
-        {
-            TermType type;
-            if (expectedType == "term") // we are gonna try to parse it as a literal
-            {
-                // TODO: We should put this into its own class or something
-                type = GetTypeFromConstant(input, compiler);
-            }
-            else
-            {
-                type = compiler.GetTermType(expectedType);
-            }
+                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), compiler.CurrentLine);
+                term.Parse(token);
                 
-            BaseTerm term = type.Construct(Guid.NewGuid().ToString(), compiler.CurrentLine);
-            if (!term.Parse(input))
-                throw new InvalidCompilationException(compiler.CurrentLine,
-                    "Unable to parse specified value, either this constant is of the incorrect type or the value cannot be parsed");
-                
-            return new Input(term);
-        }
-        else
-        {
-            BaseTerm term = holder.GetTerm(input);
-            if (term.ValueType != expectedType)
-            {
-                if (!term.CanImplicitCastToType(expectedType) && !term.GetTermType().IsSubclassOf(expectedType))
-                    throw new InvalidParametersException(compiler.CurrentLine);
+                return new Input(term);
             }
-            return new Input(term);
+            case TokenKind.Term:
+            {
+                return new Input(holder.GetTerm(token));
+            }
+            case TokenKind.Function:
+            {
+                FunctionCall call = compiler.ParseFunctionCall(token, holder);
+                return new Input(holder, call);
+            }
+            case TokenKind.SpecialFunc:
+            {
+                SpecialFuncKind specialKind = GetSpecialKind(token);
+                switch (specialKind)
+                {
+                    case SpecialFuncKind.Not:
+                    {
+                        FunctionCall call = new FunctionCall(holder, holder.GetFunction("not"), compiler.CurrentLine, HandleToken(token.Remove(0,1), "bool", holder, compiler));
+                        return new Input(holder, call);
+                    }
+                    case SpecialFuncKind.Comparison:
+                    {
+                        FunctionCall call = HandleComparisonOperation(token, GetComparisonFromToken(token), holder, compiler);
+                        return new Input(holder, call);
+                    }
+                    case SpecialFuncKind.As:
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            case TokenKind.Operator:
+            {
+                OperatorKind op = GetOperator(token);
+                if (!type.AllowedOperators.Contains(op))
+                    throw new InvalidCompilationException(compiler.CurrentLine, $"Type {type.Name} does not support ");
+
+                return new Input(holder, HandleOperation(token, op, holder, compiler, type.Name));
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
-    public static FunctionCall HandleConditionOperation(string token, ConditionType type, ITokenHolder holder, ActionCompiler compiler)
-    {
-        if (type == ConditionType.And)
-        {
-            string[] split = token.SanitizedSplit('&', 2);
-            Input a = HandleToken(split[0].Trim(), "bool", holder, compiler);
-            Input b = HandleToken(split[1].Trim(), "bool", holder, compiler);
-
-            return new FunctionCall(holder, holder.GetFunction("and"), compiler.CurrentLine, a, b);
-        }
-        else
-        {
-            string[] split = token.SanitizedSplit('|', 2);
-            Input a = HandleToken(split[0].Trim(), "bool", holder, compiler);
-            Input b = HandleToken(split[1].Trim(), "bool", holder, compiler);
-
-            return new FunctionCall(holder, holder.GetFunction("or"), compiler.CurrentLine, a, b);
-        }
-    }
+    #region Handling
 
     public static FunctionCall HandleComparisonOperation(string token, ComparisonType type, ITokenHolder holder,
         ActionCompiler compiler)
@@ -367,6 +272,23 @@ public static class CompileUtils
         return call;
     }
 
+    public static OperatorCall HandleOperation(string token, OperatorKind kind, ITokenHolder holder,
+        ActionCompiler compiler, string expectedType)
+    {
+        char splitter = GetOperatorChar(kind);
+        string[] split = token.SanitizedSplit(splitter, 2, StringSplitOptions.RemoveEmptyEntries);
+        if (split.Length == 1)
+            throw new InvalidCompilationException(compiler.CurrentLine, $"{token} lacks a second operator argument!");
+
+        Input a = HandleToken(split[0].Trim(), expectedType, holder, compiler);
+        Input b = HandleToken(split[1].Trim(), expectedType, holder, compiler);
+        return new OperatorCall(holder, compiler.CurrentLine, a, b, kind);
+    }
+
+    #endregion
+
+    #region Type Solving
+
     public static TermType GetTypeFromConstant(string token, ITokenHolder holder)
     {
         if (token.StartsWith("\"") && token.EndsWith("\"")) // is a string
@@ -390,4 +312,199 @@ public static class CompileUtils
             throw new InvalidCompilationException(0, "Unable to parse specified value, either this constant is of the incorrect type or the value cannot be parsed");
         }
     }
+
+    public static TermType GetTypeFromTerm(string token, ITokenHolder holder)
+    {
+        BaseTerm term = holder.GetTerm(token);
+        return term.GetTermType();
+    }
+
+    public static TermType GetTypeFromFunction(string token, ITokenHolder holder)
+    {
+        string name = token.SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries)[0];
+        IFunction function = holder.GetFunction(name);
+        
+        return holder.GetTermType(function.ReturnType);
+    }
+
+    #endregion
+
+    public static TermType GetTypeFromToken(string token, ITokenHolder holder, TokenKind kind)
+    {
+        switch (kind)
+        {
+            case TokenKind.Constant:
+            {
+                return GetTypeFromConstant(token, holder);
+            }
+            case TokenKind.Term:
+            {
+                return GetTypeFromTerm(token, holder);
+            }
+            case TokenKind.Function:
+            {
+                return GetTypeFromFunction(token, holder);
+            }
+            case TokenKind.SpecialFunc:
+            {
+                SpecialFuncKind specialKind = GetSpecialKind(token);
+                switch (specialKind)
+                {
+                    case SpecialFuncKind.Not:
+                    case SpecialFuncKind.Comparison:
+                    {
+                        return holder.GetTermType("bool");
+                    }
+                    case SpecialFuncKind.As:
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            case TokenKind.Operator:
+            {
+                OperatorKind operatorKind = GetOperator(token);
+                char split = GetOperatorChar(operatorKind);
+                string opToken = token.SanitizedSplit(split, 2, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
+
+                TokenKind opToKind = GetTokenKind(opToken, holder);
+                return GetTypeFromToken(opToken, holder, opToKind);
+            }
+            default:
+                throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+        }
+    }
+
+    #region Operator
+
+    public static OperatorKind GetOperator(string token)
+    {
+        string san = token.SanitizeQuotes();
+        string op = Operators.FirstOrDefault(san.Contains);
+        return op switch
+        {
+            "|" => OperatorKind.Or,
+            "&" => OperatorKind.And,
+            "+" => OperatorKind.Add,
+            "-" => OperatorKind.Subtract,
+            "/" => OperatorKind.Divide,
+            "*" => OperatorKind.Multiply,
+            "^" => OperatorKind.Power,
+            "%" => OperatorKind.Remaining,
+            _ => throw new InvalidCompilationException(0, $"Operator in token {token} is invalid")
+        };
+    }
+
+    public static char GetOperatorChar(OperatorKind kind)
+    {
+        return kind switch
+        {
+            OperatorKind.And => '&',
+            OperatorKind.Or => '|',
+            OperatorKind.Add => '+',
+            OperatorKind.Subtract => '-',
+            OperatorKind.Multiply => '*',
+            OperatorKind.Divide => '/',
+            OperatorKind.Power => '^',
+            OperatorKind.Remaining => '%',
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+    #endregion
+
+    #region Comparison
+
+    public static ComparisonType GetComparisonFromToken(string token)
+    {
+        string san = token.SanitizeQuotes();
+        string op = Comparisons.FirstOrDefault(s => san.Contains(s));
+        switch (op)
+        {
+            case "==":
+            {
+                return ComparisonType.Equal;
+            }
+            case "!=":
+            {
+                return ComparisonType.NotEqual;
+            }
+            case ">":
+            {
+                return ComparisonType.Greater;
+            }
+            case ">=":
+            {
+                return ComparisonType.GreaterEqual;
+            }
+            case "<":
+            {
+                return ComparisonType.Lesser;
+            }
+            case "<=":
+            {
+                return ComparisonType.LesserEqual;
+            } 
+        }
+
+        throw new InvalidCompilationException(0, $"Unable to determine comparison operator from {token}");
+    }
+
+    #endregion
+
+    #region Kind Solving
+
+    public static SpecialFuncKind GetSpecialKind(string token)
+    {
+        string san = token.SanitizeQuotes();
+
+        if (san.StartsWith("!"))
+            return SpecialFuncKind.Not;
+
+        if (Comparisons.Any(san.Contains))
+            return SpecialFuncKind.Comparison;
+
+        if (san.Contains(" as "))
+            return SpecialFuncKind.As;
+
+        throw new InvalidCompilationException(0, $"Token {token} is not valid");
+    }
+
+    public static TokenKind GetTokenKind(string token, ITokenHolder holder)
+    {
+        string san = token.SanitizeQuotes();
+
+        if (san.StartsWith("!"))
+        {
+            return TokenKind.SpecialFunc;
+        }
+        
+        if (san.EndsWith(")"))
+        {
+            return TokenKind.Function;
+        }
+
+        if (Operators.Any(san.Contains))
+        {
+            return TokenKind.Operator;
+        }
+        
+        if (Comparisons.Any(san.Contains))
+        {
+            return TokenKind.SpecialFunc;
+        }
+
+        if (san.Contains(" as "))
+        {
+            return TokenKind.SpecialFunc;
+        }
+
+        if (!holder.HasTerm(token))
+        {
+            return TokenKind.Constant;
+        }
+
+        return TokenKind.Term; // It is most likely a term
+    }
+
+    #endregion
 }

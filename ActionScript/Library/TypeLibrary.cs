@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ActionScript.Exceptions;
 using ActionScript.Token.Terms;
+using ActionScript.Utils;
 
 namespace ActionScript.Library;
 
@@ -11,6 +12,7 @@ public class TermType
     public TermType BaseClass { get; }
     public bool IsAbstract { get; }
     public TypeLibrary Library { get; }
+    public OperatorKind[] AllowedOperators => Term.AllowedOperators;
     private BaseTerm Term { get; }
 
     public BaseTerm Construct(string name, int line)
