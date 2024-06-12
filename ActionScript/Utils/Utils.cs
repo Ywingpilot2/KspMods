@@ -201,6 +201,16 @@ public static class CompileUtils
                         return new Input(holder, call);
                     }
                     case SpecialFuncKind.As:
+                    {
+                        string san = token.SanitizeQuotes();
+                        string[] split = san.Split(new[] { " as " }, 2, StringSplitOptions.RemoveEmptyEntries);
+                        if (split.Length != 2)
+                            throw new InvalidParametersException(0, new[] { "term", "type" });
+
+                        Input convert = HandleToken(split[0].Trim(), "term", holder, compiler);
+                        CastCall call = new CastCall(holder, compiler.CurrentLine, convert, type.Name);
+                        return new Input(holder, call);
+                    }
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -356,6 +366,15 @@ public static class CompileUtils
                         return holder.GetTermType("bool");
                     }
                     case SpecialFuncKind.As:
+                    {
+                        string san = token.SanitizeQuotes();
+                        string[] split = san.Split(new[] { " as " }, 2, StringSplitOptions.RemoveEmptyEntries);
+                        if (split.Length != 2)
+                            throw new InvalidParametersException(0, new[] { "term", "type" });
+
+                        TermType type = holder.GetTermType(split[1].Trim());
+                        return type;
+                    }
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
