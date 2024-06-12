@@ -128,34 +128,16 @@ public static class CompileUtils
         string name = typeName[1].Trim();
         if (InvalidNames.Any(s => name.Contains(s)))
             throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]} as it contains operators");
-
-        string type = typeName[0].Trim();
-        string value = split[1].Trim();
-        if (value.SanitizedContains("&") || value.SanitizedContains("|") || value.SanitizedContains("==") || value.SanitizedContains("!=")
-            || value.SanitizedContains("<=") || value.SanitizedContains(">=") || value.StartsWith("!"))
+        TokenKind kind = GetTokenKind(token, holder);
+        return kind switch
         {
-            if (type != "bool")
-                throw new InvalidCompilationException(0, $"Cannot use boolean operations on type {type}");
-
-            return AssignmentKind.Function;
-        }
-
-        if (value.SanitizedContains(" as "))
-        {
-            return AssignmentKind.Function;
-        }
-        
-        if (value.EndsWith(")"))
-        {
-            return AssignmentKind.Function;
-        }
-
-        if (holder.HasTerm(value))
-        {
-            return AssignmentKind.Term;
-        }
-        
-        return AssignmentKind.Constant;
+            TokenKind.Constant => AssignmentKind.Constant,
+            TokenKind.Term => AssignmentKind.Term,
+            TokenKind.Function => AssignmentKind.Function,
+            TokenKind.SpecialFunc => AssignmentKind.Function,
+            TokenKind.Operator => AssignmentKind.Function,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
     #endregion

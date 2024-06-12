@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using ActionScript.Token.Functions;
+using ActionScript.Utils;
 
 namespace ActionScript.Token.Terms;
 
@@ -31,6 +32,7 @@ public class NumberTerm : BaseTerm
     }
 
     protected ValueType Number;
+    protected virtual Type NumberType { get; }
 
     protected static string[] NumberTypes = new[]
     {
@@ -79,6 +81,46 @@ public class NumberTerm : BaseTerm
 
     #endregion
 
+    #region Math
+
+    public override OperatorKind[] AllowedOperators => new[]
+    {
+        OperatorKind.Add,
+        OperatorKind.Subtract,
+        OperatorKind.Divide,
+        OperatorKind.Multiply
+    };
+
+    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    {
+        double a = CastToDouble();
+        double b = subject.CastToDouble();
+        
+        switch (kind)
+        {
+            case OperatorKind.Add:
+            {
+                return Convert.ChangeType(a + b, NumberType);
+            }
+            case OperatorKind.Subtract:
+            {
+                return Convert.ChangeType(a - b, NumberType);
+            }
+            case OperatorKind.Multiply:
+            {
+                return Convert.ChangeType(a * b, NumberType);
+            }
+            case OperatorKind.Divide:
+            {
+                return Convert.ChangeType(a / b, NumberType);
+            }
+            default:
+                throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+        }
+    }
+
+    #endregion
+
     public override bool CopyFrom(BaseTerm term)
     {
         if (term.Kind == TermKind.Null)
@@ -102,6 +144,7 @@ public class NumberTerm : BaseTerm
 public class TermI : NumberTerm
 {
     public override string ValueType => "int";
+    protected override Type NumberType => typeof(int);
 
     public override bool CanImplicitCastToBool => true;
 
@@ -130,11 +173,47 @@ public class TermI : NumberTerm
 
         return false;
     }
+    
+    #region Math
+
+    public override OperatorKind[] AllowedOperators => new[]
+    {
+        OperatorKind.Add,
+        OperatorKind.Subtract,
+        OperatorKind.Divide,
+        OperatorKind.Multiply,
+        OperatorKind.And,
+        OperatorKind.Or,
+        OperatorKind.Power,
+        OperatorKind.Remaining
+    };
+
+    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    {
+        int a = CastToInt();
+        int b = subject.CastToInt();
+
+        return kind switch
+        {
+            OperatorKind.Add => Convert.ChangeType(a + b, NumberType),
+            OperatorKind.Subtract => Convert.ChangeType(a - b, NumberType),
+            OperatorKind.Multiply => Convert.ChangeType(a * b, NumberType),
+            OperatorKind.Divide => Convert.ChangeType(a / b, NumberType),
+            OperatorKind.And => a & b,
+            OperatorKind.Or => a | b,
+            OperatorKind.Power => a ^ b,
+            OperatorKind.Remaining => a % b,
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+    #endregion
 }
 
 public class TermF : NumberTerm
 {
     public override string ValueType => "float";
+    protected override Type NumberType => typeof(float);
     
     public override bool Parse(string value)
     {
@@ -163,11 +242,52 @@ public class TermF : NumberTerm
 
         return false;
     }
+    
+    #region Math
+
+    public override OperatorKind[] AllowedOperators => new[]
+    {
+        OperatorKind.Add,
+        OperatorKind.Subtract,
+        OperatorKind.Divide,
+        OperatorKind.Multiply
+    };
+
+    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    {
+        float a = CastToFloat();
+        float b = subject.CastToFloat();
+        
+        switch (kind)
+        {
+            case OperatorKind.Add:
+            {
+                return Convert.ChangeType(a + b, NumberType);
+            }
+            case OperatorKind.Subtract:
+            {
+                return Convert.ChangeType(a - b, NumberType);
+            }
+            case OperatorKind.Multiply:
+            {
+                return Convert.ChangeType(a * b, NumberType);
+            }
+            case OperatorKind.Divide:
+            {
+                return Convert.ChangeType(a / b, NumberType);
+            }
+            default:
+                throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+        }
+    }
+
+    #endregion
 }
 
 public class TermU : NumberTerm
 {
     public override string ValueType => "uint";
+    protected override Type NumberType => typeof(uint);
 
     public override bool CanImplicitCastToBool => true;
 
@@ -196,11 +316,47 @@ public class TermU : NumberTerm
         Kind = TermKind.Basic;
         return true;
     }
+    
+    #region Math
+
+    public override OperatorKind[] AllowedOperators => new[]
+    {
+        OperatorKind.Add,
+        OperatorKind.Subtract,
+        OperatorKind.Divide,
+        OperatorKind.Multiply,
+        OperatorKind.And,
+        OperatorKind.Or,
+        OperatorKind.Power,
+        OperatorKind.Remaining
+    };
+
+    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    {
+        uint a = CastToUint();
+        uint b = subject.CastToUint();
+
+        return kind switch
+        {
+            OperatorKind.Add => Convert.ChangeType(a + b, NumberType),
+            OperatorKind.Subtract => Convert.ChangeType(a - b, NumberType),
+            OperatorKind.Multiply => Convert.ChangeType(a * b, NumberType),
+            OperatorKind.Divide => Convert.ChangeType(a / b, NumberType),
+            OperatorKind.And => a & b,
+            OperatorKind.Or => a | b,
+            OperatorKind.Power => a ^ b,
+            OperatorKind.Remaining => a % b,
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+    #endregion
 }
 
 public class TermD : NumberTerm
 {
     public override string ValueType => "double";
+    protected override Type NumberType => typeof(double);
     
     public override bool Parse(string value)
     {
