@@ -134,6 +134,7 @@ public static class CompileUtils
             TokenKind.Constant => AssignmentKind.Constant,
             TokenKind.Term => AssignmentKind.Term,
             TokenKind.Function => AssignmentKind.Function,
+            TokenKind.LocalFunc => AssignmentKind.Function,
             TokenKind.SpecialFunc => AssignmentKind.Function,
             TokenKind.Operator => AssignmentKind.Function,
             _ => throw new ArgumentOutOfRangeException()
@@ -162,6 +163,7 @@ public static class CompileUtils
             {
                 return new Input(holder.GetTerm(token));
             }
+            case TokenKind.LocalFunc:
             case TokenKind.Function:
             {
                 FunctionCall call = compiler.ParseFunctionCall(token, holder);
@@ -319,6 +321,18 @@ public static class CompileUtils
         return holder.GetTermType(function.ReturnType);
     }
 
+    public static TermType GetTypeFromLocalFunc(string token, ITokenHolder holder)
+    {
+        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+
+        string termToken = split[0].Trim();
+        TermType termType = GetTypeFromToken(termToken, holder, GetTokenKind(termToken, holder));
+
+        string funcName = split[1].SanitizedSplit('(', 2)[0].Trim();
+        IFunction func = termType.GetFunction(funcName);
+        return holder.GetTermType(func.ReturnType);
+    }
+
     #endregion
 
     public static TermType GetTypeFromToken(string token, ITokenHolder holder, TokenKind kind)
@@ -336,6 +350,10 @@ public static class CompileUtils
             case TokenKind.Function:
             {
                 return GetTypeFromFunction(token, holder);
+            }
+            case TokenKind.LocalFunc:
+            {
+                return GetTypeFromLocalFunc(token, holder);
             }
             case TokenKind.SpecialFunc:
             {
@@ -478,10 +496,17 @@ public static class CompileUtils
         {
             return TokenKind.SpecialFunc;
         }
-        
+
         if (san.EndsWith(")"))
         {
-            return TokenKind.Function;
+            if (holder.HasFunction(token.SanitizedSplit('(', 2)[0].Trim()))
+            {
+                return TokenKind.Function;
+            }
+            else if (san.Contains('.'))
+            {
+                return TokenKind.LocalFunc;
+            }
         }
 
         if (Operators.Any(san.Contains))
@@ -504,7 +529,36 @@ public static class CompileUtils
             return TokenKind.Constant;
         }
 
-        return TokenKind.Term; // It is most likely a term
+        if (holder.HasTerm(token))
+        {
+            return TokenKind.Term;
+        }
+
+        return TokenKind.Invalid;
+    }
+
+    public static bool TokenIsConstant(string token)
+    {
+        if (token.StartsWith("\"") && token.EndsWith("\"")) // is a string
+        {
+            return true;
+        }
+        else if (int.TryParse(token, out _))
+        {
+            return true;
+        }
+        else if (float.TryParse(token, out _))
+        {
+            return true;
+        }
+        else if (bool.TryParse(token, out _))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     #endregion

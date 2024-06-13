@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ActionScript.Exceptions;
+using ActionScript.Token.Functions;
 using ActionScript.Token.Terms;
 using ActionScript.Utils;
 
@@ -13,6 +14,8 @@ public class TermType
     public bool IsAbstract { get; }
     public TypeLibrary Library { get; }
     public OperatorKind[] AllowedOperators => Term.AllowedOperators;
+    
+    public IEnumerable<IFunction> Functions => Term.GetFunctions();
     private BaseTerm Term { get; }
 
     public BaseTerm Construct(string name, int line)
@@ -43,6 +46,9 @@ public class TermType
     }
 
     public bool CanImplicitCastTo(string name) => Term.CanImplicitCastToType(name);
+
+    public bool HasFunction(string name) => Term.HasFunction(name);
+    public IFunction GetFunction(string name) => Term.GetFunction(name);
 
     public TermType(BaseTerm term, TypeLibrary library, TermType baseClass = null, bool isAbstract = false)
     {

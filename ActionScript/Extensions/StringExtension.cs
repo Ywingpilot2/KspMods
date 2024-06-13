@@ -4,6 +4,12 @@ using System.Linq;
 
 namespace ActionScript.Extensions;
 
+public enum ScanDirection
+{
+    LeftToRight = 0,
+    RightToLeft = 1
+}
+
 public static class StringExtension
 {
     /// <summary>
@@ -13,47 +19,89 @@ public static class StringExtension
     /// <param name="count">The maximum number of splits</param>
     /// <param name="options">string split options</param>
     /// <returns>The split string</returns>
-    public static string[] SanitizedSplit(this string self, char splitter, int count, StringSplitOptions options = StringSplitOptions.None)
+    public static string[] SanitizedSplit(this string self, char splitter, int count, StringSplitOptions options = StringSplitOptions.None, ScanDirection direction = ScanDirection.LeftToRight)
     {
         List<string> splits = new List<string>(); // TODO: Use an array instead
 
         string current = "";
         bool isStr = false;
         bool isEsc = false;
-        for (int i = 1; i < self.Length; i++)
+        if (direction == ScanDirection.LeftToRight)
         {
-            char p = self[i - 1];
-            char c = self[i];
-
-            if ((p != splitter || splits.Count + 1 > count) || isStr)
+            for (int i = 1; i < self.Length; i++)
             {
-                current += p;
-            }
-            if (p == '"' && !isEsc)
-                isStr = !isStr;
+                char p = self[i - 1];
+                char c = self[i];
 
-            if (p == '\\' || isEsc)
-                isEsc = !isEsc;
+                if ((p != splitter || splits.Count + 1 > count) || isStr)
+                {
+                    current += p;
+                }
+                if (p == '"' && !isEsc)
+                    isStr = !isStr;
+
+                if (p == '\\' || isEsc)
+                    isEsc = !isEsc;
             
-            if (c == splitter && !isStr)
-            {
-                if (splits.Count + 1 > count)
+                if (c == splitter && !isStr)
                 {
-                    string last = splits.Last();
-                    splits.Remove(last);
-                    last += current;
-                    splits.Add(last);
+                    if (splits.Count + 1 > count)
+                    {
+                        string last = splits.Last();
+                        splits.Remove(last);
+                        last += current;
+                        splits.Add(last);
+                    }
+                    else
+                    {
+                        splits.Add(current);
+                    }
+                    current = "";
                 }
-                else
-                {
-                    splits.Add(current);
-                }
-                current = "";
-            }
 
-            if (i + 1 >= self.Length)
+                if (i + 1 >= self.Length)
+                {
+                    current += c;
+                }
+            }
+        }
+        else
+        {
+            for (int i = self.Length - 2; i >= 0; i--)
             {
-                current += c;
+                char p = self[i + 1];
+                char c = self[i];
+
+                if ((p != splitter || splits.Count + 1 > count) || isStr)
+                {
+                    current += p;
+                }
+                if (p == '"' && !isEsc)
+                    isStr = !isStr;
+
+                if (p == '\\' || isEsc)
+                    isEsc = !isEsc;
+            
+                if (c == splitter && !isStr)
+                {
+                    if (splits.Count + 1 > count)
+                    {
+                        string last = splits.Last();
+                        splits.Remove(last);
+                        last = last.Insert(0, string.Join("", current.Reverse()));
+                        splits.Add(last);
+                    }
+                    else
+                    {
+                        splits.Add(string.Join("", current.Reverse()));
+                    }
+                    current = "";
+                }
+
+                if (i - 1 < 0)
+                {
+                    current += c;
+                }
             }
         }
 
@@ -63,13 +111,25 @@ public static class StringExtension
             {
                 string last = splits.Last();
                 splits.Remove(last);
-                last += current;
+                if (direction == ScanDirection.LeftToRight)
+                {
+                    last += current;
+                }
+                else
+                {
+                    last = last.Insert(0, string.Join("", current.Reverse()));
+                }
                 splits.Add(last);
             }
             else
             {
                 splits.Add(current);
             }
+        }
+
+        if (direction == ScanDirection.RightToLeft)
+        {
+            splits.Reverse();
         }
 
         if (options == StringSplitOptions.RemoveEmptyEntries && splits.Any(s => s == ""))

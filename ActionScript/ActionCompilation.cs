@@ -197,29 +197,22 @@ public class ActionCompiler : ITokenHolder
     public FunctionCall ParseFunctionCall(string token, ITokenHolder holder)
     {
         // Is this a global or local function?
-        if (holder.HasFunction(token.Split('(')[0]))
+        TokenKind kind = CompileUtils.GetTokenKind(token, holder);
+        if (kind == TokenKind.Function)
         {
             return ParseGlobalCall(token, holder);
         }
         else
         {
-            string[] dets = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
-            if (dets.Length > 1 && holder.HasTerm(dets[0].Trim()))
-            {
-                return ParseLocalCall(token, holder);
-            }
-            else
-            {
-                throw new FunctionNotExistException(CurrentLine, token);
-            }
+            return ParseLocalCall(token, holder);
         }
     }
 
-    private FunctionCall ParseGlobalCall(string token, ITokenHolder holder)
+    public FunctionCall ParseGlobalCall(string token, ITokenHolder holder)
     {
         string[] split = token.SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
         string name = split[0].Trim();
-        string prms = split[1].Trim(' ', '\t');
+        string prms = split[1].Trim();
         prms = prms.Remove(prms.Length - 1);
 
         IFunction func = holder.GetFunction(name);
@@ -228,21 +221,28 @@ public class ActionCompiler : ITokenHolder
         return new FunctionCall(holder, func, inputTokens, CurrentLine);
     }
 
-    private TermCall ParseLocalCall(string token, ITokenHolder holder)
+    public FunctionCall ParseLocalCall(string token, ITokenHolder holder)
     {
-        string[] dets = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
-        BaseTerm term = holder.GetTerm(dets[0].Trim());
+        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+        string termToken = split[0].Trim();
+        string[] funcToken = split[1].Trim().SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
 
-        string funcToken = dets[1].Trim(' ', '.');
-        string[] split = funcToken.SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
-        string name = split[0].Trim();
-        string prms = split[1].Trim();
+        TermType type = CompileUtils.GetTypeFromToken(termToken, holder, CompileUtils.GetTokenKind(termToken, holder));
+        Input term = CompileUtils.HandleToken(termToken, type.Name, holder, this);
+
+        string name = funcToken[0].Trim();
+        string prms = funcToken[1].Trim();
         prms = prms.Remove(prms.Length - 1);
-        
-        IFunction func = term.GetFunction(name);
-        List<Input> inputs = ParseInputTokens(prms, func, holder);
 
-        return new TermCall(holder, CurrentLine, func, term.Name, inputs);
+        IFunction func = type.GetFunction(name);
+        List<Input> inputTokens = new List<Input>()
+        {
+            term
+        };
+        
+        inputTokens.AddRange(ParseInputTokens(prms, func, holder));
+
+        return new FunctionCall(holder, func, inputTokens, CurrentLine);
     }
 
     private List<Input> ParseInputTokens(string prms, IFunction func, ITokenHolder holder)
