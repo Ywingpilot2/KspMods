@@ -1,4 +1,4 @@
-﻿namespace ActionScript.Token.KeyWords;
+﻿namespace ActionLanguage.Token.KeyWords;
 
 public interface IKeyword
 {

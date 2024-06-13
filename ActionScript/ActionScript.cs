@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ActionScript.Exceptions;
-using ActionScript.Library;
-using ActionScript.Token;
-using ActionScript.Token.Functions;
-using ActionScript.Token.KeyWords;
-using ActionScript.Token.Terms;
+﻿using System.Collections.Generic;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Library;
+using ActionLanguage.Token;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.KeyWords;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript
+namespace ActionLanguage
 {
     public class ActionScript : ITokenHolder
     {

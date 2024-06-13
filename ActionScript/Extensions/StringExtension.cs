@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ActionScript.Extensions;
+namespace ActionLanguage.Extensions;
 
 public enum ScanDirection
 {

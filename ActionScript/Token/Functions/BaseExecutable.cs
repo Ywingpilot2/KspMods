@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using ActionScript.Exceptions;
-using ActionScript.Library;
-using ActionScript.Token.Interaction;
-using ActionScript.Token.KeyWords;
-using ActionScript.Token.Terms;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Library;
+using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.KeyWords;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Token.Functions;
+namespace ActionLanguage.Token.Functions;
 
 public abstract class BaseExecutable : ITokenHolder, IExecutable
 {

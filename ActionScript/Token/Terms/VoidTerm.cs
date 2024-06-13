@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using ActionScript.Exceptions;
-using ActionScript.Token.Functions;
+﻿using ActionLanguage.Exceptions;
 
-namespace ActionScript.Token.Terms;
+namespace ActionLanguage.Token.Terms;
 
 /// <summary>
 /// used by method calls to signal that there is no return value

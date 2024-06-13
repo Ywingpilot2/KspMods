@@ -1,8 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Serialization;
-
-namespace ProgrammableMod
+﻿namespace ProgrammableMod.Modules.Test
 {
     public class ThrottleTestModule : PartModule
     {

@@ -1,6 +1,6 @@
-﻿using ActionScript.Token.Functions;
+﻿using ActionLanguage.Token.Functions;
 
-namespace ActionScript.Token.KeyWords;
+namespace ActionLanguage.Token.KeyWords;
 
 public struct BreakKeyword : IKeyword
 {

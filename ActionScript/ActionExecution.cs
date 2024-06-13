@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using ActionScript.Library;
+using ActionLanguage.Library;
 
-namespace ActionScript
+namespace ActionLanguage
 {
     public static class ActionExecution
     {

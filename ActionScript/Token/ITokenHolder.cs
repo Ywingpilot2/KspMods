@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using ActionScript.Library;
-using ActionScript.Token.Functions;
-using ActionScript.Token.KeyWords;
-using ActionScript.Token.Terms;
+using ActionLanguage.Library;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.KeyWords;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Token;
+namespace ActionLanguage.Token;
 
 public interface IFunctionHolder
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ActionScript.Exceptions;
+﻿namespace ActionLanguage.Exceptions;
 
 public class CompilationException : ActionException
 {

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using ActionScript.Token.Functions;
-using ActionScript.Utils;
+using ActionLanguage.Utils;
 
-namespace ActionScript.Token.Terms;
+namespace ActionLanguage.Token.Terms;
 
 public sealed class BoolTerm : BaseTerm
 {

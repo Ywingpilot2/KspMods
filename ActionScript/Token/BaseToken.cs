@@ -1,8 +1,7 @@
-﻿using ActionScript.Exceptions;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Terms;
+﻿using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Token;
+namespace ActionLanguage.Token;
 
 public class BaseToken : IToken
 {

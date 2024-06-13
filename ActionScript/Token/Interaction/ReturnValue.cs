@@ -1,4 +1,4 @@
-﻿namespace ActionScript.Token.Interaction;
+﻿namespace ActionLanguage.Token.Interaction;
 
 public struct ReturnValue
 {

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ActionScript.Exceptions;
-using ActionScript.Library;
-using ActionScript.Token.Interaction;
-using ActionScript.Token.KeyWords;
-using ActionScript.Token.Terms;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Library;
+using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.KeyWords;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Token.Functions
+namespace ActionLanguage.Token.Functions
 {
     public interface IExecutable
     {

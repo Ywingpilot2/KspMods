@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using ActionScript.Token.Functions;
-using ActionScript.Token.KeyWords;
-using ActionScript.Token.Terms;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.KeyWords;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Library;
+namespace ActionLanguage.Library;
 
 public interface ILibrary
 {

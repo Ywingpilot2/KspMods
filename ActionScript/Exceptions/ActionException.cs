@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ActionScript.Exceptions;
+namespace ActionLanguage.Exceptions;
 
 public class ActionException : Exception
 {

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using ActionScript.Exceptions;
-using ActionScript.Library;
-using ActionScript.Token.Interaction;
-using ActionScript.Token.Terms;
+﻿using System.Collections.Generic;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Token.Functions
+namespace ActionLanguage.Token.Functions
 {
     public abstract class TokenCall : BaseToken
     {

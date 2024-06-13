@@ -1,7 +1,7 @@
-﻿using ActionScript.Token.Interaction;
-using ActionScript.Token.Terms;
+﻿using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Token.Functions;
+namespace ActionLanguage.Token.Functions;
 
 public interface IConditionalCall
 {

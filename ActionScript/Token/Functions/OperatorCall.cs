@@ -1,8 +1,8 @@
-﻿using ActionScript.Token.Interaction;
-using ActionScript.Token.Terms;
-using ActionScript.Utils;
+﻿using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.Terms;
+using ActionLanguage.Utils;
 
-namespace ActionScript.Token.Functions;
+namespace ActionLanguage.Token.Functions;
 
 public class OperatorCall : TokenCall
 {

@@ -1,7 +1,7 @@
-﻿using ActionScript.Exceptions;
-using ActionScript.Token.Interaction;
+﻿using ActionLanguage.Exceptions;
+using ActionLanguage.Token.Interaction;
 
-namespace ActionScript.Token.Functions;
+namespace ActionLanguage.Token.Functions;
 
 public class ThrowCall : TokenCall
 {

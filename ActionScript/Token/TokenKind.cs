@@ -1,4 +1,4 @@
-﻿namespace ActionScript.Token;
+﻿namespace ActionLanguage.Token;
 
 public enum TokenKind
 {

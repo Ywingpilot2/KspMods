@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using ActionScript.Exceptions;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Interaction;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Interaction;
 
-namespace ActionScript.Token.Terms;
+namespace ActionLanguage.Token.Terms;
 
 public sealed class StringTerm : BaseTerm
 {

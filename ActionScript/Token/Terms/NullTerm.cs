@@ -1,6 +1,6 @@
-﻿using ActionScript.Exceptions;
+﻿using ActionLanguage.Exceptions;
 
-namespace ActionScript.Token.Terms;
+namespace ActionLanguage.Token.Terms;
 
 public class NullTerm : BaseTerm
 {

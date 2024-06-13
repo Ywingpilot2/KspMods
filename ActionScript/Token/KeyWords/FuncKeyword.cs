@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using ActionScript.Exceptions;
-using ActionScript.Extensions;
-using ActionScript.Library;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Interaction;
-using ActionScript.Token.Terms;
+﻿using System.Collections.Generic;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Extensions;
+using ActionLanguage.Library;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Token.KeyWords;
+namespace ActionLanguage.Token.KeyWords;
 
 public struct FuncKeyword : IKeyword
 {

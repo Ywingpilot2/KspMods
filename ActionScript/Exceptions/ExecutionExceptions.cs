@@ -1,8 +1,7 @@
-﻿using System;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Terms;
+﻿using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Exceptions;
+namespace ActionLanguage.Exceptions;
 
 public class ExecutionException : ActionException
 {

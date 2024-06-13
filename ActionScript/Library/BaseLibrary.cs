@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Interaction;
-using ActionScript.Token.KeyWords;
-using ActionScript.Token.Terms;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.KeyWords;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Library
+namespace ActionLanguage.Library
 {
     public class ActionLibrary : ILibrary
     {

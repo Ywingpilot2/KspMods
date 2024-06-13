@@ -1,10 +1,10 @@
 ﻿using System;
-using ActionScript.Exceptions;
-using ActionScript.Library;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Terms;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Library;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Token.Interaction;
+namespace ActionLanguage.Token.Interaction;
 
 public enum InputType
 {

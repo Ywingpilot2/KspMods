@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using ActionScript;
-using ActionScript.Library;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Interaction;
-using ActionScript.Token.KeyWords;
-using ActionScript.Token.Terms;
+using ActionLanguage;
+using ActionLanguage.Library;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.KeyWords;
+using ActionLanguage.Token.Terms;
 
 namespace ActionTest
 {

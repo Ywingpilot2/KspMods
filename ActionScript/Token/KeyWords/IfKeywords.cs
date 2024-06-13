@@ -1,11 +1,11 @@
 ﻿using System.Linq;
-using ActionScript.Exceptions;
-using ActionScript.Extensions;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Interaction;
-using ActionScript.Utils;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Extensions;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Interaction;
+using ActionLanguage.Utils;
 
-namespace ActionScript.Token.KeyWords;
+namespace ActionLanguage.Token.KeyWords;
 
 public class IfKeyword : IKeyword
 {

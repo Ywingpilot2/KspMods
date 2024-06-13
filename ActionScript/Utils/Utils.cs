@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using ActionScript.Exceptions;
-using ActionScript.Extensions;
-using ActionScript.Library;
-using ActionScript.Token;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Interaction;
-using ActionScript.Token.Terms;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Extensions;
+using ActionLanguage.Library;
+using ActionLanguage.Token;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Utils;
+namespace ActionLanguage.Utils;
 
 public enum ComparisonType
 {

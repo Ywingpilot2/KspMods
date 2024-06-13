@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using ActionScript.Exceptions;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Terms;
-using ActionScript.Utils;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Terms;
+using ActionLanguage.Utils;
 
-namespace ActionScript.Library;
+namespace ActionLanguage.Library;
 
 public class TermType
 {

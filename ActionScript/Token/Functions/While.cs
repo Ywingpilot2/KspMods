@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using ActionScript.Exceptions;
-using ActionScript.Library;
-using ActionScript.Token.Interaction;
-using ActionScript.Token.KeyWords;
-using ActionScript.Token.Terms;
+﻿using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.Terms;
 
-namespace ActionScript.Token.Functions;
+namespace ActionLanguage.Token.Functions;
 
 public class WhileCall : TokenCall
 {

@@ -1,29 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ActionScript.Exceptions;
-using ActionScript.Extensions;
-using ActionScript.Library;
-using ActionScript.Token;
-using ActionScript.Token.Functions;
-using ActionScript.Token.Interaction;
-using ActionScript.Token.KeyWords;
-using ActionScript.Token.Terms;
-using ActionScript.Utils;
+using ActionLanguage.Exceptions;
+using ActionLanguage.Extensions;
+using ActionLanguage.Library;
+using ActionLanguage.Token;
+using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Interaction;
+using ActionLanguage.Token.KeyWords;
+using ActionLanguage.Token.Terms;
+using ActionLanguage.Utils;
 
-namespace ActionScript;
+namespace ActionLanguage;
 
 public class ActionCompiler : ITokenHolder
 {
     private static readonly ActionLibrary Library = new();
 
-    private string _scriptPath;
+    private string _scriptTokens;
     private ILibrary[] _libraries;
     private ActionScript _script;
 
     public ActionScript CompileScript()
     {
-        _reader = new StringReader(_scriptPath);
+        _reader = new StringReader(_scriptTokens);
         _script = new ActionScript();
         ImportLibrary(Library);
         foreach (ILibrary library in _libraries)
@@ -468,9 +468,9 @@ public class ActionCompiler : ITokenHolder
 
     #endregion
 
-    public ActionCompiler(string path, params ILibrary[] libraries)
+    public ActionCompiler(string tokens, params ILibrary[] libraries)
     {
-        _scriptPath = path;
+        _scriptTokens = tokens;
         _libraries = libraries;
     }
 }
