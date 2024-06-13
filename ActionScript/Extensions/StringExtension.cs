@@ -123,7 +123,14 @@ public static class StringExtension
             }
             else
             {
-                splits.Add(current);
+                if (direction == ScanDirection.LeftToRight)
+                {
+                    splits.Add(current);
+                }
+                else
+                {
+                    splits.Add(string.Join("", current.Reverse()));
+                }
             }
         }
 
@@ -212,6 +219,37 @@ public static class StringExtension
                 isStr = !isStr;
             
             if (i + 1 >= self.Length && c != '"')
+            {
+                sanitized += c;
+            }
+        }
+
+        return sanitized;
+    }
+    
+    public static string SanitizeParenthesis(this string self)
+    {
+        string sanitized = ""; // omg green lady reference
+
+        bool isStr = false;
+        bool isContained = false;
+        for (int i = 1; i < self.Length; i++)
+        {
+            char p = self[i - 1];
+            char c = self[i];
+
+            if (!isContained)
+                sanitized += p;
+            else
+                sanitized += ' ';
+
+            if ((c == '(' || c == ')') && !isStr)
+                isContained = !isContained;
+
+            if (c == '"' && p != '\\')
+                isStr = !isStr;
+            
+            if (i + 1 >= self.Length)
             {
                 sanitized += c;
             }

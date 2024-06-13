@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using ActionScript.Token.Functions;
 using ActionScript.Utils;
@@ -17,6 +18,8 @@ public sealed class BoolTerm : BaseTerm
         return _value.ToString();
     }
 
+    public override bool CanImplicitCastToInt => true;
+
     public override int CastToInt()
     {
         return _value ? 1 : 0;
@@ -34,7 +37,7 @@ public sealed class BoolTerm : BaseTerm
 
     public override uint CastToUint()
     {
-        return (uint)CastToInt();
+        return (uint)Math.Abs(CastToInt());
     }
 
     public override float CastToFloat()

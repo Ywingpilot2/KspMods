@@ -128,7 +128,7 @@ public static class CompileUtils
         string name = typeName[1].Trim();
         if (InvalidNames.Any(s => name.Contains(s)))
             throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]} as it contains operators");
-        TokenKind kind = GetTokenKind(token, holder);
+        TokenKind kind = GetTokenKind(split[1].Trim(), holder);
         return kind switch
         {
             TokenKind.Constant => AssignmentKind.Constant,
@@ -499,14 +499,11 @@ public static class CompileUtils
 
         if (san.EndsWith(")"))
         {
-            if (holder.HasFunction(token.SanitizedSplit('(', 2)[0].Trim()))
-            {
-                return TokenKind.Function;
-            }
-            else if (san.Contains('.'))
-            {
+            string noPrms = san.SanitizeParenthesis();
+            if (noPrms.Contains('.'))
                 return TokenKind.LocalFunc;
-            }
+            else
+                return TokenKind.Function;
         }
 
         if (Operators.Any(san.Contains))
