@@ -232,24 +232,27 @@ public static class StringExtension
         string sanitized = ""; // omg green lady reference
 
         bool isStr = false;
-        bool isContained = false;
+        int level = 0;
         for (int i = 1; i < self.Length; i++)
         {
             char p = self[i - 1];
             char c = self[i];
 
-            if (!isContained)
+            if (level == 0)
                 sanitized += p;
             else
                 sanitized += ' ';
 
-            if ((c == '(' || c == ')') && !isStr)
-                isContained = !isContained;
+            if (c == '(' && !isStr)
+                level++;
+
+            if (c == ')' && !isStr)
+                level--;
 
             if (c == '"' && p != '\\')
                 isStr = !isStr;
             
-            if (i + 1 >= self.Length)
+            if (i + 1 >= self.Length && c != ')')
             {
                 sanitized += c;
             }

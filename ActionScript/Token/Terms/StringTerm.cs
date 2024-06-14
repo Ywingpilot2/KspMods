@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using ActionLanguage.Exceptions;
+using ActionLanguage.Library;
+using ActionLanguage.Token.Fields;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 
@@ -10,6 +12,22 @@ namespace ActionLanguage.Token.Terms;
 public sealed class StringTerm : BaseTerm
 {
     public override string ValueType => "string";
+
+    #region Fields
+
+    public override IEnumerable<TermField> GetFields()
+    {
+        foreach (TermField field in base.GetFields())
+        {
+            yield return field;
+        }
+
+        yield return new TermField("length", "int", _value.Length);
+    }
+
+    #endregion
+
+    #region Functions
 
     private readonly IEnumerable<IFunction> _functions = new IFunction[]
     {
@@ -44,7 +62,7 @@ public sealed class StringTerm : BaseTerm
         }
     }
 
-    private string _value;
+    #endregion
 
     #region Casting
 
@@ -149,6 +167,11 @@ public sealed class StringTerm : BaseTerm
     }
 
     #endregion
+
+    #region Value
+
+    // to prevent issues with fields & compilation we set a default value
+    private string _value = "";
     
     public override bool Parse(string value)
     {
@@ -254,4 +277,6 @@ public sealed class StringTerm : BaseTerm
 
         return false;
     }
+
+    #endregion
 }

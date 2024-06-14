@@ -316,3 +316,28 @@ public class AlreadyHasElseBranchException : CompilationException
     {
     }
 }
+
+public class FieldNotExistException : CompilationException
+{
+    private string _name;
+
+    public override string Message
+    {
+        get
+        {
+            if (_name != null)
+            {
+                return $"Field called at line {LineNumber} does not exist for term {_name}";
+            }
+            else
+            {
+                return $"Field called at line {LineNumber} does not exist";
+            }
+        }
+    }
+
+    public FieldNotExistException(int lineNumber, string name) : base(lineNumber)
+    {
+        _name = name;
+    }
+}

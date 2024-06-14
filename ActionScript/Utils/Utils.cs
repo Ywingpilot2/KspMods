@@ -130,6 +130,7 @@ public static class CompileUtils
         {
             TokenKind.Constant => AssignmentKind.Constant,
             TokenKind.Term => AssignmentKind.Term,
+            TokenKind.LocalField => AssignmentKind.Function,
             TokenKind.Function => AssignmentKind.Function,
             TokenKind.LocalFunc => AssignmentKind.Function,
             TokenKind.SpecialFunc => AssignmentKind.Function,
@@ -140,6 +141,8 @@ public static class CompileUtils
 
     #endregion
 
+    #region Handling
+    
     public static Input HandleToken(string token, string expectedType, ITokenHolder holder, ActionCompiler compiler)
     {
         TokenKind kind = GetTokenKind(token, holder);
@@ -204,12 +207,19 @@ public static class CompileUtils
 
                 return new Input(holder, HandleOperation(token, op, holder, compiler, type.Name));
             }
+            case TokenKind.LocalField:
+            {
+                string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+                string termToken = split[0].Trim();
+                TermType termType = GetTypeFromToken(termToken, holder, GetTokenKind(termToken, holder));
+                Input input = HandleToken(termToken, termType.Name, holder, compiler);
+                FieldCall call = new FieldCall(holder, compiler.CurrentLine, input, split[1].Trim());
+                return new Input(holder, call);
+            }
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
-
-    #region Handling
 
     public static FunctionCall HandleComparisonOperation(string token, ComparisonType type, ITokenHolder holder,
         ActionCompiler compiler)
@@ -279,6 +289,16 @@ public static class CompileUtils
     #endregion
 
     #region Type Solving
+
+    public static TermType GetTypeFromField(string token, ITokenHolder holder)
+    {
+        string san = token.SanitizeQuotes();
+        string[] split = san.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+        TermType type = GetTypeFromToken(split[0].Trim(), holder, GetTokenKind(split[0].Trim(), holder));
+
+        string typeName = type.GetField(split[1].Trim()).Value.Type;
+        return holder.GetTermType(typeName);
+    }
 
     public static TermType GetTypeFromConstant(string token, ITokenHolder holder)
     {
@@ -384,6 +404,10 @@ public static class CompileUtils
 
                 TokenKind opToKind = GetTokenKind(opToken, holder);
                 return GetTypeFromToken(opToken, holder, opToKind);
+            }
+            case TokenKind.LocalField:
+            {
+                return GetTypeFromField(token, holder);
             }
             default:
                 throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
@@ -516,6 +540,14 @@ public static class CompileUtils
         if (san.Contains(" as "))
         {
             return TokenKind.SpecialFunc;
+        }
+
+        if (san.Contains('.'))
+        {
+            string[] split = san.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+            TokenKind inKind = GetTokenKind(split[0].Trim(), holder);
+            if (inKind != TokenKind.Invalid)
+                return TokenKind.LocalField;
         }
 
         if (!holder.HasTerm(token))

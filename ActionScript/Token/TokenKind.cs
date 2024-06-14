@@ -7,8 +7,9 @@ public enum TokenKind
     Term = 1,
     Function = 2,
     LocalFunc = 3,
-    SpecialFunc = 4,
-    Operator = 5
+    LocalField = 4,
+    SpecialFunc = 5,
+    Operator = 6
 }
 
 public enum SpecialFuncKind

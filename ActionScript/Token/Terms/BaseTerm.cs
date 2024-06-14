@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Library;
+using ActionLanguage.Token.Fields;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Utils;
@@ -29,6 +30,37 @@ public abstract class BaseTerm : IToken
 
     public string Name { get; set; }
     public abstract string ValueType { get; }
+
+    #endregion
+
+    #region Fields
+    
+    public virtual IEnumerable<TermField> GetFields()
+    {
+        return new TermField[0];
+    }
+
+    public TermField GetField(string name)
+    {
+        foreach (TermField field in GetFields())
+        {
+            if (field.Name == name)
+                return field;
+        }
+        
+        throw new FieldNotExistException(0, name);
+    }
+    
+    public bool HasField(string name)
+    {
+        foreach (TermField field in GetFields())
+        {
+            if (field.Name == name)
+                return true;
+        }
+
+        return false;
+    }
 
     #endregion
 

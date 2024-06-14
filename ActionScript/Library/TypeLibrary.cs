@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ActionLanguage.Exceptions;
+using ActionLanguage.Token.Fields;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Terms;
 using ActionLanguage.Utils;
@@ -16,6 +17,7 @@ public class TermType
     public OperatorKind[] AllowedOperators => Term.AllowedOperators;
     
     public IEnumerable<IFunction> Functions => Term.GetFunctions();
+    public IEnumerable<TermField> Fields => Term.GetFields();
     private BaseTerm Term { get; }
 
     public BaseTerm Construct(string name, int line)
@@ -49,6 +51,9 @@ public class TermType
 
     public bool HasFunction(string name) => Term.HasFunction(name);
     public IFunction GetFunction(string name) => Term.GetFunction(name);
+
+    public bool HasField(string name) => Term.HasField(name);
+    public TermField GetField(string name) => Term.GetField(name);
 
     public TermType(BaseTerm term, TypeLibrary library, TermType baseClass = null, bool isAbstract = false)
     {
