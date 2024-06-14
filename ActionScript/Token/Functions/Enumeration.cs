@@ -49,4 +49,9 @@ public class ReturnCall : TokenCall
         BaseTerm term = _returnValue.GetValue();
         return new ReturnValue(term.GetValue(), term.ValueType);
     }
+
+    public override void PostCompilation()
+    {
+        _returnValue.PostCompilation();
+    }
 }

@@ -27,4 +27,9 @@ public class CastCall : TokenCall
             return new ReturnValue();
         }
     }
+
+    public override void PostCompilation()
+    {
+        _from.PostCompilation();
+    }
 }

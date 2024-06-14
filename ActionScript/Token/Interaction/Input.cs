@@ -29,10 +29,13 @@ public struct Input
             case InputType.Term:
             {
                 return _term;
-            }break;
+            }
             case InputType.Call:
             {
+                Call.PreExecution();
                 ReturnValue value = Call.Call();
+                Call.PostExecution();
+                
                 if (!value.HasValue)
                     return new NullTerm();
                     
@@ -48,11 +51,19 @@ public struct Input
                 }
 
                 return term;
-            } break;
+            }
             default:
             {
-                return null;
-            } break;
+                return new NullTerm();
+            }
+        }
+    }
+
+    public void PostCompilation()
+    {
+        if (Type == InputType.Call)
+        {
+            Call.PostCompilation();
         }
     }
 

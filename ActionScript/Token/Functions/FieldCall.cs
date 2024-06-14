@@ -17,4 +17,9 @@ public class FieldCall : TokenCall
     {
         return _input.GetValue().GetField(_field).Value;
     }
+
+    public override void PostCompilation()
+    {
+        _input.PostCompilation();
+    }
 }

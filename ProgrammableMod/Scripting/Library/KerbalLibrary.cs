@@ -19,7 +19,8 @@ namespace ProgrammableMod.Scripting.Library
             {
                 Debug.Log(terms[0].CastToStr());
                 return new ReturnValue();
-            }, "string")
+            }, "string"),
+            new Function("get_time", "float", _ => new ReturnValue(Time.fixedTime, "float"))
         };
         public IEnumerable<BaseTerm> GlobalTerms { get; }
         public IEnumerable<IKeyword> Keywords { get; }

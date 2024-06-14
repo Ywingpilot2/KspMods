@@ -16,14 +16,12 @@ namespace ActionLanguage;
 public class ActionCompiler : ITokenHolder
 {
     private static readonly ActionLibrary Library = new();
-
-    private string _scriptTokens;
+    
     private ILibrary[] _libraries;
     private ActionScript _script;
 
     public ActionScript CompileScript()
     {
-        _reader = new StringReader(_scriptTokens);
         _script = new ActionScript();
         ImportLibrary(Library);
         foreach (ILibrary library in _libraries)
@@ -60,6 +58,7 @@ public class ActionCompiler : ITokenHolder
 #endif
         }
 
+        _script.PostCompilation();
         return _script;
     }
 
@@ -470,7 +469,13 @@ public class ActionCompiler : ITokenHolder
 
     public ActionCompiler(string tokens, params ILibrary[] libraries)
     {
-        _scriptTokens = tokens;
+        _reader = new StringReader(tokens);
+        _libraries = libraries;
+    }
+    
+    public ActionCompiler(TextReader reader, params ILibrary[] libraries)
+    {
+        _reader = reader;
         _libraries = libraries;
     }
 }

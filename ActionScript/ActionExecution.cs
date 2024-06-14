@@ -5,7 +5,17 @@ namespace ActionLanguage
 {
     public static class ActionExecution
     {
-        public static bool ExecuteAction(string action, params ILibrary[] libraries)
+        public static ActionScript CompileScriptFromFile(string path, params ILibrary[] libraries)
+        {
+            if (!File.Exists(path))
+                throw new FileNotFoundException("Cannot compile file which does not exist", path);
+
+            StreamReader reader = new StreamReader(path);
+            ActionCompiler compiler = new ActionCompiler(reader, libraries);
+            return compiler.CompileScript();
+        }
+        
+        public static bool ExecuteCompileAction(string action, params ILibrary[] libraries)
         {
             ActionCompiler compiler = new ActionCompiler(action, libraries);
             ActionScript script = compiler.CompileScript();
@@ -22,7 +32,7 @@ namespace ActionLanguage
             StreamReader reader = new StreamReader(path);
             string script = reader.ReadToEnd();
             reader.Dispose();
-            return ExecuteAction(script, libraries);
+            return ExecuteCompileAction(script, libraries);
         }
     }
 }

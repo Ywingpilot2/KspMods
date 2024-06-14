@@ -12,10 +12,11 @@ namespace ActionLanguage
     {
         public ITokenHolder Container { get; }
 
-        public Dictionary<string, IFunction> Functions { get; }
+        internal Dictionary<string, IFunction> Functions { get; }
         public Dictionary<string, BaseTerm> Terms { get; }
-        public List<TypeLibrary> TypeLibraries { get; }
-        public Dictionary<string, IKeyword> Keywords { get; }
+        private Dictionary<string, object> _compiledValues;
+        internal List<TypeLibrary> TypeLibraries { get; }
+        internal Dictionary<string, IKeyword> Keywords { get; }
         public List<TokenCall> TokenCalls { get; }
 
         #region Enumeration
@@ -80,12 +81,15 @@ namespace ActionLanguage
         public int CurrentLine;
         public void Execute()
         {
+            PreExecution();
             foreach (TokenCall functionCall in TokenCalls)
             {
                 CurrentLine = functionCall.Line;
                 try
                 {
+                    functionCall.PreExecution();
                     functionCall.Call();
+                    functionCall.PostExecution();
                 }
 #if DEBUG
                 finally{} // I am too lazy to remove the try catch entirely when on debug
@@ -103,6 +107,27 @@ catch (ActionException e)
                     throw new InvalidActionException(functionCall.Line, $"Internal error occured at {functionCall.Line}: \n{e.Message}\n{e.StackTrace}");
                 }
 #endif
+            }
+        }
+
+        internal void PreExecution()
+        {
+            foreach (BaseTerm term in EnumerateTerms())
+            {
+                term.SetValue(_compiledValues[term.Name]);
+            }
+        }
+
+        internal void PostCompilation()
+        {
+            foreach (TokenCall call in TokenCalls)
+            {
+                call.PostCompilation();
+            }
+
+            foreach (BaseTerm term in EnumerateTerms())
+            {
+                _compiledValues.Add(term.Name, term.GetValue());
             }
         }
 
@@ -158,6 +183,7 @@ catch (ActionException e)
             TokenCalls = new List<TokenCall>();
             TypeLibraries = new List<TypeLibrary>();
             Keywords = new Dictionary<string, IKeyword>();
+            _compiledValues = new Dictionary<string, object>();
         }
 
         #endregion

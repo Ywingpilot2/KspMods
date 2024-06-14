@@ -23,4 +23,10 @@ public class OperatorCall : TokenCall
         BaseTerm b = _b.GetValue();
         return new ReturnValue(a.ConductOperation(_kind, b), a.ValueType);
     }
+
+    public override void PostCompilation()
+    {
+        _a.PostCompilation();
+        _b.PostCompilation();
+    }
 }

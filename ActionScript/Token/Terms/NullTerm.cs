@@ -14,12 +14,12 @@ public class NullTerm : BaseTerm
 
     public override bool SetValue(object value)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public override bool CopyFrom(BaseTerm term)
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
     public override object GetValue()

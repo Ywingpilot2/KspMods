@@ -13,12 +13,6 @@ public enum StatusKind
     Uhoh = 2
 }
 
-public enum ErrorKind
-{
-    Compiler = 0,
-    Runtime = 1
-}
-
 public abstract class BaseComputer : PartModule, IComputer
 {
     protected ILibrary[] Libraries;
@@ -29,26 +23,42 @@ public abstract class BaseComputer : PartModule, IComputer
     [KSPField(isPersistant = false, guiActive = false, guiName = "Error")]
     public string Exception;
 
+    [KSPField(isPersistant = true)]
     protected string Tokens;
     protected ActionScript Script;
     protected bool ShouldRun;
 
+    internal FlightCtrlState _state;
+
     private void Execution(FlightCtrlState state)
     {
-        if (Script != null && HighLogic.LoadedSceneIsFlight)
+        if (ShouldRun && Script != null && HighLogic.LoadedSceneIsFlight)
         {
-            Script.Execute();
+            _state = state;
+            try
+            {
+                Script.Execute();
+            }
+            catch (Exception e)
+            {
+                Exception = e.Message;
+                DisplayPopup = true;
+            }
         }
     }
 
-    private void Start()
+    public override void OnStart(StartState state)
     {
         Libraries = new ILibrary[]
         {
-            new KerbalLibrary()
+            new KerbalLibrary(),
+            new VesselLibrary(this)
         };
 
-        vessel.OnFlyByWire += Execution;
+        if (HighLogic.LoadedSceneIsFlight)
+        {
+            vessel.OnFlyByWire += Execution;
+        }
     }
 
     #region GUI Handling
@@ -124,7 +134,7 @@ public abstract class BaseComputer : PartModule, IComputer
 
     #region UI Buttons
 
-    [KSPEvent(active = true, guiActive = true, guiName = "Open Code Editor")]
+    [KSPEvent(active = true, guiActive = true, guiName = "Open Code Editor", guiActiveEditor = true)]
     public void OpenEditor()
     {
         _editorText = Tokens;
@@ -166,6 +176,7 @@ public abstract class BaseComputer : PartModule, IComputer
     #region Execution buttons
 
     [KSPEvent(active = true, guiActive = true, guiName = "Start execution")]
+    [KSPAction("Execute Script")]
     public void Execute()
     {
         ShouldRun = true;
@@ -173,12 +184,14 @@ public abstract class BaseComputer : PartModule, IComputer
     }
 
     [KSPEvent(active = false, guiActive = true, guiName = "Stop execution")]
+    [KSPAction("Stop Script")]
     public void StopExecuting()
     {
         ShouldRun = false;
         UpdateButton();
     }
 
+    [KSPAction("Toggle Script")]
     public void Toggle()
     {
         if (ShouldRun)

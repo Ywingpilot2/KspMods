@@ -14,7 +14,23 @@ public class WhileCall : TokenCall
 
     public override ReturnValue Call()
     {
-        return _while.Execute();
+        ReturnValue value = _while.Execute();
+        return value;
+    }
+
+    public override void PreExecution()
+    {
+        _while.PreExecution();
+    }
+
+    public override void PostExecution()
+    {
+        _while.PostExecution();
+    }
+
+    public override void PostCompilation()
+    {
+        _while.PostCompilation();
     }
 }
 
@@ -65,6 +81,12 @@ public class WhileFunction : BaseExecutable
         }
 
         return new ReturnValue();
+    }
+
+    public override void PostCompilation()
+    {
+        base.PostCompilation();
+        _condition.PostCompilation();
     }
 
     public WhileFunction(Input condition, ITokenHolder holder) : base(holder)

@@ -9,6 +9,22 @@ namespace ActionLanguage.Token.Functions
     {
         public abstract ReturnValue Call();
 
+        #region Pre/Post events
+
+        public virtual void PreExecution()
+        {
+        }
+
+        public virtual void PostExecution()
+        {
+        }
+
+        public virtual void PostCompilation()
+        {
+        }
+
+        #endregion
+
         protected TokenCall(ITokenHolder script, int line) : base(script, line)
         {
         }
@@ -29,6 +45,29 @@ namespace ActionLanguage.Token.Functions
 
             return Function.Execute(terms.ToArray());
         }
+        
+        #region Pre/Post events
+
+        public override void PreExecution()
+        {
+            Function.PreExecution();
+        }
+
+        public override void PostExecution()
+        {
+            Function.PostExecution();
+        }
+
+        public override void PostCompilation()
+        {
+            Function.PostCompilation();
+            foreach (Input input in _inputs)
+            {
+                input.PostCompilation();
+            }
+        }
+
+        #endregion
 
         public FunctionCall(ITokenHolder script, IFunction function, IEnumerable<Input> inputs, int line) : base(script, line)
         {
@@ -55,6 +94,11 @@ namespace ActionLanguage.Token.Functions
                 throw new InvalidAssignmentException(Line, GetTerm(_term));
             }
             return new ReturnValue();
+        }
+
+        public override void PostCompilation()
+        {
+            Input.PostCompilation();
         }
 
         public AssignmentCall(BaseTerm term, Input input, ITokenHolder script, int line) : base(script, line)

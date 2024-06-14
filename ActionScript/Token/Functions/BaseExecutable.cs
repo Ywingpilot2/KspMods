@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Library;
 using ActionLanguage.Token.Interaction;
@@ -12,24 +13,20 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
     public ITokenHolder Container { get; }
 
     protected Dictionary<string, BaseTerm> BaseTerms;
+    private Dictionary<string, object> _compiledValues;
     protected List<TokenCall> Calls;
 
     #region Token Holder
     
-    public IEnumerable<TokenCall> EnumerateCalls()
+    public virtual IEnumerable<TokenCall> EnumerateCalls()
     {
-        foreach (TokenCall call in Container.EnumerateCalls())
-        {
-            yield return call;
-        }
-
         foreach (TokenCall call in Calls)
         {
             yield return call;
         }
     }
 
-    public IEnumerable<BaseTerm> EnumerateTerms()
+    public virtual IEnumerable<BaseTerm> EnumerateTerms()
     {
         foreach (BaseTerm term in Container.EnumerateTerms())
         {
@@ -46,7 +43,7 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
 
     public bool HasFunction(string name) => Container.HasFunction(name);
 
-    public BaseTerm GetTerm(string name)
+    public virtual BaseTerm GetTerm(string name)
     {
         if (!BaseTerms.ContainsKey(name))
             return Container.GetTerm(name);
@@ -54,7 +51,7 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
         return BaseTerms[name];
     }
 
-    public bool HasTerm(string name)
+    public virtual bool HasTerm(string name)
     {
         if (!BaseTerms.ContainsKey(name))
             return Container.HasTerm(name);
@@ -77,7 +74,7 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
 
     public void AddFunc(IFunction function)
     {
-        throw new InvalidCompilationException(0, "Cannot declare a function within a while statement");
+        throw new InvalidCompilationException(0, "Cannot declare a function here");
     }
 
     public bool TermTypeExists(string name) => Container.TermTypeExists(name);
@@ -92,9 +89,48 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
 
     public abstract ReturnValue Execute(params BaseTerm[] terms);
 
+    #region Pre/Post events
+
+    public virtual void PreExecution()
+    {
+        foreach (BaseTerm term in BaseTerms.Values)
+        {
+            term.SetValue(_compiledValues[term.Name]);
+        }
+
+        foreach (TokenCall call in Calls)
+        {
+            call.PreExecution();
+        }
+    }
+
+    public virtual void PostExecution()
+    {
+        foreach (TokenCall call in Calls)
+        {
+            call.PostExecution();
+        }
+    }
+
+    public virtual void PostCompilation()
+    {
+        foreach (TokenCall call in Calls)
+        {
+            call.PostCompilation();
+        }
+        
+        foreach (BaseTerm term in BaseTerms.Values)
+        {
+            _compiledValues.Add(term.Name, term.GetValue());
+        }
+    }
+
+    #endregion
+
     public BaseExecutable(ITokenHolder holder)
     {
         BaseTerms = new Dictionary<string, BaseTerm>();
+        _compiledValues = new Dictionary<string, object>();
         Calls = new List<TokenCall>();
         Container = holder;
     }

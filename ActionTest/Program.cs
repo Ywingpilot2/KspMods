@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using ActionLanguage;
 using ActionLanguage.Library;
 using ActionLanguage.Token.Functions;
@@ -29,8 +30,10 @@ namespace ActionTest
         public TypeLibrary TypeLibrary { get; }
     }
     
-    internal class Program
+    internal static class Program
     {
+        public static Dictionary<string, ActionScript> _compiled = new Dictionary<string, ActionScript>();
+
         public static void Main(string[] args)
         {
             bool interaction = false;
@@ -45,6 +48,34 @@ namespace ActionTest
                 string[] split = input.Split(new []{'='}, 2);
                 switch (split[0].Trim(' ', '\t'))
                 {
+                    case "compileLocal":
+                    {
+                        Console.WriteLine("Compiling file...");
+                        string global = $"{AppDomain.CurrentDomain.BaseDirectory}{split[1].Trim('"', ' ', '\t')}";
+                        FileInfo fileInfo = new FileInfo(global);
+                        if (!fileInfo.Exists)
+                        {
+                            Console.WriteLine("Specified file does not exist!");
+                            continue;
+                        }
+
+                        ActionScript script = ActionExecution.CompileScriptFromFile(fileInfo.FullName, new ProgramLibrary());
+                        if (_compiled.ContainsKey(fileInfo.Name))
+                        {
+                            _compiled.Remove(fileInfo.Name);
+                        }
+                        _compiled.Add(fileInfo.Name, script);
+                    } break;
+                    case "execCompiled":
+                    {
+                        if (!_compiled.ContainsKey(split[1].Trim('"', ' ', '\t')))
+                        {
+                            Console.WriteLine("Specified script either does not exist or has not been compiled");
+                            continue;
+                        }
+
+                        _compiled[split[1].Trim('"', ' ', '\t')].Execute();
+                    } break;
                     case "execFile":
                     {
                         Console.WriteLine("Executing file...");

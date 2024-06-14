@@ -85,7 +85,9 @@
         <Compile Include="Modules\Test\GuiTestModule.cs" />
         <Compile Include="Modules\Test\ProgammableTest.cs" />
         <Compile Include="Modules\Test\ThrottleTest.cs" />
+        <Compile Include="Scripting\Library\ComputerLibrary.cs" />
         <Compile Include="Scripting\Library\KerbalLibrary.cs" />
+        <Compile Include="Scripting\Library\VesselLibrary.cs" />
         <Compile Include="Startup.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

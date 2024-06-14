@@ -12,6 +12,10 @@ namespace ActionLanguage.Token.Functions
     public interface IExecutable
     {
         public ReturnValue Execute(params BaseTerm[] terms);
+
+        public void PreExecution();
+        public void PostExecution();
+        public void PostCompilation();
     }
     
     public interface IFunction : IExecutable
@@ -19,8 +23,9 @@ namespace ActionLanguage.Token.Functions
         public string Name { get; }
         public string ReturnType { get; }
         public string[] InputTypes { get; }
-        public bool AnyCount { get; }
+        public bool AnyCount { get; } // TODO: actually implement optional params
         
+        // TODO: this is a cool idea, why aren't we using it?
         public bool InputIsValid(string type, int idx, ITokenHolder holder);
     }
     
@@ -35,6 +40,18 @@ namespace ActionLanguage.Token.Functions
         public ReturnValue Execute(params BaseTerm[] terms)
         {
             return Action.Invoke(terms);
+        }
+
+        public void PreExecution()
+        {
+        }
+
+        public void PostExecution()
+        {
+        }
+
+        public void PostCompilation()
+        {
         }
 
         public bool InputIsValid(string type, int idx, ITokenHolder holder)
@@ -104,23 +121,15 @@ namespace ActionLanguage.Token.Functions
         }
     }
     
-    public class UserFunction : IFunction, ITokenHolder
+    public class UserFunction : BaseExecutable, IFunction
     {
         public string Name { get; }
         public string ReturnType { get; }
         public string[] InputTypes { get; }
         public bool AnyCount { get; }
-        
-        public ITokenHolder Container { get; }
-
-        private Dictionary<string, BaseTerm> _baseTerms;
-        private List<TokenCall> _calls;
-        private ReturnCall _return;
         private readonly string[] _inputNames;
 
-        private ActionScript _script;
-
-        public ReturnValue Execute(params BaseTerm[] terms)
+        public override ReturnValue Execute(params BaseTerm[] terms)
         {
             for (int i = 0; i < _inputNames.Length; i++)
             {
@@ -129,7 +138,7 @@ namespace ActionLanguage.Token.Functions
                 term.CopyFrom(terms[i]);
             }
 
-            foreach (TokenCall call in _calls)
+            foreach (TokenCall call in Calls)
             {
                 if (call is ReturnCall)
                     return call.Call();
@@ -200,86 +209,39 @@ namespace ActionLanguage.Token.Functions
             }
         }
 
-        public UserFunction(string name, string returnType, Dictionary<string, string> inputs, ActionScript script)
+        public UserFunction(ITokenHolder holder, string name, string returnType, Dictionary<string,string> inputs) : base(holder)
         {
             Name = name;
             ReturnType = returnType;
             InputTypes = new string[inputs.Count];
             _inputNames = new string[inputs.Count];
-            _baseTerms = new Dictionary<string, BaseTerm>();
 
             int idx = 0;
             foreach (KeyValuePair<string,string> input in inputs)
             {
                 InputTypes.SetValue(input.Value, idx);
                 _inputNames.SetValue(input.Key, idx);
-                _baseTerms.Add(input.Key, script.GetTermType(input.Value).Construct(input.Key, 0)); // TODO: Set line
+                AddTerm(GetTermType(input.Value).Construct(input.Key, 0));
                 idx++;
             }
-
-            _script = script;
-            _calls = new List<TokenCall>();
-            Container = script;
-        }
-        
-        public IEnumerable<TokenCall> EnumerateCalls()
-        {
-            foreach (TokenCall call in Container.EnumerateCalls())
-            {
-                yield return call;
-            }
-
-            foreach (TokenCall call in _calls)
-            {
-                yield return call;
-            }
         }
 
-        public IEnumerable<BaseTerm> EnumerateTerms()
+        public override IEnumerable<BaseTerm> EnumerateTerms()
         {
-            foreach (BaseTerm term in _baseTerms.Values)
+            foreach (BaseTerm term in BaseTerms.Values)
             {
                 yield return term;
             }
         }
 
-        public IFunction GetFunction(string name) => _script.GetFunction(name);
-
-        public bool HasFunction(string name) => _script.HasFunction(name);
-
-        public BaseTerm GetTerm(string name)
+        public override BaseTerm GetTerm(string name)
         {
-            if (!_baseTerms.ContainsKey(name))
-                throw new TermNotExistException(0, name);
-
-            return _baseTerms[name];
+            return BaseTerms[name];
         }
 
-        public bool HasTerm(string name)
+        public override bool HasTerm(string name)
         {
-            return _baseTerms.ContainsKey(name);
+            return BaseTerms.ContainsKey(name);
         }
-
-        public void AddCall(TokenCall call)
-        {
-            _calls.Add(call);
-        }
-
-        public void AddTerm(BaseTerm term)
-        {
-            _baseTerms.Add(term.Name, term);
-        }
-
-        public void AddFunc(IFunction function)
-        {
-            throw new InvalidCompilationException(0, "Cannot declare a function within a function");
-        }
-
-        public bool TermTypeExists(string name) => _script.TermTypeExists(name);
-
-        public TermType GetTermType(string name) => _script.GetTermType(name);
-        public bool HasKeyword(string name) => _script.HasKeyword(name);
-
-        public IKeyword GetKeyword(string name) => _script.GetKeyword(name);
     }
 }

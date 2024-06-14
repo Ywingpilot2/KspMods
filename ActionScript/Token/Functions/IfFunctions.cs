@@ -27,16 +27,33 @@ public class IfCall : TokenCall, IConditionalCall
 
     public override ReturnValue Call()
     {
+        ReturnValue value = new ReturnValue();
         if (_condition.GetValue().CastToBool())
         {
-            return ExecutableFunc.Execute();
+            value = ExecutableFunc.Execute();
         }
         else if (Else != null)
         {
-            return Else.Call();
+            value = Else.Call();
         }
-        
-        return new ReturnValue();
+
+        return value;
+    }
+
+    public override void PreExecution()
+    {
+        ExecutableFunc.PreExecution();
+    }
+
+    public override void PostExecution()
+    {
+        ExecutableFunc.PostExecution();
+    }
+
+    public override void PostCompilation()
+    {
+        ExecutableFunc.PostCompilation();
+        _condition.PostCompilation();
     }
 
     public IConditionalCall GetLastBranch()
@@ -61,6 +78,21 @@ public class ElseCall : TokenCall, IConditionalCall
     public override ReturnValue Call()
     {
         return ExecutableFunc.Execute();
+    }
+    
+    public override void PreExecution()
+    {
+        ExecutableFunc.PreExecution();
+    }
+
+    public override void PostExecution()
+    {
+        ExecutableFunc.PostExecution();
+    }
+
+    public override void PostCompilation()
+    {
+        ExecutableFunc.PostCompilation();
     }
 
     public IConditionalCall GetLastBranch()

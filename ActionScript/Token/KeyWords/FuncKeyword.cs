@@ -42,7 +42,7 @@ public struct FuncKeyword : IKeyword
             inputMapping.Add(inTs[1], inTs[0]);
         }
 
-        UserFunction function = new UserFunction(name, returnType, inputMapping, _script);
+        UserFunction function = new UserFunction(_script, name, returnType, inputMapping);
         // first add global terms from the compiler
         foreach (ILibrary library in _compiler.EnumerateLibraries())
         {
