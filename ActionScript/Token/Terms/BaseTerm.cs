@@ -123,6 +123,37 @@ public abstract class BaseTerm : IToken
 
     #endregion
 
+    #region Construction
+
+    public virtual IEnumerable<TermConstructor> GetConstructors()
+    {
+        yield return new TermConstructor(_ => new ReturnValue(GetValue(), ValueType));
+    }
+
+    public TermConstructor GetConstructor(string sig)
+    {
+        foreach (TermConstructor constructor in GetConstructors())
+        {
+            if (constructor.GetSig() == sig)
+                return constructor;
+        }
+
+        throw new ConstructorNotFoundException(0, sig);
+    }
+
+    public bool HasConstructor(string sig)
+    {
+        foreach (TermConstructor constructor in GetConstructors())
+        {
+            if (constructor.GetSig() == sig)
+                return true;
+        }
+
+        return false;
+    }
+
+    #endregion
+
     #region Casting
 
     public virtual bool CanImplicitCastToStr => false;

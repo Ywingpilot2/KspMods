@@ -1,12 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
 using ActionLanguage.Exceptions;
+using ActionLanguage.Token;
 using ActionLanguage.Token.Fields;
 using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms;
 using ActionLanguage.Utils;
 
 namespace ActionLanguage.Library;
+
+public enum ConstructorKind
+{
+    Empty = 0,
+    Filled = 1
+}
+
+public struct TermConstructor : IExecutable
+{
+    public string[] Inputs { get; }
+    public ConstructorKind Kind { get; }
+    
+    private Func<BaseTerm[], ReturnValue> _action;
+
+    public ReturnValue Execute(params BaseTerm[] terms)
+    {
+        return _action.Invoke(terms);
+    }
+
+    public string GetSig()
+    {
+        if (Kind == ConstructorKind.Empty)
+        {
+            return "";
+        }
+
+        return string.Join(" ", Inputs);
+    }
+
+    public TermConstructor()
+    {
+        Inputs = new string[0];
+    }
+
+    public TermConstructor(Func<BaseTerm[], ReturnValue> action, params string[] inputs)
+    {
+        _action = action;
+        Inputs = inputs;
+        Kind = ConstructorKind.Filled;
+    }
+
+    public void PreExecution()
+    {
+    }
+
+    public void PostExecution()
+    {
+    }
+
+    public void PostCompilation()
+    {
+    }
+}
 
 public class TermType
 {
@@ -18,18 +73,29 @@ public class TermType
     
     public IEnumerable<IFunction> Functions => Term.GetFunctions();
     public IEnumerable<TermField> Fields => Term.GetFields();
+    public IEnumerable<TermConstructor> Constructors => Term.GetConstructors();
     private BaseTerm Term { get; }
 
-    public BaseTerm Construct(string name, int line)
+    public bool HasConstructor(string sig) => Term.HasConstructor(sig);
+    public TermConstructor GetConstructor(string sig) => Term.GetConstructor(sig);
+
+    public BaseTerm Construct(string name, int line, string sig = "", params BaseTerm[] inputs)
     {
         if (IsAbstract)
             throw new TypeNotConstructableException(line, Name);
-        
+
         BaseTerm copy = (BaseTerm)Activator.CreateInstance(Term.GetType());
         copy.Name = name;
         copy.Line = line;
         copy.TypeLibrary = Library;
+        copy.SetValue(Term.GetConstructor(sig).Execute(inputs));
+
         return copy;
+    }
+
+    public ReturnValue Construct(string sig, params BaseTerm[] inputs)
+    {
+        return Term.GetConstructor(sig).Execute(inputs);
     }
     
     public bool IsSubclassOf(string name)

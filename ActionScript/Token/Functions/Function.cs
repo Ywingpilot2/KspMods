@@ -17,7 +17,7 @@ namespace ActionLanguage.Token.Functions
         public void PostExecution();
         public void PostCompilation();
     }
-    
+
     public interface IFunction : IExecutable
     {
         public string Name { get; }

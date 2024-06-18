@@ -16,5 +16,6 @@ public enum SpecialFuncKind
 {
     Not = 0,
     Comparison = 1,
-    As = 2
+    As = 2,
+    New = 3
 }

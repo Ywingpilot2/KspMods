@@ -1,6 +1,6 @@
 ﻿using ActionLanguage.Exceptions;
 
-namespace ActionLanguage.Token.Terms;
+namespace ActionLanguage.Token.Terms.Literal;
 
 public class NullTerm : BaseTerm
 {

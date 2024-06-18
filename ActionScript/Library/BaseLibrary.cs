@@ -4,6 +4,7 @@ using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
+using ActionLanguage.Token.Terms.Literal;
 
 namespace ActionLanguage.Library
 {

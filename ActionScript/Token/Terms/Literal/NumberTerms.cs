@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using ActionLanguage.Library;
+using ActionLanguage.Token.Interaction;
 using ActionLanguage.Utils;
 
-namespace ActionLanguage.Token.Terms;
+namespace ActionLanguage.Token.Terms.Literal;
 
 public static class NumberConversion
 {
@@ -115,6 +118,15 @@ public class NumberTerm : BaseTerm
             default:
                 throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
         }
+    }
+
+    #endregion
+
+    #region Creation
+
+    public override IEnumerable<TermConstructor> GetConstructors()
+    {
+        yield return new TermConstructor(_ => new ReturnValue(0, "int"));
     }
 
     #endregion

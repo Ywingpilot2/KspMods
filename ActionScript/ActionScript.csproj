@@ -55,6 +55,7 @@
         <Compile Include="Token\Fields\TermField.cs" />
         <Compile Include="Token\Functions\BaseExecutable.cs" />
         <Compile Include="Token\Functions\CastCall.cs" />
+        <Compile Include="Token\Functions\ConstructorCall.cs" />
         <Compile Include="Token\Functions\Enumeration.cs" />
         <Compile Include="Token\Functions\FieldCall.cs" />
         <Compile Include="Token\Functions\Function.cs" />
@@ -76,9 +77,9 @@
         <Compile Include="Token\KeyWords\ThrowKeyword.cs" />
         <Compile Include="Token\KeyWords\WhileKeyword.cs" />
         <Compile Include="Token\Terms\BaseTerm.cs" />
-        <Compile Include="Token\Terms\BoolTerm.cs" />
-        <Compile Include="Token\Terms\NullTerm.cs" />
-        <Compile Include="Token\Terms\NumberTerms.cs" />
+        <Compile Include="Token\Terms\Literal\BoolTerm.cs" />
+        <Compile Include="Token\Terms\Literal\NullTerm.cs" />
+        <Compile Include="Token\Terms\Literal\NumberTerms.cs" />
         <Compile Include="Token\Terms\StringTerm.cs" />
         <Compile Include="Token\Terms\Term.cs" />
         <Compile Include="Token\Terms\VoidTerm.cs" />

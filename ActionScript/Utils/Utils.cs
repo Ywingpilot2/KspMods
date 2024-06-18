@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Extensions;
@@ -193,6 +194,32 @@ public static class CompileUtils
 
                         Input convert = HandleToken(split[0].Trim(), "term", holder, compiler);
                         CastCall call = new CastCall(holder, compiler.CurrentLine, convert, type.Name);
+                        return new Input(holder, call);
+                    }
+                    case SpecialFuncKind.New:
+                    {
+                        string[] split = token.SanitizedSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+                        string[] typePrms = split[1].SanitizedSplit('(', 2);
+                        string prms = typePrms[1].Trim(')'); // TODO: Trimming is expensive and wasteful!
+                        List<string> inputTokens = compiler.ParseCallInputs(prms);
+
+                        string[] types = new string[inputTokens.Count];
+                        for (int i = 0; i < inputTokens.Count; i++)
+                        {
+                            types.SetValue(GetTypeFromToken(inputTokens[i], holder, GetTokenKind(inputTokens[i], holder)).Name, i);
+                        }
+                        
+                        string sig = string.Join(" ", types);
+                        if (!type.HasConstructor(sig))
+                            throw new ConstructorNotFoundException(compiler.CurrentLine, sig);
+                        
+                        Input[] inputs = new Input[inputTokens.Count];
+                        for (int i = 0; i < inputTokens.Count; i++)
+                        {
+                            inputs.SetValue(HandleToken(inputTokens[i], types[i], holder, compiler), i);
+                        }
+
+                        ConstructorCall call = new ConstructorCall(holder, compiler.CurrentLine, sig, type, inputs);
                         return new Input(holder, call);
                     }
                     default:
@@ -392,6 +419,16 @@ public static class CompileUtils
                         TermType type = holder.GetTermType(split[1].Trim());
                         return type;
                     }
+                    case SpecialFuncKind.New:
+                    {
+                        string[] split = token.SanitizedSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+                        if (split.Length != 2)
+                            throw new InvalidParametersException(0, new[] { "type" });
+
+                        string typeName = split[1].Trim().SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
+                        TermType type = holder.GetTermType(typeName);
+                        return type;
+                    }
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -506,6 +543,9 @@ public static class CompileUtils
         if (san.Contains(" as "))
             return SpecialFuncKind.As;
 
+        if (san.StartsWith("new "))
+            return SpecialFuncKind.New;
+
         throw new InvalidCompilationException(0, $"Token {token} is not valid");
     }
 
@@ -517,6 +557,21 @@ public static class CompileUtils
         {
             return TokenKind.SpecialFunc;
         }
+        
+        if (Operators.Any(san.SanitizeParenthesis().Contains))
+        {
+            return TokenKind.Operator;
+        }
+        
+        if (Comparisons.Any(san.SanitizeParenthesis().Contains))
+        {
+            return TokenKind.SpecialFunc;
+        }
+        
+        if (san.StartsWith("new "))
+        {
+            return TokenKind.SpecialFunc;
+        }
 
         if (san.EndsWith(")"))
         {
@@ -525,16 +580,6 @@ public static class CompileUtils
                 return TokenKind.LocalFunc;
             else
                 return TokenKind.Function;
-        }
-
-        if (Operators.Any(san.Contains))
-        {
-            return TokenKind.Operator;
-        }
-        
-        if (Comparisons.Any(san.Contains))
-        {
-            return TokenKind.SpecialFunc;
         }
 
         if (san.Contains(" as "))

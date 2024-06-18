@@ -2,7 +2,7 @@
 using System.Globalization;
 using ActionLanguage.Utils;
 
-namespace ActionLanguage.Token.Terms;
+namespace ActionLanguage.Token.Terms.Literal;
 
 public sealed class BoolTerm : BaseTerm
 {

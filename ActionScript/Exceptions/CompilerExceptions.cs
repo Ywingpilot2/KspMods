@@ -341,3 +341,14 @@ public class FieldNotExistException : CompilationException
         _name = name;
     }
 }
+
+public class ConstructorNotFoundException : CompilationException
+{
+    private string _sig;
+    public override string Message => $"Could not find constructor with signature \"{_sig}\" at line {LineNumber}"; // TODO: Check for null
+
+    public ConstructorNotFoundException(int lineNumber, string sig) : base(lineNumber)
+    {
+        _sig = sig;
+    }
+}
