@@ -1,6 +1,6 @@
 ﻿using ActionLanguage.Exceptions;
 
-namespace ActionLanguage.Token.Terms;
+namespace ActionLanguage.Token.Terms.Technical;
 
 /// <summary>
 /// Represents the base class for a <see cref="BaseTerm"/>

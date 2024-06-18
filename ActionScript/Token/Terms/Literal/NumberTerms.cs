@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using ActionLanguage.Library;
+using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Utils;
 
@@ -170,6 +171,29 @@ public class TermI : NumberTerm
         {
             return false;
         }
+    }
+
+    public override IEnumerable<IFunction> GetFunctions()
+    {
+        foreach (IFunction function in base.GetFunctions())
+        {
+            yield return function;
+        }
+
+        yield return new Function("increment", "void", terms =>
+        {
+            BaseTerm term = terms[0];
+            term.SetValue(term.CastToInt() + 1);
+
+            return new ReturnValue();
+        });
+        yield return new Function("decrement", "void", terms =>
+        {
+            BaseTerm term = terms[0];
+            term.SetValue(term.CastToInt() - 1);
+
+            return new ReturnValue();
+        });
     }
 
     public override bool SetValue(object value)

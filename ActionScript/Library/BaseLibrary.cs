@@ -4,7 +4,10 @@ using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
+using ActionLanguage.Token.Terms.Complex;
+using ActionLanguage.Token.Terms.Complex.Enumerators;
 using ActionLanguage.Token.Terms.Literal;
+using ActionLanguage.Token.Terms.Technical;
 
 namespace ActionLanguage.Library
 {
@@ -109,7 +112,8 @@ namespace ActionLanguage.Library
             new ThrowKeyword(),
             new IfKeyword(),
             new ElseIfKeyword(),
-            new ElseKeyword()
+            new ElseKeyword(),
+            new ForeachKeyword()
         };
         public TypeLibrary TypeLibrary { get; }
         
@@ -119,8 +123,10 @@ namespace ActionLanguage.Library
 
             TermType baseType = new TermType(new Term(), TypeLibrary, isAbstract:true);
             TermType numberType = new TermType(new NumberTerm(), TypeLibrary, baseType, true);
+            TermType enumerableType = new TermType(new EnumeratorTerm(), TypeLibrary, baseType, true);
             TypeLibrary.AddTermType(baseType);
             TypeLibrary.AddTermType(numberType);
+            TypeLibrary.AddTermType(enumerableType);
             TypeLibrary.AddTermType(new TermType(new VoidTerm(), TypeLibrary, isAbstract:true));
             TypeLibrary.AddTermType(new TermType(new NullTerm(), TypeLibrary, baseType, isAbstract:true));
             TypeLibrary.AddTermType(new TermType(new TermI(), TypeLibrary, numberType));
@@ -129,6 +135,7 @@ namespace ActionLanguage.Library
             TypeLibrary.AddTermType(new TermType(new TermD(), TypeLibrary, numberType));
             TypeLibrary.AddTermType(new TermType(new StringTerm(), TypeLibrary, baseType));
             TypeLibrary.AddTermType(new TermType(new BoolTerm(), TypeLibrary, baseType));
+            TypeLibrary.AddTermType(new TermType(new ArrayTerm(), TypeLibrary, enumerableType));
         }
     }
 }

@@ -112,7 +112,7 @@ public class ActionCompiler : ITokenHolder
             string[] split = token.SanitizedSplit('=', 2, StringSplitOptions.RemoveEmptyEntries);
             if (split.Length == 1)
             {
-                FunctionCall call = ParseFunctionCall(token, holder);
+                TokenCall call = ParseFunctionCall(token, holder);
                 holder.AddCall(call);
             }
             else if (split.Length == 2)
@@ -193,7 +193,7 @@ public class ActionCompiler : ITokenHolder
 
     #region Function Calls
 
-    public FunctionCall ParseFunctionCall(string token, ITokenHolder holder)
+    public TokenCall ParseFunctionCall(string token, ITokenHolder holder)
     {
         // Is this a global or local function?
         TokenKind kind = CompileUtils.GetTokenKind(token, holder);
@@ -220,7 +220,7 @@ public class ActionCompiler : ITokenHolder
         return new FunctionCall(holder, func, inputTokens, CurrentLine);
     }
 
-    public FunctionCall ParseLocalCall(string token, ITokenHolder holder)
+    public LocalCall ParseLocalCall(string token, ITokenHolder holder)
     {
         string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
         string termToken = split[0].Trim();
@@ -241,7 +241,7 @@ public class ActionCompiler : ITokenHolder
         
         inputTokens.AddRange(ParseInputTokens(prms, func, holder));
 
-        return new FunctionCall(holder, func, inputTokens, CurrentLine);
+        return new LocalCall(holder, func.Name, inputTokens, CurrentLine, term);
     }
 
     private List<Input> ParseInputTokens(string prms, IFunction func, ITokenHolder holder)

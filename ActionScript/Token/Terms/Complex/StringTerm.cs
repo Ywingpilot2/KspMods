@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using ActionLanguage.Exceptions;
-using ActionLanguage.Library;
 using ActionLanguage.Token.Fields;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms.Literal;
 
-namespace ActionLanguage.Token.Terms;
+namespace ActionLanguage.Token.Terms.Complex;
 
 public sealed class StringTerm : BaseTerm
 {

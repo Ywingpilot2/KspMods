@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms;
@@ -32,18 +33,18 @@ namespace ActionLanguage.Token.Functions
     
     public class FunctionCall : TokenCall
     {
-        protected List<Input> _inputs;
+        protected Input[] _inputs;
         public IFunction Function { get; }
 
         public override ReturnValue Call()
         {
-            List<BaseTerm> terms = new List<BaseTerm>();
-            foreach (Input input in _inputs)
+            BaseTerm[] terms = new BaseTerm[_inputs.Length];
+            for (var i = 0; i < _inputs.Length; i++)
             {
-                terms.Add(input.GetValue());
+                terms.SetValue(_inputs[i].GetValue(), i);
             }
 
-            return Function.Execute(terms.ToArray());
+            return Function.Execute(terms);
         }
         
         #region Pre/Post events
@@ -72,13 +73,13 @@ namespace ActionLanguage.Token.Functions
         public FunctionCall(ITokenHolder script, IFunction function, IEnumerable<Input> inputs, int line) : base(script, line)
         {
             Function = function;
-            _inputs = new List<Input>(inputs);
+            _inputs = inputs.ToArray();
         }
 
         public FunctionCall(ITokenHolder script, IFunction function, int line, params Input[] inputs) : base(script, line)
         {
             Function = function;
-            _inputs = new List<Input>(inputs);
+            _inputs = inputs;
         }
     }
 

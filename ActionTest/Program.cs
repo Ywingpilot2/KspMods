@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using ActionLanguage;
 using ActionLanguage.Library;
@@ -7,6 +8,7 @@ using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
+using ActionLanguage.Token.Terms.Literal;
 
 namespace ActionTest
 {
@@ -37,11 +39,13 @@ namespace ActionTest
         public static void Main(string[] args)
         {
             bool interaction = false;
-            
+
+            Stopwatch stopwatch = new Stopwatch();
             while (true)
             {
                 Console.WriteLine("Execute Action:");
                 string input = Console.ReadLine();
+                stopwatch.Start();
                 if (string.IsNullOrEmpty(input))
                     continue;
 
@@ -96,6 +100,10 @@ namespace ActionTest
                         return;
                     } break;
                 }
+                
+                stopwatch.Stop();
+                Console.WriteLine($"Executed action in {stopwatch.Elapsed}");
+                stopwatch.Reset();
             }
         }
 

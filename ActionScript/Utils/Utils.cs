@@ -167,7 +167,7 @@ public static class CompileUtils
             case TokenKind.LocalFunc:
             case TokenKind.Function:
             {
-                FunctionCall call = compiler.ParseFunctionCall(token, holder);
+                TokenCall call = compiler.ParseFunctionCall(token, holder);
                 return new Input(holder, call);
             }
             case TokenKind.SpecialFunc:

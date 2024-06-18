@@ -1,6 +1,6 @@
 ﻿using ActionLanguage.Exceptions;
 
-namespace ActionLanguage.Token.Terms;
+namespace ActionLanguage.Token.Terms.Technical;
 
 /// <summary>
 /// used by method calls to signal that there is no return value

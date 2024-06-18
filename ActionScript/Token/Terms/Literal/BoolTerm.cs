@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using ActionLanguage.Library;
+using ActionLanguage.Token.Interaction;
 using ActionLanguage.Utils;
 
 namespace ActionLanguage.Token.Terms.Literal;
@@ -58,6 +61,11 @@ public sealed class BoolTerm : BaseTerm
             return _value && b;
         else
             return _value || b;
+    }
+
+    public override IEnumerable<TermConstructor> GetConstructors()
+    {
+        yield return new TermConstructor(_ => new ReturnValue(false, "bool"));
     }
 
     public override bool Parse(string value)

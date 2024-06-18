@@ -68,6 +68,9 @@ public class TermType
     public string Name => Term.ValueType;
     public TermType BaseClass { get; }
     public bool IsAbstract { get; }
+    public bool IsNullable { get; }
+    public bool DefaultConstruction => HasConstructor("");
+    
     public TypeLibrary Library { get; }
     public OperatorKind[] AllowedOperators => Term.AllowedOperators;
     
@@ -79,7 +82,7 @@ public class TermType
     public bool HasConstructor(string sig) => Term.HasConstructor(sig);
     public TermConstructor GetConstructor(string sig) => Term.GetConstructor(sig);
 
-    public BaseTerm Construct(string name, int line, string sig = "", params BaseTerm[] inputs)
+    public BaseTerm Construct(string name, int line)
     {
         if (IsAbstract)
             throw new TypeNotConstructableException(line, Name);
@@ -88,7 +91,6 @@ public class TermType
         copy.Name = name;
         copy.Line = line;
         copy.TypeLibrary = Library;
-        copy.SetValue(Term.GetConstructor(sig).Execute(inputs));
 
         return copy;
     }
@@ -121,12 +123,15 @@ public class TermType
     public bool HasField(string name) => Term.HasField(name);
     public TermField GetField(string name) => Term.GetField(name);
 
-    public TermType(BaseTerm term, TypeLibrary library, TermType baseClass = null, bool isAbstract = false)
+    public string GetClassName() => Term.GetType().Name;
+
+    public TermType(BaseTerm term, TypeLibrary library, TermType baseClass = null, bool isAbstract = false, bool isNullable = false)
     {
         Term = term;
         Library = library;
         BaseClass = baseClass;
         IsAbstract = isAbstract;
+        IsNullable = isNullable;
     }
 
     public override string ToString()
@@ -150,6 +155,17 @@ public class TypeLibrary
             throw new TypeNotExistException(line, name);
 
         return Types[name];
+    }
+
+    public TermType GetByClass(string className)
+    {
+        foreach (TermType type in EnumerateTypes())
+        {
+            if (type.Name == className)
+                return type;
+        }
+        
+        throw new TypeNotExistException(0, className);
     }
 
     public void AddTermType(TermType type)

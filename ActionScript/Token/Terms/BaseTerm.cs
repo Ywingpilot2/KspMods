@@ -293,7 +293,10 @@ public abstract class BaseTerm : IToken
     /// </summary>
     /// <param name="value">The pure value from the token</param>
     /// <returns>A bool indicating whether the operation was a success. If false a <see cref="CompilationException"/> will be thrown</returns>
-    public abstract bool Parse(string value);
+    public virtual bool Parse(string value)
+    {
+        throw new NotImplementedException();
+    }
 
     public abstract bool SetValue(object value);
     
