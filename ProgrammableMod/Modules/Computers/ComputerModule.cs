@@ -4,8 +4,9 @@ namespace ProgrammableMod.Modules.Computers;
 
 public class ComputerModule : BaseComputer
 {
-    public override bool ValidateScript(ActionScript script)
+    public override bool ValidateScript(ActionScript script, out string reason)
     {
+        reason = "working";
         return true;
     }
 }

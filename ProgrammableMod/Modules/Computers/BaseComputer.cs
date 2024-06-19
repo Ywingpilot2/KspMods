@@ -1,5 +1,6 @@
 ﻿using System;
 using ActionLanguage;
+using ActionLanguage.Exceptions;
 using ActionLanguage.Library;
 using ProgrammableMod.Scripting.Library;
 using UnityEngine;
@@ -18,8 +19,8 @@ public abstract class BaseComputer : PartModule, IComputer
 {
     protected ILibrary[] Libraries;
     
-    [KSPField(isPersistant = false, guiActive = true, guiName = "Program Status")]
-    public string status = "Operating effectively";
+    [KSPField(isPersistant = false, guiActive = true, guiName = "Program Status", guiActiveEditor = true)]
+    public string status = "Operating";
     
     [KSPField(isPersistant = false, guiActive = false, guiName = "Error")]
     public string exception;
@@ -47,6 +48,7 @@ public abstract class BaseComputer : PartModule, IComputer
             {
                 exception = e.Message;
                 DisplayPopup = true;
+                tokenContainer.shouldRun = false;
             }
         }
     }
@@ -67,6 +69,7 @@ public abstract class BaseComputer : PartModule, IComputer
         };
 
         _compiler = new ActionCompiler(Libraries);
+        ResetStatus();
         if (tokenContainer.shouldCompile)
         {
             CompileScript();
@@ -76,6 +79,8 @@ public abstract class BaseComputer : PartModule, IComputer
         {
             vessel.OnFlyByWire += Execution;
         }
+        
+        UpdateButton();
     }
 
     #endregion
@@ -114,6 +119,11 @@ public abstract class BaseComputer : PartModule, IComputer
 
         GUILayout.BeginHorizontal();
 
+        if (GUILayout.Button("Cancel"))
+        {
+            DisplayEditor = false;
+        }
+
         if (GUILayout.Button("Save")) // TODO: cancel button
         {
             tokenContainer.tokens = _editorText;
@@ -136,13 +146,56 @@ public abstract class BaseComputer : PartModule, IComputer
         
         GUILayout.Label(exception);
 
-        if (GUILayout.Button("Ok"))
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Break Execution"))
         {
             DisplayPopup = false;
+            tokenContainer.shouldRun = false;
+            tokenContainer.shouldCompile = false;
+            UpdateButton();
         }
+        
+        if (GUILayout.Button("Continue Execution"))
+        {
+            DisplayPopup = false;
+            tokenContainer.shouldRun = true;
+        }
+        
+        GUILayout.EndHorizontal();
         
         GUILayout.EndVertical();
     }
+
+    #endregion
+    
+    #region Compilation
+
+    [KSPEvent(active = true, guiActive = true, guiName = "Compile Script", guiActiveEditor = true, guiActiveUnfocused = true, unfocusedRange = 15f)]
+    public void CompileScript()
+    {
+        try
+        {
+            ActionScript script = _compiler.Compile(tokenContainer.tokens);
+            if (!ValidateScript(script, out string reason))
+            {
+                throw new InvalidCompilationException(1, reason);
+            }
+
+            Script = script;
+            tokenContainer.shouldCompile = true;
+            ResetStatus();
+        }
+        catch (Exception e)
+        {
+            tokenContainer.shouldRun = false;
+            tokenContainer.shouldCompile = false;
+            UpdateButton();
+            SetStatus(e.Message, StatusKind.Uhoh);
+        }
+    }
+
+    public abstract bool ValidateScript(ActionScript script, out string reason);
 
     #endregion
 
@@ -157,31 +210,18 @@ public abstract class BaseComputer : PartModule, IComputer
 
     #endregion
 
-    #region Compilation
-
-    [KSPEvent(active = true, guiActive = true, guiName = "Compile Script")]
-    public void CompileScript()
-    {
-        try
-        {
-            Script = _compiler.Compile(tokenContainer.tokens);
-            tokenContainer.shouldCompile = true;
-            ResetStatus();
-        }
-        catch (Exception e)
-        {
-            tokenContainer.shouldRun = false;
-            tokenContainer.shouldCompile = false;
-            UpdateButton();
-            SetStatus(e.Message, StatusKind.Uhoh);
-        }
-    }
-
-    public abstract bool ValidateScript(ActionScript script);
-
-    #endregion
-
     #region Execution buttons
+
+    #region Flight
+    
+    [KSPAction("Toggle Script")]
+    public void Toggle()
+    {
+        if (tokenContainer.shouldRun)
+            StopExecuting();
+        else
+            Execute();
+    }
 
     [KSPEvent(active = true, guiActive = true, guiName = "Start execution")]
     [KSPAction("Execute Script")]
@@ -199,26 +239,47 @@ public abstract class BaseComputer : PartModule, IComputer
         UpdateButton();
     }
 
-    [KSPAction("Toggle Script")]
-    public void Toggle()
+    #endregion
+
+    #region Editor
+
+    [KSPField(guiActiveEditor = true, guiName = "Execution")]
+    public string execEditorStatus = "Start inactive";
+
+    [KSPEvent(guiActiveEditor = true, guiName = "Toggle startup")]
+    public void ToggleStart()
     {
-        if (tokenContainer.shouldRun)
-            StopExecuting();
-        else
-            Execute();
+        tokenContainer.shouldRun = !tokenContainer.shouldRun;
+        UpdateButton();
     }
+
+    #endregion
 
     protected void UpdateButton()
     {
-        if (tokenContainer.shouldRun)
+        if (HighLogic.LoadedSceneIsFlight)
         {
-            Events["StopExecuting"].active = true;
-            Events["Execute"].active = false;
+            if (tokenContainer.shouldRun)
+            {
+                Events["StopExecuting"].active = true;
+                Events["Execute"].active = false;
+            }
+            else
+            {
+                Events["StopExecuting"].active = false;
+                Events["Execute"].active = true;
+            }
         }
         else
         {
-            Events["StopExecuting"].active = false;
-            Events["Execute"].active = true;
+            if (tokenContainer.shouldRun)
+            {
+                execEditorStatus = "Start active";
+            }
+            else
+            {
+                execEditorStatus = "Start inactive";
+            }
         }
     }
 
@@ -226,19 +287,19 @@ public abstract class BaseComputer : PartModule, IComputer
 
     #region Status
 
-    protected void SetStatus(string status, StatusKind kind)
+    protected void SetStatus(string newStatus, StatusKind kind)
     {
         switch (kind)
         {
             case StatusKind.NotGreat:
             {
-                this.status = $"Warning: {status}";
+                status = $"Somethings off:\n{newStatus}";
                 UpdateException(kind);
             } break;
             case StatusKind.Uhoh:
             {
-                this.status = "An exception has occured!\nSee below for info:";
-                exception = status;
+                status = "Uh oh, something is breaking!\nSee below for info:";
+                exception = newStatus;
                 UpdateException(kind);
             } break;
             default:
@@ -254,16 +315,20 @@ public abstract class BaseComputer : PartModule, IComputer
         if (kind == StatusKind.Uhoh)
         {
             Fields["exception"].guiActive = true;
+            Fields["exception"].guiActiveEditor = true;
+            Fields["exception"].guiActiveUnfocused = true;
         }
         else
         {
             Fields["exception"].guiActive = false;
+            Fields["exception"].guiActiveEditor = false;
+            Fields["exception"].guiActiveUnfocused = false;
         }
     }
 
     protected void ResetStatus()
     {
-        status = "Operating properly";
+        status = "Not actively breaking";
         UpdateException(StatusKind.Exceptional);
     }
 
@@ -281,10 +346,10 @@ public class TokenContainer : IConfigNode
     public string tokens = "";
 
     [SerializeField]
-    public bool shouldRun = false;
+    public bool shouldRun;
     
     [SerializeField]
-    public bool shouldCompile = false;
+    public bool shouldCompile;
     
     public void Load(ConfigNode node)
     {
@@ -294,9 +359,19 @@ public class TokenContainer : IConfigNode
             {
                 if (node.HasValue($"script-line{i}"))
                 {
-                    tokens += $"{node.GetValue($"script-line{i}")}\n\r";
+                    tokens += $"{node.GetValue($"script-line{i}")}\n";
                 }
             }
+        }
+
+        if (node.HasValue("compile-startup"))
+        {
+            shouldCompile = true;
+        }
+
+        if (node.HasValue("script-startup"))
+        {
+            shouldRun = true;
         }
     }
 
@@ -307,6 +382,16 @@ public class TokenContainer : IConfigNode
         for (int i = 0; i < lines.Length; i++)
         {
             node.AddValue($"script-line{i}", lines[i].Trim());
+        }
+
+        if (shouldCompile)
+        {
+            node.AddValue("compile-startup", "");
+        }
+        
+        if (shouldRun)
+        {
+            node.AddValue("script-startup", "");
         }
     }
 }

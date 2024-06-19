@@ -11,7 +11,7 @@ namespace ProgrammableMod.Modules.Computers
         /// Validates the current script
         /// </summary>
         /// <returns>Whether the script is valid or not</returns>
-        public bool ValidateScript(ActionScript script);
+        public bool ValidateScript(ActionScript script, out string reason);
 
         [KSPEvent(active = true, guiActive = true, guiName = "Start execution")]
         public void Execute();

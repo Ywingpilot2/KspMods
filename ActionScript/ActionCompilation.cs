@@ -77,11 +77,14 @@ public class ActionCompiler
 
     public void ParseToken(string token, ITokenHolder holder)
     {
+        _currentScript.TotalTokens++;
+        
         string keywordName = token.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
         if (_currentScript.GetLibraryManager().HasKeyword(keywordName))
         {
             IKeyword keyword = _currentScript.GetLibraryManager().GetKeyword(keywordName);
             keyword.CompileKeyword(token, this, _currentScript, holder);
+            _currentScript.KeyTokens++;
         }
         else
         {
@@ -90,6 +93,7 @@ public class ActionCompiler
             {
                 TokenCall call = ParseFunctionCall(token, holder);
                 holder.AddCall(call);
+                _currentScript.CallTokens++;
             }
             else if (split.Length == 2)
             {
@@ -120,7 +124,8 @@ public class ActionCompiler
                 BaseTerm term = type.Construct(values[1], CurrentLine, manager);
                 if (!term.Parse(values[2]))
                     throw new InvalidAssignmentException(CurrentLine, term);
-                
+
+                _currentScript.TermTokens++;
                 holder.AddTerm(term);
             } break;
             case AssignmentKind.Term:
@@ -143,6 +148,7 @@ public class ActionCompiler
                 Input input = new Input(from);
 
                 AssignmentCall assignmentCall = new AssignmentCall(term, input, holder, CurrentLine);
+                _currentScript.TermTokens++;
                 holder.AddTerm(term);
                 holder.AddCall(assignmentCall);
             } break;
@@ -154,6 +160,7 @@ public class ActionCompiler
                 AssignmentCall call = new AssignmentCall(term, input, holder, CurrentLine);
                 holder.AddTerm(term);
                 holder.AddCall(call);
+                _currentScript.CallTokens++;
             } break;
             case AssignmentKind.Assignment:
             {
@@ -162,6 +169,7 @@ public class ActionCompiler
                 Input input = CompileUtils.HandleToken(values[1], type, holder, this);
                 AssignmentCall call = new AssignmentCall(term, input, holder, CurrentLine);
                 holder.AddCall(call);
+                _currentScript.CallTokens++;
             } break;
         }
     }

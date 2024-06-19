@@ -19,6 +19,15 @@ namespace ActionLanguage
         private LibraryManager LibraryManager { get; }
         private List<TokenCall> TokenCalls { get; }
 
+        #region Tokens
+
+        public int TotalTokens { get; set; }
+        public int CallTokens { get; set; }
+        public int KeyTokens { get; set; }
+        public int TermTokens { get; set; }
+
+        #endregion
+
         #region Enumeration
 
         public IEnumerable<TokenCall> EnumerateCalls() => TokenCalls;
