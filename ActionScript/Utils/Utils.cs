@@ -567,6 +567,11 @@ public static class CompileUtils
         {
             return TokenKind.SpecialFunc;
         }
+
+        if (TokenIsConstant(token))
+        {
+            return TokenKind.Constant;
+        }
         
         if (san.StartsWith("new "))
         {
@@ -593,11 +598,6 @@ public static class CompileUtils
             TokenKind inKind = GetTokenKind(split[0].Trim(), holder);
             if (inKind != TokenKind.Invalid)
                 return TokenKind.LocalField;
-        }
-
-        if (!holder.HasTerm(token))
-        {
-            return TokenKind.Constant;
         }
 
         if (holder.HasTerm(token))

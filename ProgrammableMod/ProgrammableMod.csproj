@@ -88,6 +88,9 @@
         <Compile Include="Scripting\Library\ComputerLibrary.cs" />
         <Compile Include="Scripting\Library\KerbalLibrary.cs" />
         <Compile Include="Scripting\Library\VesselLibrary.cs" />
+        <Compile Include="Scripting\Terms\Graphmatics\PiecewiseCurve.cs" />
+        <Compile Include="Scripting\Terms\Vectors\Vec2Term.cs" />
+        <Compile Include="Scripting\Terms\Vectors\Vec3Term.cs" />
         <Compile Include="Startup.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

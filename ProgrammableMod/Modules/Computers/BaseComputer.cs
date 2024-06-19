@@ -26,6 +26,7 @@ public abstract class BaseComputer : PartModule, IComputer
     [KSPField(isPersistant = true)]
     protected string Tokens;
     protected ActionScript Script;
+    [KSPField(isPersistant =  true)]
     protected bool ShouldRun;
 
     internal FlightCtrlState _state;
@@ -47,12 +48,19 @@ public abstract class BaseComputer : PartModule, IComputer
         }
     }
 
+    public override void OnAwake()
+    {
+        base.OnAwake();
+        Tokens = "";
+    }
+
     public override void OnStart(StartState state)
     {
         Libraries = new ILibrary[]
         {
             new KerbalLibrary(),
-            new VesselLibrary(this)
+            new VesselLibrary(this),
+            new ComputerLibrary(ActionCompiler.Library)
         };
 
         if (HighLogic.LoadedSceneIsFlight)

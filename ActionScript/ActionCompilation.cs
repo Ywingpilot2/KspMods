@@ -15,7 +15,7 @@ namespace ActionLanguage;
 
 public class ActionCompiler : ITokenHolder
 {
-    private static readonly ActionLibrary Library = new();
+    public static ActionLibrary Library => new();
     
     private ILibrary[] _libraries;
     private ActionScript _script;
@@ -222,7 +222,7 @@ public class ActionCompiler : ITokenHolder
 
     public LocalCall ParseLocalCall(string token, ITokenHolder holder)
     {
-        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
         string termToken = split[0].Trim();
         string[] funcToken = split[1].Trim().SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
 
