@@ -26,7 +26,7 @@ namespace ActionLanguage.Token.Functions
         public bool AnyCount { get; } // TODO: actually implement optional params
         
         // TODO: this is a cool idea, why aren't we using it?
-        public bool InputIsValid(string type, int idx, ITokenHolder holder);
+        // public bool InputIsValid(string type, int idx, ITokenHolder holder);
     }
     
     public struct Function : IFunction
@@ -52,55 +52,6 @@ namespace ActionLanguage.Token.Functions
 
         public void PostCompilation()
         {
-        }
-
-        public bool InputIsValid(string type, int idx, ITokenHolder holder)
-        {
-            if (InputTypes.Length == 0)
-                return false;
-            
-            if (AnyCount)
-            {
-                if (idx >= InputTypes.Length)
-                {
-                    string last = InputTypes.Last();
-                    if (last != type)
-                    {
-                        TermType termType = holder.GetTermType(last);
-                        return termType.IsSubclassOf(type);
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    string at = InputTypes.ElementAtOrDefault(idx);
-                    if (string.IsNullOrEmpty(at))
-                        return false;
-
-                    if (at != type)
-                    {
-                        TermType termType = holder.GetTermType(at);
-                        return termType.IsSubclassOf(type);
-                    }
-
-                    return true;
-                }
-            }
-            else
-            {
-                string at = InputTypes.ElementAtOrDefault(idx);
-                if (string.IsNullOrEmpty(at))
-                    return false;
-
-                if (at != type)
-                {
-                    TermType termType = holder.GetTermType(at);
-                    return termType.IsSubclassOf(type);
-                }
-
-                return true;
-            }
         }
 
         public Function(string name, string returnType, Func<BaseTerm[], ReturnValue> action, params string[] inputTypes)
@@ -160,55 +111,6 @@ namespace ActionLanguage.Token.Functions
                 throw new FunctionLacksReturnException(0, this);
         }
 
-        public bool InputIsValid(string type, int idx, ITokenHolder holder)
-        {
-            if (InputTypes.Length == 0)
-                return false;
-            
-            if (AnyCount)
-            {
-                if (idx >= InputTypes.Length)
-                {
-                    string last = InputTypes.Last();
-                    if (last != type)
-                    {
-                        TermType termType = holder.GetTermType(last);
-                        return termType.IsSubclassOf(type);
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    string at = InputTypes.ElementAtOrDefault(idx);
-                    if (string.IsNullOrEmpty(at))
-                        return false;
-
-                    if (at != type)
-                    {
-                        TermType termType = holder.GetTermType(at);
-                        return termType.IsSubclassOf(type);
-                    }
-
-                    return true;
-                }
-            }
-            else
-            {
-                string at = InputTypes.ElementAtOrDefault(idx);
-                if (string.IsNullOrEmpty(at))
-                    return false;
-
-                if (at != type)
-                {
-                    TermType termType = holder.GetTermType(at);
-                    return termType.IsSubclassOf(type);
-                }
-
-                return true;
-            }
-        }
-
         public UserFunction(ITokenHolder holder, string name, string returnType, Dictionary<string,string> inputs) : base(holder)
         {
             Name = name;
@@ -221,7 +123,9 @@ namespace ActionLanguage.Token.Functions
             {
                 InputTypes.SetValue(input.Value, idx);
                 _inputNames.SetValue(input.Key, idx);
-                AddTerm(GetTermType(input.Value).Construct(input.Key, 0));
+
+                LibraryManager manager = GetLibraryManager();
+                AddTerm(manager.GetTermType(input.Value).Construct(input.Key, 0, manager));
                 idx++;
             }
         }

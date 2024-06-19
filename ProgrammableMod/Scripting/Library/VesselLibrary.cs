@@ -12,27 +12,29 @@ namespace ProgrammableMod.Scripting.Library;
 public class VesselLibrary : ILibrary
 {
     private BaseComputer _computer;
-    
+
+    public string Name => "vessel";
+
     public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
     {
         new Function("set_pitch", "void", terms =>
         {
-            _computer._state.pitch = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
+            _computer.State.pitch = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
             return new ReturnValue();
         }, "float"),
         new Function("set_yaw", "void", terms =>
         {
-            _computer._state.yaw = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
+            _computer.State.yaw = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
             return new ReturnValue();
         }, "float"),
         new Function("set_roll", "void", terms =>
         {
-            _computer._state.roll = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
+            _computer.State.roll = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
             return new ReturnValue();
         }, "float"),
         new Function("set_throttle", "void", terms =>
         {
-            _computer._state.mainThrottle = Mathf.Clamp(terms[0].CastToFloat(), 0.0F, 1.0F);
+            _computer.State.mainThrottle = Mathf.Clamp(terms[0].CastToFloat(), 0.0F, 1.0F);
             return new ReturnValue();
         }, "float")
     };

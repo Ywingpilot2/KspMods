@@ -13,6 +13,8 @@ namespace ProgrammableMod.Scripting.Library;
 
 public class ComputerLibrary : ILibrary
 {
+    public string Name => "computing";
+
     public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
     {
         new Function("lerp", "float", 

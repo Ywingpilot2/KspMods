@@ -155,7 +155,7 @@ public static class CompileUtils
         {
             case TokenKind.Constant:
             {
-                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), compiler.CurrentLine);
+                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), compiler.CurrentLine, holder.GetLibraryManager());
                 term.Parse(token);
                 
                 return new Input(term);
@@ -294,7 +294,7 @@ public static class CompileUtils
         if (split.Length != 2)
             throw new InvalidParametersException(compiler.CurrentLine, new []{"term","term"});
 
-        FunctionCall call = new FunctionCall(holder, compiler.GetFunction(callName), compiler.CurrentLine,
+        FunctionCall call = new FunctionCall(holder, holder.GetFunction(callName), compiler.CurrentLine,
             HandleToken(split[0].Remove(split[0].Length - 1).Trim(), "term", holder, compiler),
             HandleToken(split[1].Remove(0,1).Trim(), "term", holder, compiler));
         return call;
@@ -324,26 +324,28 @@ public static class CompileUtils
         TermType type = GetTypeFromToken(split[0].Trim(), holder, GetTokenKind(split[0].Trim(), holder));
 
         string typeName = type.GetField(split[1].Trim()).Value.Type;
-        return holder.GetTermType(typeName);
+        return holder.GetLibraryManager().GetTermType(typeName);
     }
 
     public static TermType GetTypeFromConstant(string token, ITokenHolder holder)
     {
+        LibraryManager manager = holder.GetLibraryManager();
+        
         if (token.StartsWith("\"") && token.EndsWith("\"")) // is a string
         {
-            return holder.GetTermType("string");
+            return manager.GetTermType("string");
         }
         else if (int.TryParse(token, out _))
         {
-            return holder.GetTermType("int");
+            return manager.GetTermType("int");
         }
         else if (float.TryParse(token, out _))
         {
-            return holder.GetTermType("float");
+            return manager.GetTermType("float");
         }
         else if (bool.TryParse(token, out _))
         {
-            return holder.GetTermType("bool");
+            return manager.GetTermType("bool");
         }
         else
         {
@@ -362,19 +364,19 @@ public static class CompileUtils
         string name = token.SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries)[0];
         IFunction function = holder.GetFunction(name);
         
-        return holder.GetTermType(function.ReturnType);
+        return holder.GetLibraryManager().GetTermType(function.ReturnType);
     }
 
     public static TermType GetTypeFromLocalFunc(string token, ITokenHolder holder)
     {
-        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
 
         string termToken = split[0].Trim();
         TermType termType = GetTypeFromToken(termToken, holder, GetTokenKind(termToken, holder));
 
         string funcName = split[1].SanitizedSplit('(', 2)[0].Trim();
         IFunction func = termType.GetFunction(funcName);
-        return holder.GetTermType(func.ReturnType);
+        return holder.GetLibraryManager().GetTermType(func.ReturnType);
     }
 
     #endregion
@@ -407,7 +409,7 @@ public static class CompileUtils
                     case SpecialFuncKind.Not:
                     case SpecialFuncKind.Comparison:
                     {
-                        return holder.GetTermType("bool");
+                        return holder.GetLibraryManager().GetTermType("bool");
                     }
                     case SpecialFuncKind.As:
                     {
@@ -416,7 +418,7 @@ public static class CompileUtils
                         if (split.Length != 2)
                             throw new InvalidParametersException(0, new[] { "term", "type" });
 
-                        TermType type = holder.GetTermType(split[1].Trim());
+                        TermType type = holder.GetLibraryManager().GetTermType(split[1].Trim());
                         return type;
                     }
                     case SpecialFuncKind.New:
@@ -426,7 +428,7 @@ public static class CompileUtils
                             throw new InvalidParametersException(0, new[] { "type" });
 
                         string typeName = split[1].Trim().SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
-                        TermType type = holder.GetTermType(typeName);
+                        TermType type = holder.GetLibraryManager().GetTermType(typeName);
                         return type;
                     }
                     default:

@@ -1,4 +1,6 @@
-﻿namespace ProgrammableMod.Modules.Computers
+﻿using ActionLanguage;
+
+namespace ProgrammableMod.Modules.Computers
 {
     public interface IComputer
     {
@@ -9,7 +11,7 @@
         /// Validates the current script
         /// </summary>
         /// <returns>Whether the script is valid or not</returns>
-        public bool ValidateScript();
+        public bool ValidateScript(ActionScript script);
 
         [KSPEvent(active = true, guiActive = true, guiName = "Start execution")]
         public void Execute();

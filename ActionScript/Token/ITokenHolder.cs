@@ -29,9 +29,5 @@ public interface ITokenHolder : IFunctionHolder
     public void AddCall(TokenCall call);
     public void AddTerm(BaseTerm term);
 
-    public bool TermTypeExists(string name);
-    public TermType GetTermType(string name);
-
-    public bool HasKeyword(string name);
-    public IKeyword GetKeyword(string name);
+    public LibraryManager GetLibraryManager();
 }

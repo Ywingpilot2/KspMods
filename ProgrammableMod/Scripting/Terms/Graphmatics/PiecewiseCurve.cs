@@ -133,7 +133,7 @@ public class PiecewiseCTerm : BaseTerm
         }
 
         yield return new Function("get", "float",
-            terms => new ReturnValue(_piecewise.GetValue(terms[0].CastToFloat()), "float"),
+            terms => new ReturnValue(_piecewise.GetValue(terms[1].CastToFloat()), "float"),
             "float");
     }
 

@@ -28,12 +28,12 @@ public struct ForeachKeyword : IKeyword
         Input input = CompileUtils.HandleToken(inputToken, "enumerable", tokenHolder, compiler);
 
         string[] typeName = termToken.Split(new []{' '}, 2, StringSplitOptions.RemoveEmptyEntries);
-        TermType type = tokenHolder.GetTermType(typeName[0].Trim());
+        TermType type = tokenHolder.GetLibraryManager().GetTermType(typeName[0].Trim());
         string name = typeName[1].Trim();
         
         ForeachFunc func = new ForeachFunc(tokenHolder, input, name);
 
-        BaseTerm term = type.Construct(name, compiler.CurrentLine);
+        BaseTerm term = type.Construct(name, compiler.CurrentLine, script.GetLibraryManager());
         func.AddTerm(term);
 
         ParseForeachTokens(token, func);

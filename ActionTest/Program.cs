@@ -14,6 +14,8 @@ namespace ActionTest
 {
     public class ProgramLibrary : ILibrary
     {
+        public string Name => "program";
+
         public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
         {
             new Function("print", "void", inputTypes:"string", action: terms =>
@@ -34,7 +36,8 @@ namespace ActionTest
     
     internal static class Program
     {
-        public static Dictionary<string, ActionScript> _compiled = new Dictionary<string, ActionScript>();
+        private static Dictionary<string, ActionScript> _compiled = new Dictionary<string, ActionScript>();
+        private static ActionCompiler _compiler = new ActionCompiler(new ProgramLibrary());
 
         public static void Main(string[] args)
         {
@@ -63,7 +66,7 @@ namespace ActionTest
                             continue;
                         }
 
-                        ActionScript script = ActionExecution.CompileScriptFromFile(fileInfo.FullName, new ProgramLibrary());
+                        ActionScript script = _compiler.Compile(new StreamReader(fileInfo.FullName));
                         if (_compiled.ContainsKey(fileInfo.Name))
                         {
                             _compiled.Remove(fileInfo.Name);
@@ -83,12 +86,14 @@ namespace ActionTest
                     case "execFile":
                     {
                         Console.WriteLine("Executing file...");
-                        ActionExecution.ExecuteFromFile(split[1].Trim('"'), new ProgramLibrary());
+                        ActionScript script = _compiler.Compile(new StreamReader(split[1].Trim('"', ' ')));
+                        script.Execute();
                     } break;
                     case "execLocal":
                     {
                         Console.WriteLine("Executing file...");
-                        ExecuteLocal(split[1].Trim('"', ' ', '\t'));
+                        ActionScript script = _compiler.Compile(new StreamReader(GetGlobalPath(split[1].Trim('"', ' '))));
+                        script.Execute();
                     } break;
                     case "begin-interaction":
                     {
@@ -107,9 +112,6 @@ namespace ActionTest
             }
         }
 
-        public static void ExecuteLocal(string relativePath)
-        {
-            ActionExecution.ExecuteFromFile($"{AppDomain.CurrentDomain.BaseDirectory}{relativePath}", new ProgramLibrary());
-        }
+        public static string GetGlobalPath(string relativePath) => $"{AppDomain.CurrentDomain.BaseDirectory}{relativePath}";
     }
 }

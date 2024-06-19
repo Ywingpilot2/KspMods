@@ -41,11 +41,11 @@ public struct Input
                     return new NullTerm();
                     
                 //return new BaseTerm(Guid.NewGuid().ToString(), value.Value.ToString(), Call.Function.ValueType);
-                if (!_script.TermTypeExists(value.Type))
+                if (!_script.GetLibraryManager().HasTermType(value.Type))
                     throw new TypeNotExistException(Call.Line, value.Type);
 
-                TermType type = _script.GetTermType(value.Type);
-                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), Call.Line);
+                TermType type = _script.GetLibraryManager().GetTermType(value.Type);
+                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), Call.Line, _script.GetLibraryManager());
                 if (term.SetValue(value.Value) && term.Kind == TermKind.Null)
                 {
                     term.Kind = TermKind.Basic;

@@ -82,7 +82,7 @@ public class TermType
     public bool HasConstructor(string sig) => Term.HasConstructor(sig);
     public TermConstructor GetConstructor(string sig) => Term.GetConstructor(sig);
 
-    public BaseTerm Construct(string name, int line)
+    public BaseTerm Construct(string name, int line, LibraryManager manager)
     {
         if (IsAbstract)
             throw new TypeNotConstructableException(line, Name);
@@ -90,7 +90,7 @@ public class TermType
         BaseTerm copy = (BaseTerm)Activator.CreateInstance(Term.GetType());
         copy.Name = name;
         copy.Line = line;
-        copy.TypeLibrary = Library;
+        copy.TypeLibrary = manager;
 
         return copy;
     }

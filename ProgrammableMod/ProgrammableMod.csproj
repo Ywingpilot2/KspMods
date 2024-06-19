@@ -83,7 +83,6 @@
         <Compile Include="Modules\Computers\ComputerModule.cs" />
         <Compile Include="Modules\Computers\IComputer.cs" />
         <Compile Include="Modules\Test\GuiTestModule.cs" />
-        <Compile Include="Modules\Test\ProgammableTest.cs" />
         <Compile Include="Modules\Test\ThrottleTest.cs" />
         <Compile Include="Scripting\Library\ComputerLibrary.cs" />
         <Compile Include="Scripting\Library\KerbalLibrary.cs" />

@@ -44,7 +44,7 @@ public struct FuncKeyword : IKeyword
 
         UserFunction function = new UserFunction(_script, name, returnType, inputMapping);
         // first add global terms from the compiler
-        foreach (ILibrary library in _compiler.EnumerateLibraries())
+        foreach (ILibrary library in _script.GetLibraryManager().EnumerateLibraries())
         {
             if (library.GlobalTerms == null)
                 continue;

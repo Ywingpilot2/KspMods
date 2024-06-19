@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Extensions;
 using ActionLanguage.Library;
@@ -13,21 +14,31 @@ using ActionLanguage.Utils;
 
 namespace ActionLanguage;
 
-public class ActionCompiler : ITokenHolder
+public class ActionCompiler
 {
-    public static ActionLibrary Library => new();
-    
     private ILibrary[] _libraries;
-    private ActionScript _script;
+    private ActionScript _currentScript;
 
-    public ActionScript CompileScript()
+    public static ActionLibrary Library = new();
+
+    public ActionScript Compile(string tokens)
     {
-        _script = new ActionScript();
-        ImportLibrary(Library);
-        foreach (ILibrary library in _libraries)
-        {
-            ImportLibrary(library);
-        }
+        return Compile(new StringReader(tokens));
+    }
+
+    /// <summary>
+    /// Compiles a <see cref="ActionScript"/>
+    /// NOTICE: This does not work in multi threaded or async situations. 
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <returns>A compiled <see cref="ActionScript"/> ready for execution</returns>
+    public ActionScript Compile(TextReader reader)
+    {
+        _reader = reader;
+        _currentScript = new ActionScript();
+        
+        // TODO: Should the system library always be imported?
+        _currentScript.GetLibraryManager().ImportLibrary(Library);
 
         using (_reader)
         {
@@ -42,7 +53,7 @@ public class ActionCompiler : ITokenHolder
                         continue;
                     }
                 
-                    ParseToken(line, _script);
+                    ParseToken(line, _currentScript);
                     line = ReadCleanLine();
                 }
             }
@@ -58,54 +69,19 @@ public class ActionCompiler : ITokenHolder
 #endif
         }
 
-        _script.PostCompilation();
-        return _script;
+        _currentScript.PostCompilation();
+        return _currentScript;
     }
 
-    #region Types
-
-    public bool TermTypeExists(string name)
-    {
-        foreach (TypeLibrary library in _script.TypeLibraries)
-        {
-            if (library == null)
-                continue;
-            
-            if (library.HasTermType(name))
-                return true;
-        }
-        return false;
-    }
-
-    public TermType GetTermType(string name)
-    {
-        foreach (TypeLibrary library in _script.TypeLibraries)
-        {
-            if (library == null)
-                continue;
-            
-            if (!library.HasTermType(name))
-                continue;
-
-            return library.GetTermType(name, CurrentLine);
-        }
-            
-        throw new TypeNotExistException(CurrentLine, name);
-    }
-
-    
-
-    #endregion
-    
     #region Tokens
 
     public void ParseToken(string token, ITokenHolder holder)
     {
         string keywordName = token.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
-        if (HasKeyword(keywordName))
+        if (_currentScript.GetLibraryManager().HasKeyword(keywordName))
         {
-            IKeyword keyword = GetKeyword(keywordName);
-            keyword.CompileKeyword(token, this, _script, holder);
+            IKeyword keyword = _currentScript.GetLibraryManager().GetKeyword(keywordName);
+            keyword.CompileKeyword(token, this, _currentScript, holder);
         }
         else
         {
@@ -134,13 +110,14 @@ public class ActionCompiler : ITokenHolder
     {
         AssignmentKind kind = CompileUtils.DetermineAssignment(token, holder);
         string[] values = CompileUtils.GetTermValues(token);
-        
+
+        LibraryManager manager = _currentScript.GetLibraryManager();
         switch (kind)
         {
             case AssignmentKind.Constant:
             {
-                TermType type = GetTermType(values[0]);
-                BaseTerm term = type.Construct(values[1], CurrentLine);
+                TermType type = manager.GetTermType(values[0]);
+                BaseTerm term = type.Construct(values[1], CurrentLine, manager);
                 if (!term.Parse(values[2]))
                     throw new InvalidAssignmentException(CurrentLine, term);
                 
@@ -148,7 +125,7 @@ public class ActionCompiler : ITokenHolder
             } break;
             case AssignmentKind.Term:
             {
-                TermType type = GetTermType(values[0]);
+                TermType type = manager.GetTermType(values[0]);
                 BaseTerm from = holder.GetTerm(values[2]);
                 if (!from.CanImplicitCastToType(type.Name) && !from.GetTermType().IsSubclassOf(type.Name))
                     throw new InvalidAssignmentException(CurrentLine);
@@ -157,11 +134,11 @@ public class ActionCompiler : ITokenHolder
                 if (from.GetTermType().IsSubclassOf(type.Name))
                 {
                     TermType constructType = from.GetTermType();
-                    term = constructType.Construct(values[1], CurrentLine);
+                    term = constructType.Construct(values[1], CurrentLine, manager);
                 }
                 else
                 {
-                    term = type.Construct(values[1], CurrentLine);
+                    term = type.Construct(values[1], CurrentLine, manager);
                 }
                 Input input = new Input(from);
 
@@ -171,8 +148,8 @@ public class ActionCompiler : ITokenHolder
             } break;
             case AssignmentKind.Function:
             {
-                TermType type = GetTermType(values[0]);
-                BaseTerm term = type.Construct(values[1], CurrentLine);
+                TermType type = manager.GetTermType(values[0]);
+                BaseTerm term = type.Construct(values[1], CurrentLine, manager);
                 Input input = CompileUtils.HandleToken(values[2], type.Name, holder, this);
                 AssignmentCall call = new AssignmentCall(term, input, holder, CurrentLine);
                 holder.AddTerm(term);
@@ -320,8 +297,8 @@ public class ActionCompiler : ITokenHolder
 
     #endregion
 
-    #region Reading
-    
+    #region Text reading
+
     public int CurrentLine;
     private TextReader _reader;
 
@@ -391,91 +368,23 @@ public class ActionCompiler : ITokenHolder
 
     #region Libraries
 
-    public void ImportLibrary(ILibrary library)
+    public bool HasLibrary(string name) => _libraries.Any(l => l.Name == name);
+
+    public ILibrary GetLibrary(string name)
     {
-        if (library.GlobalFunctions != null)
-        {
-            foreach (IFunction globalFunction in library.GlobalFunctions)
-            {
-                if (_script.HasFunction(globalFunction.Name))
-                    continue;
-                
-                _script.Functions.Add(globalFunction.Name, globalFunction);
-            }
-        }
-
-        if (library.GlobalTerms != null)
-        {
-            foreach (BaseTerm term in library.GlobalTerms)
-            {
-                if (_script.Functions.ContainsKey(term.Name))
-                    continue;
-                
-                _script.Terms.Add(term.Name, term);
-            }
-        }
-
-        if (library.Keywords != null)
-        {
-            foreach (IKeyword keyword in library.Keywords)
-            {
-                _script.Keywords.Add(keyword.Name, keyword);
-            }
-        }
-        
-        if (library.TypeLibrary != null)
-        {
-            _script.TypeLibraries.Add(library.TypeLibrary);
-        }
-    }
-
-    public IEnumerable<ILibrary> EnumerateLibraries()
-    {
-        yield return Library;
-        foreach (ILibrary library in _libraries)
-        {
-            yield return library;
-        }
+        return _libraries.First(l => name == l.Name);
     }
 
     #endregion
 
-    #region Token Holder
-
-    public IFunction GetFunction(string name) => _script.GetFunction(name);
-
-    public bool HasFunction(string name) => _script.HasFunction(name);
-
-    public ITokenHolder Container { get; }
-    public IEnumerable<TokenCall> EnumerateCalls() => _script.EnumerateCalls();
-
-    public IEnumerable<BaseTerm> EnumerateTerms() => _script.EnumerateTerms();
-
-    public BaseTerm GetTerm(string name) => _script.GetTerm(name);
-
-    public bool HasTerm(string name) => _script.HasTerm(name);
-
-    public void AddCall(TokenCall call) => _script.AddCall(call);
-
-    public void AddTerm(BaseTerm term) => _script.AddTerm(term);
-
-    public void AddFunc(IFunction function) => _script.AddFunc(function);
-
-    public bool HasKeyword(string name) => _script.HasKeyword(name);
-
-    public IKeyword GetKeyword(string name) => _script.GetKeyword(name);
-
-    #endregion
-
-    public ActionCompiler(string tokens, params ILibrary[] libraries)
+    public ActionCompiler(params ILibrary[] libraries)
     {
-        _reader = new StringReader(tokens);
-        _libraries = libraries;
-    }
-    
-    public ActionCompiler(TextReader reader, params ILibrary[] libraries)
-    {
-        _reader = reader;
-        _libraries = libraries;
+        // needs to be longer by one to account for the system library(always imported)
+        _libraries = new ILibrary[libraries.Length + 1];
+        _libraries.SetValue(new ActionLibrary(), 0);
+        for (int i = 0; i < libraries.Length; i++)
+        {
+            _libraries.SetValue(libraries[i], i + 1);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Library;
 using ActionLanguage.Token;
@@ -12,12 +13,11 @@ namespace ActionLanguage
     {
         public ITokenHolder Container { get; }
 
-        internal Dictionary<string, IFunction> Functions { get; }
-        public Dictionary<string, BaseTerm> Terms { get; }
+        private Dictionary<string, IFunction> Functions { get; }
+        private Dictionary<string, BaseTerm> Terms { get; }
         private Dictionary<string, object> _compiledValues;
-        internal List<TypeLibrary> TypeLibraries { get; }
-        internal Dictionary<string, IKeyword> Keywords { get; }
-        public List<TokenCall> TokenCalls { get; }
+        private LibraryManager LibraryManager { get; }
+        private List<TokenCall> TokenCalls { get; }
 
         #region Enumeration
 
@@ -31,13 +31,16 @@ namespace ActionLanguage
 
         public IFunction GetFunction(string name)
         {
+            if (LibraryManager.HasFunction(name))
+                return LibraryManager.GetFunction(name);
+            
             if (!Functions.ContainsKey(name))
                 throw new FunctionNotExistException(0, name);
 
             return Functions[name];
         }
 
-        public bool HasFunction(string name) => Functions.ContainsKey(name);
+        public bool HasFunction(string name) => Functions.ContainsKey(name) || LibraryManager.HasFunction(name);
         
         public void AddCall(TokenCall call)
         {
@@ -73,6 +76,8 @@ namespace ActionLanguage
             
             Terms.Add(term.Name, term);
         }
+
+        public LibraryManager GetLibraryManager() => LibraryManager;
 
         #endregion
 
@@ -134,43 +139,22 @@ catch (ActionException e)
         #endregion
 
         #region Type Library
+        
+        [Obsolete]
+        public bool TermTypeExists(string name) => LibraryManager.HasTermType(name);
 
-        public bool TermTypeExists(string name)
-        {
-            foreach (TypeLibrary library in TypeLibraries)
-            {
-                if (library.HasTermType(name))
-                    return true;
-            }
-            return false;
-        }
-
-        public TermType GetTermType(string name)
-        {
-            foreach (TypeLibrary library in TypeLibraries)
-            {
-                if (!library.HasTermType(name))
-                    continue;
-
-                return library.GetTermType(name, CurrentLine);
-            }
-            
-            throw new TypeNotExistException(CurrentLine, name);
-        }
+        [Obsolete]
+        public TermType GetTermType(string name) => LibraryManager.GetTermType(name);
         
         #endregion
 
         #region Keywords
 
-        public bool HasKeyword(string name) => Keywords.ContainsKey(name);
+        [Obsolete]
+        public bool HasKeyword(string name) => LibraryManager.HasKeyword(name);
 
-        public IKeyword GetKeyword(string name)
-        {
-            if (!HasKeyword(name))
-                throw new InvalidCompilationException(0, $"Keyword {name} does not exist");
-
-            return Keywords[name];
-        }
+        [Obsolete]
+        public IKeyword GetKeyword(string name) => LibraryManager.GetKeyword(name);
 
         #endregion
 
@@ -181,8 +165,7 @@ catch (ActionException e)
             Functions = new Dictionary<string, IFunction>();
             Terms = new Dictionary<string, BaseTerm>();
             TokenCalls = new List<TokenCall>();
-            TypeLibraries = new List<TypeLibrary>();
-            Keywords = new Dictionary<string, IKeyword>();
+            LibraryManager = new LibraryManager();
             _compiledValues = new Dictionary<string, object>();
         }
 

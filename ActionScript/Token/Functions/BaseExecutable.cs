@@ -72,18 +72,12 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
         BaseTerms.Add(term.Name, term);
     }
 
+    public LibraryManager GetLibraryManager() => Container.GetLibraryManager();
+
     public void AddFunc(IFunction function)
     {
         throw new InvalidCompilationException(0, "Cannot declare a function here");
     }
-
-    public bool TermTypeExists(string name) => Container.TermTypeExists(name);
-
-    public TermType GetTermType(string name) => Container.GetTermType(name);
-
-    public bool HasKeyword(string name) => Container.HasKeyword(name);
-
-    public IKeyword GetKeyword(string name) => Container.GetKeyword(name);
 
     #endregion
 

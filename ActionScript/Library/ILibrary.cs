@@ -7,6 +7,8 @@ namespace ActionLanguage.Library;
 
 public interface ILibrary
 {
+    public string Name { get; }
+    
     public IEnumerable<IFunction> GlobalFunctions { get; }
     public IEnumerable<BaseTerm> GlobalTerms { get; }
     public IEnumerable<IKeyword> Keywords { get; }

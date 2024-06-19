@@ -13,6 +13,8 @@ namespace ProgrammableMod.Scripting.Library
     /// </summary>
     public class KerbalLibrary : ILibrary
     {
+        public string Name => "super_computing";
+
         public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
         {
             new Function("log", "void", terms =>

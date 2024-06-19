@@ -22,7 +22,7 @@ public abstract class BaseTerm : IToken
 
     public TermKind Kind { get; set; }
     public int Line { get; set; }
-    public TypeLibrary TypeLibrary { get; set; }
+    public LibraryManager TypeLibrary { get; set; }
 
     #endregion
 
@@ -315,8 +315,8 @@ public abstract class BaseTerm : IToken
 
     #endregion
 
-    public TermType GetTermType()
+    public virtual TermType GetTermType()
     {
-        return TypeLibrary.GetTermType(ValueType, 0);
+        return TypeLibrary.GetTermType(ValueType);
     }
 }

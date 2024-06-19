@@ -13,8 +13,9 @@ namespace ActionLanguage.Library
 {
     public class ActionLibrary : ILibrary
     {
+        public string Name => "system";
         static Random _rng = new();
-        
+
         public IEnumerable<IFunction> GlobalFunctions { get; } = new IFunction[]
         {
             new Function("to_string", "string", inputTypes: "term", action: terms =>
@@ -97,7 +98,6 @@ namespace ActionLanguage.Library
             {
                 Name = "null",
                 Kind = TermKind.Null,
-                TypeLibrary = TypeLibrary,
                 Line = 0
             }
         };
@@ -113,7 +113,8 @@ namespace ActionLanguage.Library
             new IfKeyword(),
             new ElseIfKeyword(),
             new ElseKeyword(),
-            new ForeachKeyword()
+            new ForeachKeyword(),
+            new ImportKeyword()
         };
         public TypeLibrary TypeLibrary { get; }
         
