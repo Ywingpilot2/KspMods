@@ -160,7 +160,7 @@ public class ActionCompiler
                 AssignmentCall call = new AssignmentCall(term, input, holder, CurrentLine);
                 holder.AddTerm(term);
                 holder.AddCall(call);
-                _currentScript.CallTokens++;
+                _currentScript.TermTokens++;
             } break;
             case AssignmentKind.Assignment:
             {

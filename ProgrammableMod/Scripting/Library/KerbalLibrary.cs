@@ -4,28 +4,60 @@ using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
+using ProgrammableMod.Modules.Computers;
+using ProgrammableMod.Scripting.Exceptions;
 using UnityEngine;
 
-namespace ProgrammableMod.Scripting.Library
-{
-    /// <summary>
-    /// Basic ksp library, this contains things mostly used for debugging
-    /// </summary>
-    public class KerbalLibrary : ILibrary
-    {
-        public string Name => "super_computing";
+namespace ProgrammableMod.Scripting.Library;
 
-        public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
+/// <summary>
+/// Basic ksp library, this contains things mostly used for debugging
+/// </summary>
+public class KerbalLibrary : ILibrary
+{
+    public string Name => "kerbnet";
+    private BaseComputer _computer;
+
+    public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
+    {
+        new Function("get_time", "float", _ =>
         {
-            new Function("log", "void", terms =>
-            {
-                Debug.Log(terms[0].CastToStr());
-                return new ReturnValue();
-            }, "string"),
-            new Function("get_time", "float", _ => new ReturnValue(Time.fixedTime, "float"))
-        };
-        public IEnumerable<BaseTerm> GlobalTerms { get; }
-        public IEnumerable<IKeyword> Keywords { get; }
-        public TypeLibrary TypeLibrary { get; }
+            EstablishConnection();
+            return new ReturnValue(Time.fixedTime, "float");
+        }),
+        new Function("has_access", "bool", _ => new ReturnValue(_computer.vessel.Connection.IsConnected, "bool")),
+        new Function("get_altitude", "double", _ =>
+        {
+            EstablishConnection();
+            return new ReturnValue(_computer.vessel.altitude, "double");
+        }),
+        new Function("get_ground_dist", "double", _ =>
+        {
+            EstablishConnection();
+            return new ReturnValue(_computer.vessel.terrainAltitude, "double");
+        }),
+        new Function("get_density", "double", _ =>
+        {
+            EstablishConnection();
+            return new ReturnValue(_computer.vessel.atmDensity, "double");
+        })
+    };
+    public IEnumerable<BaseTerm> GlobalTerms { get; }
+    public IEnumerable<IKeyword> Keywords { get; }
+    public TypeLibrary TypeLibrary { get; }
+
+    /// <summary>
+    /// Connect to the <see cref="KerbinSuperComputer"/>!
+    /// Warranty void if connection unstable.
+    /// </summary>
+    private void EstablishConnection()
+    {
+        if (!_computer.vessel.Connection.IsConnected)
+            throw new KerbnetLostException(0);
+    }
+
+    public KerbalLibrary(BaseComputer computer)
+    {
+        _computer = computer;
     }
 }

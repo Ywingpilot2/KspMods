@@ -205,23 +205,31 @@ public static class StringExtension
         string sanitized = ""; // omg green lady reference
 
         bool isStr = false;
-        for (int i = 1; i < self.Length; i++)
+        if (self.Length > 1)
         {
-            char p = self[i - 1];
-            char c = self[i];
-
-            if (!isStr)
-                sanitized += p;
-            else
-                sanitized += ' ';
-
-            if (c == '"' && p != '\\')
-                isStr = !isStr;
-            
-            if (i + 1 >= self.Length && c != '"')
+            for (int i = 1; i < self.Length; i++)
             {
-                sanitized += c;
+                char p = self[i - 1];
+                char c = self[i];
+
+                if (!isStr)
+                    sanitized += p;
+                else
+                    sanitized += ' ';
+
+                if (c == '"' && p != '\\')
+                    isStr = !isStr;
+            
+                if (i + 1 >= self.Length && c != '"')
+                {
+                    sanitized += c;
+                }
             }
+        }
+        else if (self.Length != 0)
+        {
+            if (self != "\"")
+                return self;
         }
 
         return sanitized;
@@ -263,29 +271,7 @@ public static class StringExtension
 
     public static bool SanitizedContains(this string self, string check)
     {
-        string clean = "";
-
-        bool isStr = false;
-        for (int i = 1; i < self.Length; i++)
-        {
-            char p = self[i - 1];
-            char c = self[i];
-
-            if (!isStr)
-            {
-                clean += p;
-            }
-
-            if (c == '"' && p != '\\')
-                isStr = !isStr;
-            
-            if (i + 1 >= self.Length)
-            {
-                clean += c;
-            }
-        }
-
-        return clean.Contains(check);
+        return self.SanitizeQuotes().Contains(check);
     }
 
     public static int SanitizedIndexOf(this string self, string check, StringComparison comparison = StringComparison.Ordinal)
@@ -297,11 +283,33 @@ public static class StringExtension
     public static string SanitizedReplace(this string self, string replace, string with)
     {
         string updated = self;
-        while (self.SanitizedContains(replace))
+        if (self != replace)
         {
-            int idx = SanitizedIndexOf(updated, replace);
-            updated = updated.Remove(idx, replace.Length);
-            updated = updated.Insert(idx, with);
+            // needs special handling to avoid forever replacing
+            if (with.SanitizedContains(replace))
+            {
+                while (self.SanitizedContains(replace))
+                {
+                    string san = updated.SanitizeQuotes();
+                    int idx = san.IndexOf(replace, san.IndexOf(with, StringComparison.Ordinal) + with.Length, StringComparison.Ordinal);
+                    
+                    updated = updated.Remove(idx, replace.Length);
+                    updated = updated.Insert(idx, with);
+                }
+            }
+            else
+            {
+                while (self.SanitizedContains(replace))
+                {
+                    int idx = SanitizedIndexOf(updated, replace);
+                    updated = updated.Remove(idx, replace.Length);
+                    updated = updated.Insert(idx, with);
+                }
+            }
+        }
+        else
+        {
+            return with;
         }
 
         return updated;

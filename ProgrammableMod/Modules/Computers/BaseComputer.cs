@@ -1,6 +1,7 @@
 ﻿using System;
 using ActionLanguage;
 using ActionLanguage.Exceptions;
+using ActionLanguage.Extensions;
 using ActionLanguage.Library;
 using ProgrammableMod.Scripting.Library;
 using UnityEngine;
@@ -28,8 +29,23 @@ public abstract class BaseComputer : PartModule, IComputer
     [KSPField(isPersistant = true)]
     public TokenContainer tokenContainer;
 
+    public float runTime;
+
     internal FlightCtrlState State;
     private ActionCompiler _compiler;
+
+    public bool ShouldRun
+    {
+        get => tokenContainer.shouldRun;
+        set
+        {
+            if (value)
+            {
+                runTime = Time.fixedTime;
+            }
+            tokenContainer.shouldRun = value;
+        }
+    }
     
     protected ActionScript Script;
 
@@ -48,7 +64,7 @@ public abstract class BaseComputer : PartModule, IComputer
             {
                 exception = e.Message;
                 DisplayPopup = true;
-                tokenContainer.shouldRun = false;
+                ShouldRun = false;
             }
         }
     }
@@ -63,7 +79,7 @@ public abstract class BaseComputer : PartModule, IComputer
     {
         Libraries = new ILibrary[]
         {
-            new KerbalLibrary(),
+            new KerbalLibrary(this),
             new VesselLibrary(this),
             new ComputerLibrary(ActionCompiler.Library)
         };
@@ -151,7 +167,7 @@ public abstract class BaseComputer : PartModule, IComputer
         if (GUILayout.Button("Break Execution"))
         {
             DisplayPopup = false;
-            tokenContainer.shouldRun = false;
+            ShouldRun = false;
             tokenContainer.shouldCompile = false;
             UpdateButton();
         }
@@ -159,12 +175,20 @@ public abstract class BaseComputer : PartModule, IComputer
         if (GUILayout.Button("Continue Execution"))
         {
             DisplayPopup = false;
-            tokenContainer.shouldRun = true;
+            ShouldRun = true;
         }
         
         GUILayout.EndHorizontal();
         
         GUILayout.EndVertical();
+    }
+
+    #endregion
+
+    #region Events
+
+    protected virtual void OnCompiled()
+    {
     }
 
     #endregion
@@ -179,7 +203,10 @@ public abstract class BaseComputer : PartModule, IComputer
             ActionScript script = _compiler.Compile(tokenContainer.tokens);
             if (!ValidateScript(script, out string reason))
             {
-                throw new InvalidCompilationException(1, reason);
+                ShouldRun = false;
+                tokenContainer.shouldCompile = false;
+                UpdateButton();
+                SetStatus(reason, StatusKind.Uhoh);
             }
 
             Script = script;
@@ -188,10 +215,14 @@ public abstract class BaseComputer : PartModule, IComputer
         }
         catch (Exception e)
         {
-            tokenContainer.shouldRun = false;
+            ShouldRun = false;
             tokenContainer.shouldCompile = false;
             UpdateButton();
             SetStatus(e.Message, StatusKind.Uhoh);
+        }
+        finally
+        {
+            OnCompiled();
         }
     }
 
@@ -227,7 +258,7 @@ public abstract class BaseComputer : PartModule, IComputer
     [KSPAction("Execute Script")]
     public void Execute()
     {
-        tokenContainer.shouldRun = true;
+        ShouldRun = true;
         UpdateButton();
     }
 
@@ -235,7 +266,7 @@ public abstract class BaseComputer : PartModule, IComputer
     [KSPAction("Stop Script")]
     public void StopExecuting()
     {
-        tokenContainer.shouldRun = false;
+        ShouldRun = false;
         UpdateButton();
     }
 
@@ -249,7 +280,7 @@ public abstract class BaseComputer : PartModule, IComputer
     [KSPEvent(guiActiveEditor = true, guiName = "Toggle startup")]
     public void ToggleStart()
     {
-        tokenContainer.shouldRun = !tokenContainer.shouldRun;
+        ShouldRun = !ShouldRun;
         UpdateButton();
     }
 
@@ -336,7 +367,7 @@ public abstract class BaseComputer : PartModule, IComputer
 }
 
 /// <summary>
-/// TODO: This is an extremely hacked together way of keeping new lines on scripts
+/// TODO: This is an extremely hacked together way of keeping certain characters without bricking saves
 /// we also store other things here 'cuz why not
 /// </summary>
 [Serializable]
@@ -359,7 +390,7 @@ public class TokenContainer : IConfigNode
             {
                 if (node.HasValue($"script-line{i}"))
                 {
-                    tokens += $"{node.GetValue($"script-line{i}")}\n";
+                    tokens += $"{node.GetValue($"script-line{i}").SanitizedReplace("|[|", "{").SanitizedReplace("|]|","}")}\n";
                 }
             }
         }
@@ -381,7 +412,7 @@ public class TokenContainer : IConfigNode
         node.AddValue("script-length", lines.Length);
         for (int i = 0; i < lines.Length; i++)
         {
-            node.AddValue($"script-line{i}", lines[i].Trim());
+            node.AddValue($"script-line{i}", lines[i].Trim().SanitizedReplace("{", "|{|").SanitizedReplace("}", "|}|"));
         }
 
         if (shouldCompile)

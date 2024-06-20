@@ -1,40 +1,39 @@
-﻿namespace ProgrammableMod.Modules.Test
+﻿namespace ProgrammableMod.Modules.Test;
+
+public class ThrottleTestModule : PartModule
 {
-    public class ThrottleTestModule : PartModule
+    [KSPField]
+    public bool fullThrottle;
+
+    [KSPField]
+    public bool shouldThrottle;
+
+    [KSPField] 
+    private float currentThrottle;
+
+    private void fullThorttle(FlightCtrlState s)
     {
-        [KSPField]
-        public bool fullThrottle;
+        s.mainThrottle = currentThrottle;
+    }
 
-        [KSPField]
-        public bool shouldThrottle;
+    [KSPEvent(active = true, guiActive = true, guiName = "Start Full Throttle")]
+    public void StartFullThrottle()
+    {
+        Events["StopFullThrottle"].active = true;
+        Events["StartFullThrottle"].active = false;
 
-        [KSPField] 
-        private float currentThrottle;
-
-        private void fullThorttle(FlightCtrlState s)
-        {
-            s.mainThrottle = currentThrottle;
-        }
-
-        [KSPEvent(active = true, guiActive = true, guiName = "Start Full Throttle")]
-        public void StartFullThrottle()
-        {
-            Events["StopFullThrottle"].active = true;
-            Events["StartFullThrottle"].active = false;
-
-            currentThrottle = 1f;
-            vessel.OnFlyByWire += fullThorttle;
-            vessel.ActionGroups.SetGroup(KSPActionGroup.SAS, true);
-            vessel.Autopilot.SetMode(VesselAutopilot.AutopilotMode.Normal);
-        }
+        currentThrottle = 1f;
+        vessel.OnFlyByWire += fullThorttle;
+        vessel.ActionGroups.SetGroup(KSPActionGroup.SAS, true);
+        vessel.Autopilot.SetMode(VesselAutopilot.AutopilotMode.Normal);
+    }
         
-        [KSPEvent(active = false, guiActive = true, guiName = "Stop Full Throttle")]
-        public void StopFullThrottle()
-        {
-            Events["StopFullThrottle"].active = false;
-            Events["StartFullThrottle"].active = true;
-            currentThrottle = 0f;
-            vessel.OnFlyByWire -= fullThorttle;
-        }
+    [KSPEvent(active = false, guiActive = true, guiName = "Stop Full Throttle")]
+    public void StopFullThrottle()
+    {
+        Events["StopFullThrottle"].active = false;
+        Events["StartFullThrottle"].active = true;
+        currentThrottle = 0f;
+        vessel.OnFlyByWire -= fullThorttle;
     }
 }
