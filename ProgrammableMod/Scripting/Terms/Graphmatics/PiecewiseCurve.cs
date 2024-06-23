@@ -111,8 +111,6 @@ public class PiecewiseCTerm : BaseTerm
         yield return new TermConstructor(terms =>
         {
             ArrayTerm arrayTerm = (ArrayTerm)terms[0];
-            if (arrayTerm.ContainedType != "vec2")
-                throw new InvalidParametersException(0, new[] { "array<vec2>" });
 
             TermArray array = (TermArray)arrayTerm.Value;
             Vector2[] vecs = new Vector2[array.Length];
@@ -122,7 +120,7 @@ public class PiecewiseCTerm : BaseTerm
             }
 
             return new ReturnValue(new PiecewiseCurve(vecs), "piecewise");
-        }, "array");
+        }, "array<vec2>");
     }
 
     public override IEnumerable<IFunction> GetFunctions()
