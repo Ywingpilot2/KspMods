@@ -24,12 +24,21 @@ public class IfKeyword : IKeyword
 
     protected void ParseTokens(SingleExecutableFunc func, ActionCompiler compiler)
     {
-        string line = compiler.ReadCleanLine();
-        while (line != "{")
+        string line;
+        while (true)
         {
             line = compiler.ReadCleanLine();
+            if (line == "")
+                continue;
+            
             if (line == null)
                 throw new FunctionLacksEndException(compiler.CurrentLine, null);
+            
+            if (line == "{")
+                break;
+            
+            compiler.ParseToken(line, func);
+            return;
         }
 
         line = compiler.ReadCleanLine();
