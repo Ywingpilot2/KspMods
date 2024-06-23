@@ -140,6 +140,9 @@ namespace ActionLanguage.Token.Functions
 
         public override BaseTerm GetTerm(string name)
         {
+            if (!BaseTerms.ContainsKey(name) && GetLibraryManager().HasGlobalTerm(name))
+                return GetLibraryManager().GetGlobalTerm(name);
+            
             return BaseTerms[name];
         }
 

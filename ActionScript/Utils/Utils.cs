@@ -539,7 +539,7 @@ public static class CompileUtils
         if (san.StartsWith("!"))
             return SpecialFuncKind.Not;
 
-        if (Comparisons.Any(san.Contains))
+        if (Comparisons.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
             return SpecialFuncKind.Comparison;
 
         if (san.Contains(" as "))
@@ -560,12 +560,13 @@ public static class CompileUtils
             return TokenKind.SpecialFunc;
         }
         
-        if (Operators.Any(san.SanitizeParenthesis().Contains))
+        // there needs to be a space between the operator in order to prevent conflicts with type containers
+        if (Operators.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
         {
             return TokenKind.Operator;
         }
         
-        if (Comparisons.Any(san.SanitizeParenthesis().Contains))
+        if (Comparisons.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
         {
             return TokenKind.SpecialFunc;
         }

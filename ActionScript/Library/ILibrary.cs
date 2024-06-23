@@ -10,7 +10,7 @@ public interface ILibrary
     public string Name { get; }
     
     public IEnumerable<IFunction> GlobalFunctions { get; }
-    public IEnumerable<BaseTerm> GlobalTerms { get; }
+    public IEnumerable<GlobalTerm> GlobalTerms { get; }
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 }

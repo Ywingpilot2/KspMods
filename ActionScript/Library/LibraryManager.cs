@@ -2,6 +2,7 @@
 using ActionLanguage.Exceptions;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.KeyWords;
+using ActionLanguage.Token.Terms;
 
 namespace ActionLanguage.Library;
 
@@ -13,6 +14,25 @@ public class LibraryManager
     private Dictionary<string, ILibrary> _libraries;
     private Dictionary<string, IKeyword> _keywords;
     private Dictionary<string, IFunction> _functions;
+    private Dictionary<string, BaseTerm> _globals;
+    
+    public bool HasGlobalTerm(string name) => _globals.ContainsKey(name);
+
+    public BaseTerm GetGlobalTerm(string name)
+    {
+        if (!HasGlobalTerm(name))
+            throw new TermNotExistException(0, name);
+
+        return _globals[name];
+    }
+
+    public IEnumerable<BaseTerm> EnumerateGlobalTerms()
+    {
+        foreach (BaseTerm globalsValue in _globals.Values)
+        {
+            yield return globalsValue;
+        }
+    }
 
     public bool HasFunction(string name) => _functions.ContainsKey(name);
 
@@ -83,6 +103,14 @@ public class LibraryManager
                 _functions.Add(function.Name, function);
             }
         }
+
+        if (library.GlobalTerms != null)
+        {
+            foreach (GlobalTerm globalTerm in library.GlobalTerms)
+            {
+                _globals.Add(globalTerm.Name, GetTermType(globalTerm.TypeName).Construct(globalTerm.Name, 0, this));
+            }
+        }
     }
 
     public ILibrary GetLibrary(string name)
@@ -98,5 +126,6 @@ public class LibraryManager
         _libraries = new Dictionary<string, ILibrary>();
         _keywords = new Dictionary<string, IKeyword>();
         _functions = new Dictionary<string, IFunction>();
+        _globals = new Dictionary<string, BaseTerm>();
     }
 }

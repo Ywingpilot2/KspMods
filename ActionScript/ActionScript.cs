@@ -70,13 +70,16 @@ namespace ActionLanguage
 
         public BaseTerm GetTerm(string name)
         {
+            if (LibraryManager.HasGlobalTerm(name))
+                return LibraryManager.GetGlobalTerm(name);
+            
             if (!Terms.ContainsKey(name))
                 throw new TermNotExistException(0, name);
 
             return Terms[name];
         }
 
-        public bool HasTerm(string name) => Terms.ContainsKey(name);
+        public bool HasTerm(string name) => Terms.ContainsKey(name) || LibraryManager.HasGlobalTerm(name);
 
         public void AddTerm(BaseTerm term)
         {

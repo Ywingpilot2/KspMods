@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using ActionLanguage.Library;
 using ActionLanguage.Token.Fields;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
@@ -9,9 +11,11 @@ namespace ActionLanguage.Token.Terms.Complex;
 public class EnumeratorTerm : BaseTerm
 {
     public IEnumerable Value { get; set; }
-    public virtual string ContainedType { get; protected set; }
+    public override bool ContainsType => true;
 
     public override string ValueType => "enumerable";
+
+    #region Functions
 
     public override IEnumerable<IFunction> GetFunctions()
     {
@@ -33,18 +37,31 @@ public class EnumeratorTerm : BaseTerm
         });
     }
 
+    #endregion
+
+    #region Value
+
     public override bool SetValue(object value)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public override bool CopyFrom(BaseTerm term)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public override object GetValue()
     {
         return Value;
+    }
+
+    #endregion
+
+    public override TermType GetTermType()
+    {
+        TermType type = base.GetTermType();
+        type.ContainedType = ContainedType;
+        return type;
     }
 }

@@ -30,6 +30,9 @@ public abstract class BaseTerm : IToken
 
     public string Name { get; set; }
     public abstract string ValueType { get; }
+    
+    public virtual bool ContainsType { get; }
+    public virtual string ContainedType { get; set; }
 
     #endregion
 
@@ -315,8 +318,13 @@ public abstract class BaseTerm : IToken
 
     #endregion
 
+    /// <summary>
+    /// Gets the <see cref="TermType"/> representing this term
+    /// </summary>
+    /// <returns>A copy of the <see cref="TermType"/> gotten from <see cref="LibraryManager"/> used to construct this <see cref="BaseTerm"/></returns>
     public virtual TermType GetTermType()
     {
-        return TypeLibrary.GetTermType(ValueType);
+        TermType example = TypeLibrary.GetTermType(ValueType);
+        return new TermType(this, example.BaseClass, example.IsAbstract);
     }
 }

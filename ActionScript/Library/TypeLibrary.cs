@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ActionLanguage.Exceptions;
+using ActionLanguage.Extensions;
 using ActionLanguage.Token;
 using ActionLanguage.Token.Fields;
 using ActionLanguage.Token.Functions;
@@ -65,19 +66,32 @@ public struct TermConstructor : IExecutable
 
 public class TermType
 {
-    public string Name => Term.ValueType;
+    public string Name
+    {
+        get
+        {
+            if (ContainsType && ContainedType != null)
+            {
+                return $"{Term.ValueType}<{ContainedType}>";
+            }
+
+            return Term.ValueType;
+        }
+    }
     public TermType BaseClass { get; }
     public bool IsAbstract { get; }
     public bool IsNullable { get; }
     public bool DefaultConstruction => HasConstructor("");
+
+    public bool ContainsType => Term.ContainsType;
+    public string ContainedType { get; set; }
     
-    public TypeLibrary Library { get; }
     public OperatorKind[] AllowedOperators => Term.AllowedOperators;
     
     public IEnumerable<IFunction> Functions => Term.GetFunctions();
     public IEnumerable<TermField> Fields => Term.GetFields();
     public IEnumerable<TermConstructor> Constructors => Term.GetConstructors();
-    private BaseTerm Term { get; }
+    internal BaseTerm Term { get; }
 
     public bool HasConstructor(string sig) => Term.HasConstructor(sig);
     public TermConstructor GetConstructor(string sig) => Term.GetConstructor(sig);
@@ -91,6 +105,7 @@ public class TermType
         copy.Name = name;
         copy.Line = line;
         copy.TypeLibrary = manager;
+        copy.ContainedType = ContainedType;
 
         return copy;
     }
@@ -125,10 +140,9 @@ public class TermType
 
     public string GetClassName() => Term.GetType().Name;
 
-    public TermType(BaseTerm term, TypeLibrary library, TermType baseClass = null, bool isAbstract = false, bool isNullable = false)
+    public TermType(BaseTerm term, TermType baseClass = null, bool isAbstract = false, bool isNullable = false)
     {
         Term = term;
-        Library = library;
         BaseClass = baseClass;
         IsAbstract = isAbstract;
         IsNullable = isNullable;
@@ -146,11 +160,44 @@ public class TypeLibrary
 
     public bool HasTermType(string name)
     {
+        // type container
+        if (name.EndsWith(">"))
+        {
+            string[] split = name.SanitizedSplit('<', 2, StringSplitOptions.RemoveEmptyEntries);
+            
+            string currentType = split[0].Trim();
+            return Types.ContainsKey(currentType);
+        }
+        
         return Types.ContainsKey(name);
     }
 
     public TermType GetTermType(string name, int line)
     {
+        if (name.EndsWith(">"))
+        {
+            string[] split = name.SanitizedSplit('<', 2, StringSplitOptions.RemoveEmptyEntries);
+            
+            string containedType = split[1].Remove(split[1].Length - 1);
+            string currentType = split[0].Trim();
+            
+            if (!Types.ContainsKey(currentType))
+                throw new TypeNotExistException(line, currentType);
+
+            TermType example = Types[currentType];
+            
+            // TODO HACK!!!1 This is a stupid way of ensuring that the BaseTerm gets the correct ContainedType, ensuring the constructor call
+            // actually fucking works, this is stupid, pls fix!
+            BaseTerm copyTerm = (BaseTerm)Activator.CreateInstance(example.Term.GetType());
+            copyTerm.ContainedType = containedType;
+            TermType copy = new TermType(copyTerm, example.BaseClass, example.IsAbstract)
+            {
+                ContainedType = containedType
+            };
+
+            return copy;
+        }
+        
         if (!Types.ContainsKey(name))
             throw new TypeNotExistException(line, name);
 

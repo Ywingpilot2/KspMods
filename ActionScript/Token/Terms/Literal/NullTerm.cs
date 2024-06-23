@@ -1,4 +1,5 @@
 ﻿using ActionLanguage.Exceptions;
+using ActionLanguage.Library;
 
 namespace ActionLanguage.Token.Terms.Literal;
 
@@ -11,6 +12,17 @@ public class NullTerm : BaseTerm
     }
 
     public override bool CanImplicitCastToStr => true;
+
+    public override bool CanImplicitCastToType(string name)
+    {
+        TermType type = TypeLibrary.GetTermType(name);
+        if (type.IsNullable)
+        {
+            return true;
+        }
+        
+        return base.CanImplicitCastToType(name);
+    }
 
     public override bool SetValue(object value)
     {

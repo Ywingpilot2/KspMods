@@ -26,13 +26,7 @@ public struct TermArray : IEnumerable
 
     public BaseTerm GetValue(int idx)
     {
-        BaseTerm term = _terms[idx];
-        if (term == null)
-        {
-            return new NullTerm();
-        }
-        
-        return term;
+        return _terms[idx];
     }
 
     public IEnumerator GetEnumerator()
@@ -52,6 +46,10 @@ public struct TermArray : IEnumerable
         ValueType = valueType;
         Length = length;
         _terms = new BaseTerm[length];
+        for (int i = 0; i < length; i++)
+        {
+            _terms.SetValue(new NullTerm(), i); // initialize everything to null by default to avoid issues
+        }
     }
 }
 
@@ -66,9 +64,18 @@ public class ArrayTerm : EnumeratorTerm
         {
             Value = array;
             ContainedType = array.ValueType;
+            Kind = TermKind.Class;
             return true;
         }
-        
+
+        if (value == null)
+        {
+            Value = null;
+            ContainedType = null;
+            Kind = TermKind.Null;
+            return true;
+        }
+
         return false;
     }
 
@@ -86,10 +93,9 @@ public class ArrayTerm : EnumeratorTerm
     {
         yield return new TermConstructor(terms =>
         {
-            string type = terms[0].CastToStr();
-            int length = terms[1].CastToInt();
-            return new ReturnValue(new TermArray(type, length), "array");
-        }, "string", "int");
+            int length = terms[0].CastToInt();
+            return new ReturnValue(new TermArray(ContainedType, length), "array");
+        }, "int");
     }
 
     public override IEnumerable<IFunction> GetFunctions()

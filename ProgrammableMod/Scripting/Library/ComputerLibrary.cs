@@ -33,7 +33,7 @@ public class ComputerLibrary : ILibrary
             return new ReturnValue();
         }, "string")
     };
-    public IEnumerable<BaseTerm> GlobalTerms { get; }
+    public IEnumerable<GlobalTerm> GlobalTerms { get; }
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 
@@ -42,8 +42,8 @@ public class ComputerLibrary : ILibrary
         TypeLibrary = new TypeLibrary();
 
         TermType baseType = baseLibrary.TypeLibrary.GetTermType("term", 0);
-        TypeLibrary.AddTermType(new TermType(new PiecewiseCTerm(), TypeLibrary, baseType));
-        TypeLibrary.AddTermType(new TermType(new Vec2Term(), TypeLibrary, baseType));
-        TypeLibrary.AddTermType(new TermType(new Vec2Term(), TypeLibrary, baseType));
+        TypeLibrary.AddTermType(new TermType(new PiecewiseCTerm(), baseType));
+        TypeLibrary.AddTermType(new TermType(new Vec2Term(), baseType));
+        TypeLibrary.AddTermType(new TermType(new Vec2Term(), baseType));
     }
 }

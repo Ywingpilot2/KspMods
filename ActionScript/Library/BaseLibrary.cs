@@ -14,7 +14,7 @@ namespace ActionLanguage.Library
     public class ActionLibrary : ILibrary
     {
         public string Name => "system";
-        static Random _rng = new();
+        private static readonly Random Rng = new();
 
         public IEnumerable<IFunction> GlobalFunctions { get; } = new IFunction[]
         {
@@ -79,9 +79,9 @@ namespace ActionLanguage.Library
                 double b = terms[1].CastToDouble();
                 return new ReturnValue(a <= b, "bool");
             }, "number_term","number_term"),
-            new Function("random", "int", _ => new ReturnValue(_rng.Next(), "int")),
-            new Function("random_max", "int",inputTypes:new []{"int"}, action:terms => new ReturnValue(_rng.Next(terms[0].CastToInt()), "int")),
-            new Function("random_interval", "int", inputTypes:new []{"int","int"}, action:terms => new ReturnValue(_rng.Next(terms[0].CastToInt(), terms[1].CastToInt()), "int")),
+            new Function("random", "int", _ => new ReturnValue(Rng.Next(), "int")),
+            new Function("random_max", "int",inputTypes:new []{"int"}, action:terms => new ReturnValue(Rng.Next(terms[0].CastToInt()), "int")),
+            new Function("random_interval", "int", inputTypes:new []{"int","int"}, action:terms => new ReturnValue(Rng.Next(terms[0].CastToInt(), terms[1].CastToInt()), "int")),
             new Function("not", "bool", inputTypes:new []{"bool"}, action: terms => new ReturnValue(!terms[0].CastToBool(), "bool")),
             new Function("and", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() && terms[1].CastToBool(), "bool")),
             new Function("or", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() || terms[1].CastToBool(), "bool")),
@@ -92,14 +92,9 @@ namespace ActionLanguage.Library
             }),
         };
 
-        public IEnumerable<BaseTerm> GlobalTerms => new[]
+        public IEnumerable<GlobalTerm> GlobalTerms => new[]
         {
-            new NullTerm
-            {
-                Name = "null",
-                Kind = TermKind.Null,
-                Line = 0
-            }
+            new GlobalTerm("null", "null-type")
         };
 
         public IEnumerable<IKeyword> Keywords => new IKeyword[]
@@ -122,21 +117,21 @@ namespace ActionLanguage.Library
         {
             TypeLibrary = new TypeLibrary();
 
-            TermType baseType = new TermType(new Term(), TypeLibrary, isAbstract:true);
-            TermType numberType = new TermType(new NumberTerm(), TypeLibrary, baseType, true);
-            TermType enumerableType = new TermType(new EnumeratorTerm(), TypeLibrary, baseType, true);
+            TermType baseType = new TermType(new Term(), isAbstract:true);
+            TermType numberType = new TermType(new NumberTerm(), baseType, true);
+            TermType enumerableType = new TermType(new EnumeratorTerm(), baseType, true);
             TypeLibrary.AddTermType(baseType);
             TypeLibrary.AddTermType(numberType);
             TypeLibrary.AddTermType(enumerableType);
-            TypeLibrary.AddTermType(new TermType(new VoidTerm(), TypeLibrary, isAbstract:true));
-            TypeLibrary.AddTermType(new TermType(new NullTerm(), TypeLibrary, baseType, isAbstract:true));
-            TypeLibrary.AddTermType(new TermType(new TermI(), TypeLibrary, numberType));
-            TypeLibrary.AddTermType(new TermType(new TermU(), TypeLibrary, numberType));
-            TypeLibrary.AddTermType(new TermType(new TermF(), TypeLibrary, numberType));
-            TypeLibrary.AddTermType(new TermType(new TermD(), TypeLibrary, numberType));
-            TypeLibrary.AddTermType(new TermType(new StringTerm(), TypeLibrary, baseType));
-            TypeLibrary.AddTermType(new TermType(new BoolTerm(), TypeLibrary, baseType));
-            TypeLibrary.AddTermType(new TermType(new ArrayTerm(), TypeLibrary, enumerableType));
+            TypeLibrary.AddTermType(new TermType(new VoidTerm(), isAbstract:true));
+            TypeLibrary.AddTermType(new TermType(new TermI(), numberType));
+            TypeLibrary.AddTermType(new TermType(new TermU(), numberType));
+            TypeLibrary.AddTermType(new TermType(new TermF(), numberType));
+            TypeLibrary.AddTermType(new TermType(new TermD(), numberType));
+            TypeLibrary.AddTermType(new TermType(new StringTerm(), baseType, isNullable:true));
+            TypeLibrary.AddTermType(new TermType(new BoolTerm(), baseType));
+            TypeLibrary.AddTermType(new TermType(new ArrayTerm(), enumerableType, isNullable:true));
+            TypeLibrary.AddTermType(new TermType(new NullTerm(), baseType, isNullable:true));
         }
     }
 }

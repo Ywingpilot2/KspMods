@@ -29,7 +29,7 @@ namespace ActionTest
                 return new ReturnValue(read, "string");
             })
         };
-        public IEnumerable<BaseTerm> GlobalTerms { get; }
+        public IEnumerable<GlobalTerm> GlobalTerms { get; }
         public IEnumerable<IKeyword> Keywords { get; }
         public TypeLibrary TypeLibrary { get; }
     }

@@ -47,6 +47,7 @@
         <Compile Include="Library\BaseLibrary.cs" />
         <Compile Include="ActionScript.cs" />
         <Compile Include="Exceptions\ExecutionExceptions.cs" />
+        <Compile Include="Library\GlobalTerm.cs" />
         <Compile Include="Library\ILibrary.cs" />
         <Compile Include="Library\LibraryManager.cs" />
         <Compile Include="Library\TypeLibrary.cs" />
