@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Library;
+using ActionLanguage.Reflection;
 using ActionLanguage.Token;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.KeyWords;
@@ -9,7 +10,7 @@ using ActionLanguage.Token.Terms;
 
 namespace ActionLanguage
 {
-    public class ActionScript : ITokenHolder
+    public sealed class ActionScript : ITokenHolder
     {
         public ITokenHolder Container { get; }
 

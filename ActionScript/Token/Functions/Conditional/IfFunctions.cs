@@ -1,7 +1,8 @@
-﻿using ActionLanguage.Token.Interaction;
+﻿using ActionLanguage.Token.Functions.Single;
+using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms;
 
-namespace ActionLanguage.Token.Functions;
+namespace ActionLanguage.Token.Functions.Conditional;
 
 public interface IConditionalCall
 {

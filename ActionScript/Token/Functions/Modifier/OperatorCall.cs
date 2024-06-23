@@ -2,7 +2,7 @@
 using ActionLanguage.Token.Terms;
 using ActionLanguage.Utils;
 
-namespace ActionLanguage.Token.Functions;
+namespace ActionLanguage.Token.Functions.Modifier;
 
 public class OperatorCall : TokenCall
 {

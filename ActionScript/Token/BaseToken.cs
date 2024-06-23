@@ -3,7 +3,7 @@ using ActionLanguage.Token.Terms;
 
 namespace ActionLanguage.Token;
 
-public class BaseToken : IToken
+public abstract class BaseToken : IToken
 {
     protected ITokenHolder Script;
     public int Line { get; set; }

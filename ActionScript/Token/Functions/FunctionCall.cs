@@ -33,15 +33,15 @@ namespace ActionLanguage.Token.Functions
     
     public class FunctionCall : TokenCall
     {
-        protected Input[] _inputs;
-        public IFunction Function { get; }
+        private Input[] Inputs;
+        private IFunction Function { get; }
 
         public override ReturnValue Call()
         {
-            BaseTerm[] terms = new BaseTerm[_inputs.Length];
-            for (var i = 0; i < _inputs.Length; i++)
+            BaseTerm[] terms = new BaseTerm[Inputs.Length];
+            for (var i = 0; i < Inputs.Length; i++)
             {
-                terms.SetValue(_inputs[i].GetValue(), i);
+                terms.SetValue(Inputs[i].GetValue(), i);
             }
 
             return Function.Execute(terms);
@@ -62,7 +62,7 @@ namespace ActionLanguage.Token.Functions
         public override void PostCompilation()
         {
             Function.PostCompilation();
-            foreach (Input input in _inputs)
+            foreach (Input input in Inputs)
             {
                 input.PostCompilation();
             }
@@ -73,13 +73,13 @@ namespace ActionLanguage.Token.Functions
         public FunctionCall(ITokenHolder script, IFunction function, IEnumerable<Input> inputs, int line) : base(script, line)
         {
             Function = function;
-            _inputs = inputs.ToArray();
+            Inputs = inputs.ToArray();
         }
 
         public FunctionCall(ITokenHolder script, IFunction function, int line, params Input[] inputs) : base(script, line)
         {
             Function = function;
-            _inputs = inputs;
+            Inputs = inputs;
         }
     }
 

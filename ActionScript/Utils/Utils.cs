@@ -4,8 +4,11 @@ using System.Linq;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Extensions;
 using ActionLanguage.Library;
+using ActionLanguage.Reflection;
 using ActionLanguage.Token;
 using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Functions.Modifier;
+using ActionLanguage.Token.Functions.Single;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms;
 

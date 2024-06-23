@@ -1,5 +1,6 @@
 ﻿using ActionLanguage.Extensions;
 using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Functions.Single;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Utils;
 

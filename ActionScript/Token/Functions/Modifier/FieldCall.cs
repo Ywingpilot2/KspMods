@@ -1,6 +1,6 @@
 ﻿using ActionLanguage.Token.Interaction;
 
-namespace ActionLanguage.Token.Functions;
+namespace ActionLanguage.Token.Functions.Modifier;
 
 public class FieldCall : TokenCall
 {

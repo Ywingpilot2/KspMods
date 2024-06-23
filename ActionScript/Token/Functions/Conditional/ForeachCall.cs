@@ -1,55 +1,66 @@
-﻿using ActionLanguage.Token.Interaction;
+﻿using System.Collections;
+using ActionLanguage.Token.Functions.Single;
+using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms;
+using ActionLanguage.Token.Terms.Complex;
 
-namespace ActionLanguage.Token.Functions;
+namespace ActionLanguage.Token.Functions.Conditional;
 
-public class WhileCall : TokenCall
+public class ForeachCall : TokenCall
 {
-    private WhileFunction _while;
+    private ForeachFunc _foreach;
     
-    public WhileCall(ITokenHolder script, int line, WhileFunction function) : base(script, line)
+    public ForeachCall(ITokenHolder script, int line, ForeachFunc function) : base(script, line)
     {
-        _while = function;
+        _foreach = function;
     }
 
     public override ReturnValue Call()
     {
-        ReturnValue value = _while.Execute();
+        ReturnValue value = _foreach.Execute();
         return value;
     }
 
     public override void PreExecution()
     {
-        _while.PreExecution();
+        _foreach.PreExecution();
     }
 
     public override void PostExecution()
     {
-        _while.PostExecution();
+        _foreach.PostExecution();
     }
 
     public override void PostCompilation()
     {
-        _while.PostCompilation();
+        _foreach.PostCompilation();
     }
 }
 
-public class WhileFunction : BaseExecutable
+public class ForeachFunc : BaseExecutable
 {
-    private Input _condition;
+    private Input _enumerator;
+    private string _term;
 
     public override ReturnValue Execute(params BaseTerm[] terms)
     {
         bool shouldBreak = false;
         bool shouldContinue = false;
-        while (_condition.GetValue().CastToBool())
+        EnumeratorTerm term = (EnumeratorTerm)_enumerator.GetValue();
+
+        IEnumerator enumerator = term.Value.GetEnumerator();
+        while (enumerator.MoveNext())
         {
             if (shouldBreak)
+            {
+                enumerator.Reset();
                 break;
+            }
             
             if (shouldContinue)
                 continue;
-            
+
+            GetTerm(_term).CopyFrom((BaseTerm)enumerator.Current);
             foreach (TokenCall call in Calls)
             {
                 if (call is BreakCall)
@@ -57,7 +68,7 @@ public class WhileFunction : BaseExecutable
                     shouldBreak = true;
                     break;
                 }
-
+                
                 if (call is ContinueCall)
                 {
                     shouldContinue = true;
@@ -85,10 +96,15 @@ public class WhileFunction : BaseExecutable
                     }
 
                     if (returnValue.Value is ReturnCall)
+                    {
+                        enumerator.Reset();
                         return returnValue;
+                    }
                 }
             }
         }
+        
+        enumerator.Reset();
 
         return new ReturnValue();
     }
@@ -96,11 +112,12 @@ public class WhileFunction : BaseExecutable
     public override void PostCompilation()
     {
         base.PostCompilation();
-        _condition.PostCompilation();
+        _enumerator.PostCompilation();
     }
 
-    public WhileFunction(Input condition, ITokenHolder holder) : base(holder)
+    public ForeachFunc(ITokenHolder holder, Input enumerator, string enumTerm) : base(holder)
     {
-        _condition = condition;
+        _enumerator = enumerator;
+        _term = enumTerm;
     }
 }

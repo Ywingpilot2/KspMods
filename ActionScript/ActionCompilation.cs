@@ -5,6 +5,7 @@ using System.Linq;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Extensions;
 using ActionLanguage.Library;
+using ActionLanguage.Reflection;
 using ActionLanguage.Token;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
@@ -14,12 +15,12 @@ using ActionLanguage.Utils;
 
 namespace ActionLanguage;
 
-public class ActionCompiler
+public sealed class ActionCompiler
 {
     private ILibrary[] _libraries;
     private ActionScript _currentScript;
 
-    public static ActionLibrary Library = new();
+    public static readonly ActionLibrary Library = new();
 
     public ActionScript Compile(string tokens)
     {
@@ -110,7 +111,7 @@ public class ActionCompiler
 
     #region Terms
 
-    public void ParseTerm(string token, ITokenHolder holder)
+    internal void ParseTerm(string token, ITokenHolder holder)
     {
         AssignmentKind kind = CompileUtils.DetermineAssignment(token, holder);
         string[] values = CompileUtils.GetTermValues(token);
@@ -192,7 +193,7 @@ public class ActionCompiler
         }
     }
 
-    public FunctionCall ParseGlobalCall(string token, ITokenHolder holder)
+    private FunctionCall ParseGlobalCall(string token, ITokenHolder holder)
     {
         string[] split = token.SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
         string name = split[0].Trim();
@@ -205,7 +206,7 @@ public class ActionCompiler
         return new FunctionCall(holder, func, inputTokens, CurrentLine);
     }
 
-    public LocalCall ParseLocalCall(string token, ITokenHolder holder)
+    private LocalCall ParseLocalCall(string token, ITokenHolder holder)
     {
         string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
         string termToken = split[0].Trim();
@@ -315,8 +316,8 @@ public class ActionCompiler
         CurrentLine++;
         return CleanLine(_reader.ReadLine());
     }
-    
-    public string CleanLine(string line)
+
+    private string CleanLine(string line)
     {
         if (line == null) return null;
         

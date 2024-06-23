@@ -1,7 +1,7 @@
 ﻿using ActionLanguage.Exceptions;
 using ActionLanguage.Token.Interaction;
 
-namespace ActionLanguage.Token.Functions;
+namespace ActionLanguage.Token.Functions.Single;
 
 public class ThrowCall : TokenCall
 {

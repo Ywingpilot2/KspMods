@@ -1,4 +1,5 @@
 ﻿using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Functions.Single;
 
 namespace ActionLanguage.Token.KeyWords;
 

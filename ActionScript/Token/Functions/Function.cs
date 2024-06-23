@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Library;
+using ActionLanguage.Token.Functions.Single;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;

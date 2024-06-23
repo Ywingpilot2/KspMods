@@ -1,7 +1,7 @@
 ﻿using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms;
 
-namespace ActionLanguage.Token.Functions;
+namespace ActionLanguage.Token.Functions.Single;
 
 /// <summary>
 /// Now this is just wasteful...
