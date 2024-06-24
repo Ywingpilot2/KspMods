@@ -147,29 +147,54 @@ public static class StringExtension
         return splits.ToArray();
     }
 
-    public static string[] SplitAt(this string self, int idx, int count,
-        StringSplitOptions options = StringSplitOptions.None)
+    public static string[] SplitAt(this string self, int idx, int count = 2,
+        StringSplitOptions options = StringSplitOptions.None, ScanDirection direction = ScanDirection.LeftToRight)
     {
         List<string> splits = new List<string>(); // TODO: Use an array instead
 
         string current = "";
-        for (int i = 0; i < self.Length; i++)
+        if (direction == ScanDirection.LeftToRight)
         {
-            char c = self[i];
-            current += c;
+            for (int i = 0; i < self.Length; i++)
+            {
+                char c = self[i];
+                current += c;
 
-            if (i != idx) continue;
-            if (splits.Count + 1 > count)
-            {
-                string last = splits.Last();
-                splits.Remove(last);
-                last += current;
-                splits.Add(last);
+                if (i != idx) continue;
+                if (splits.Count + 1 > count)
+                {
+                    string last = splits.Last();
+                    splits.Remove(last);
+                    last += current;
+                    splits.Add(last);
+                }
+                else
+                {
+                    splits.Add(current);
+                    current = "";
+                }
             }
-            else
+        }
+        else
+        {
+            for (int i = self.Length - 1; i >= 0; i--)
             {
-                splits.Add(current);
-                current = "";
+                char c = self[i];
+                current += c;
+
+                if (i != idx) continue;
+                if (splits.Count + 1 > count)
+                {
+                    string last = splits.Last();
+                    splits.Remove(last);
+                    last = last.Insert(0, string.Join("", current.Reverse()));
+                    splits.Add(last);
+                }
+                else
+                {
+                    splits.Add(string.Join("", current.Reverse()));
+                    current = "";
+                }
             }
         }
 
@@ -179,13 +204,32 @@ public static class StringExtension
             {
                 string last = splits.Last();
                 splits.Remove(last);
-                last += current;
+                if (direction == ScanDirection.LeftToRight)
+                {
+                    last += current;
+                }
+                else
+                {
+                    last = last.Insert(0, string.Join("", current.Reverse()));
+                }
                 splits.Add(last);
             }
             else
             {
-                splits.Add(current);
+                if (direction == ScanDirection.LeftToRight)
+                {
+                    splits.Add(current);
+                }
+                else
+                {
+                    splits.Add(string.Join("", current.Reverse()));
+                }
             }
+        }
+        
+        if (direction == ScanDirection.RightToLeft)
+        {
+            splits.Reverse();
         }
 
         if (options == StringSplitOptions.RemoveEmptyEntries && splits.Any(s => s == ""))

@@ -31,7 +31,7 @@ public class KerbalLibrary : ILibrary
             EstablishConnection();
             return new ReturnValue(_computer.vessel.altitude, "double");
         }),
-        new Function("get_ground_dist", "double", _ =>
+        new Function("get_ground_altitude", "double", _ =>
         {
             EstablishConnection();
             return new ReturnValue(_computer.vessel.terrainAltitude, "double");
@@ -40,6 +40,16 @@ public class KerbalLibrary : ILibrary
         {
             EstablishConnection();
             return new ReturnValue(_computer.vessel.atmDensity, "double");
+        }),
+        new Function("get_surf_dist", "float", _ =>
+        {
+            EstablishConnection();
+            return new ReturnValue(_computer.vessel.heightFromTerrain, "float");
+        }),
+        new Function("get_mission_time", "double", _ =>
+        {
+            EstablishConnection();
+            return new ReturnValue(_computer.vessel.missionTime, "double");
         })
     };
     public IEnumerable<GlobalTerm> GlobalTerms { get; }

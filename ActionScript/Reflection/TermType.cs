@@ -10,7 +10,7 @@ using ActionLanguage.Utils;
 
 namespace ActionLanguage.Reflection;
 
-public class TermType
+public sealed class TermType
 {
     public string Name
     {

@@ -15,16 +15,11 @@ public struct ReturnKeyword : IKeyword
     private ActionCompiler _compiler;
     public void CompileKeyword(string token, ActionCompiler compiler, ActionScript script, ITokenHolder tokenHolder)
     {
-        UserFunction function;
         ITokenHolder current = tokenHolder;
         while (true)
         {
-            if (current == null)
-                throw new InvalidCompilationException(_compiler.CurrentLine, $"Return is not valid at line {_compiler.CurrentLine}");
-            
-            if (current is UserFunction yay)
+            if (current.Container == null || current is UserFunction yay)
             {
-                function = yay;
                 break;
             }
 
@@ -32,15 +27,23 @@ public struct ReturnKeyword : IKeyword
         }
         
         _compiler = compiler;
-        tokenHolder.AddCall(ParseReturn(token, tokenHolder, function));
+        tokenHolder.AddCall(ParseReturn(token, tokenHolder, current));
     }
     
-    private ReturnCall ParseReturn(string token, ITokenHolder holder, UserFunction function)
+    private ReturnCall ParseReturn(string token, ITokenHolder holder, ITokenHolder function)
     {
         string[] split = token.SanitizedSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+
+        string returnType = "void";
+        if (function is UserFunction user)
+            returnType = user.ReturnType;
+
+        if (returnType == "void")
+            return new ReturnCall(holder, _compiler.CurrentLine);
+        
         string value = split[1].Trim();
 
-        Input input = CompileUtils.HandleToken(value, function.ReturnType, holder, _compiler);
+        Input input = CompileUtils.HandleToken(value, returnType, holder, _compiler);
         return new ReturnCall(holder, _compiler.CurrentLine, input);
     }
 }

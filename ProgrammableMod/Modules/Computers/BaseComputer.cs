@@ -53,9 +53,10 @@ public abstract class BaseComputer : PartModule, IComputer
 
     private void Execution(FlightCtrlState state)
     {
-        if (tokenContainer.shouldRun && Script != null && HighLogic.LoadedSceneIsFlight)
+        if (tokenContainer.shouldRun && HighLogic.LoadedSceneIsFlight)
         {
-            State = state;
+            State = new FlightCtrlState();
+
             try
             {
                 Script.Execute();
@@ -65,6 +66,18 @@ public abstract class BaseComputer : PartModule, IComputer
                 exception = e.Message;
                 DisplayPopup = true;
                 ShouldRun = false;
+            }
+
+            if (!vessel.Autopilot.Enabled)
+            {
+                state.CopyFrom(State);
+            }
+            else
+            {
+                if (State.mainThrottle != 0 || state.mainThrottle != 0)
+                {
+                    state.mainThrottle = State.mainThrottle;
+                }
             }
         }
     }
@@ -318,7 +331,7 @@ public abstract class BaseComputer : PartModule, IComputer
 
     #region Status
 
-    protected void SetStatus(string newStatus, StatusKind kind)
+    public void SetStatus(string newStatus, StatusKind kind)
     {
         switch (kind)
         {
@@ -357,7 +370,7 @@ public abstract class BaseComputer : PartModule, IComputer
         }
     }
 
-    protected void ResetStatus()
+    public void ResetStatus()
     {
         status = "Not actively breaking";
         UpdateException(StatusKind.Exceptional);

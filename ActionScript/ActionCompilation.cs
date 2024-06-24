@@ -53,7 +53,7 @@ public sealed class ActionCompiler
                         line = ReadCleanLine();
                         continue;
                     }
-                
+
                     ParseToken(line, _currentScript);
                     line = ReadCleanLine();
                 }
@@ -65,9 +65,11 @@ public sealed class ActionCompiler
                     e.LineNumber = _currentLine;
                 throw;
             }
-#else
-            finally{}
 #endif
+            finally
+            {
+                CurrentLine = 0;
+            }
         }
 
         _currentScript.PostCompilation();

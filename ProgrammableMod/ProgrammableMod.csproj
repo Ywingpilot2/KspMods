@@ -110,6 +110,7 @@
     -->
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="del &quot;D:\Y wing steam games\steamapps\common\Kerbal Space Program\GameData\ProgrammableModules&quot; /S /Q" />
         <Exec Command="xcopy &quot;$(ProjectDir)bin\GameData\*.*&quot; &quot;D:\Y wing steam games\steamapps\common\Kerbal Space Program\GameData\ProgrammableModules&quot; /Y /I /E" />
     </Target>
 

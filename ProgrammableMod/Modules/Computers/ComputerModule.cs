@@ -45,4 +45,9 @@ public class ComputerModule : BaseComputer
 
         return total;
     }
+
+    public override string GetInfo()
+    {
+        return $"Has a token limit of {tokenLimit}";
+    }
 }

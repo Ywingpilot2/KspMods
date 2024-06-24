@@ -67,6 +67,9 @@ public class LibraryManager
     {
         foreach (ILibrary library in EnumerateLibraries())
         {
+            if (library.TypeLibrary == null)
+                continue;
+            
             if (library.TypeLibrary.HasTermType(name))
                 return true;
         }
@@ -78,6 +81,9 @@ public class LibraryManager
     {
         foreach (ILibrary library in EnumerateLibraries())
         {
+            if (library.TypeLibrary == null)
+                continue;
+            
             if (library.TypeLibrary.HasTermType(name))
                 return library.TypeLibrary.GetTermType(name, 0);
         }

@@ -5,6 +5,7 @@ using ActionLanguage.Library;
 using ActionLanguage.Reflection;
 using ActionLanguage.Token;
 using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
 
@@ -106,8 +107,13 @@ namespace ActionLanguage
                 try
                 {
                     functionCall.PreExecution();
-                    functionCall.Call();
+                    ReturnValue value = functionCall.Call();
                     functionCall.PostExecution();
+
+                    if (value.Value is ReturnValue)
+                    {
+                        return;
+                    }
                 }
 #if DEBUG
                 finally{} // I am too lazy to remove the try catch entirely when on debug

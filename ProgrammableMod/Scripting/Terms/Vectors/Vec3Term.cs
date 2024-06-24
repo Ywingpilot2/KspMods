@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using ActionLanguage.Library;
 using ActionLanguage.Reflection;
+using ActionLanguage.Token.Fields;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms;
 using UnityEngine;
@@ -22,6 +23,18 @@ public class Vec3Term : BaseTerm
             "float", "float", "float");
         yield return new TermConstructor(terms => new ReturnValue(new Vector3(terms[0].CastToFloat(), terms[1].CastToFloat(), terms[2].CastToFloat()), "vec3"), 
             "double", "double", "double");
+    }
+
+    public override IEnumerable<TermField> GetFields()
+    {
+        foreach (TermField field in base.GetFields())
+        {
+            yield return field;
+        }
+
+        yield return new TermField("x", "float", _value.x);
+        yield return new TermField("y", "float", _value.y);
+        yield return new TermField("z", "float", _value.z);
     }
 
     private Vector3 _value;

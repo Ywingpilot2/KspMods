@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using ActionLanguage.Exceptions;
 using ActionLanguage.Library;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
@@ -22,16 +24,33 @@ public class VesselLibrary : ILibrary
     {
         new Function("set_pitch", "void", terms =>
         {
+            if (_computer.vessel.Autopilot.Enabled)
+            {
+                _computer.SetStatus("SAS Enabled, cannot do maneuvers", StatusKind.NotGreat);
+                return new ReturnValue();
+            }
             _computer.State.pitch = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
             return new ReturnValue();
         }, "float"),
         new Function("set_yaw", "void", terms =>
         {
+            if (_computer.vessel.Autopilot.Enabled)
+            {
+                _computer.SetStatus("SAS Enabled, cannot do maneuvers", StatusKind.NotGreat);
+                return new ReturnValue();
+            }
+            
             _computer.State.yaw = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
             return new ReturnValue();
         }, "float"),
         new Function("set_roll", "void", terms =>
         {
+            if (_computer.vessel.Autopilot.Enabled)
+            {
+                _computer.SetStatus("SAS Enabled, cannot do maneuvers", StatusKind.NotGreat);
+                return new ReturnValue();
+            }
+            
             _computer.State.roll = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
             return new ReturnValue();
         }, "float"),
@@ -46,17 +65,44 @@ public class VesselLibrary : ILibrary
         new Function("get_accel", "vec3", _ => new ReturnValue(_computer.vessel.acceleration, "vec3")),
         new Function("enable_sas", "void", _ =>
         {
-            if (_computer.vessel.Connection.ControlState != VesselControlState.ProbeFull)
+            if (_computer.vessel.Connection.ControlState != VesselControlState.ProbeFull 
+                && _computer.vessel.Connection.ControlState != VesselControlState.KerbalFull)
                 throw new KerbnetLostException(0);
             
-            _computer.vessel.Autopilot.Enable();
+            if (!_computer.vessel.Autopilot.Enabled)
+                _computer.vessel.Autopilot.Enable();
+            
             return new ReturnValue();
         }),
         new Function("disable_sas", "void", _ =>
         {
-            _computer.vessel.Autopilot.Disable();
+            if (_computer.vessel.Autopilot.Enabled)
+                _computer.vessel.Autopilot.Disable();
+            
             return new ReturnValue();
         }),
+        new Function("can_sas", "bool", terms => new ReturnValue(
+            _computer.vessel.Autopilot.CanSetMode(
+                (VesselAutopilot.AutopilotMode)Enum.Parse(typeof(VesselAutopilot.AutopilotMode),
+                    terms[0].CastToStr())), "bool"), "string"),
+        new Function("set_sas", "void", terms =>
+        {
+            string sasType = terms[0].CastToStr();
+
+            // TODO: enums
+            VesselAutopilot.AutopilotMode mode = (VesselAutopilot.AutopilotMode)Enum.Parse(typeof(VesselAutopilot.AutopilotMode), sasType);
+            if (!_computer.vessel.Autopilot.CanSetMode(mode))
+                throw new InvalidActionException(0, $"Cannot set autopilot mode to {sasType} currently");
+
+            // You can only set SAS once, if you spam set it over and over and over it will just do nothing
+            // so to prevent this from happening, we just don't set it if its the same
+            if (mode != _computer.vessel.Autopilot.Mode)
+                _computer.vessel.Autopilot.SetMode(mode);
+            
+            return new ReturnValue();
+        }, "string"),
+        new Function("get_vertical_speed", "double", _ => new ReturnValue(_computer.vessel.verticalSpeed, "double")),
+        new Function("get_horizontal_speed", "double", _ => new ReturnValue(_computer.vessel.horizontalSrfSpeed, "double"))
     };
 
     public IEnumerable<GlobalTerm> GlobalTerms { get; }

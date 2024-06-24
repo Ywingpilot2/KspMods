@@ -43,9 +43,16 @@ public class ReturnCall : TokenCall
     {
         _returnValue = input;
     }
+    
+    public ReturnCall(ITokenHolder script, int line) : base(script, line)
+    {
+    }
 
     public override ReturnValue Call()
     {
+        if (_returnValue.Type == InputType.Null)
+            return new ReturnValue();
+        
         BaseTerm term = _returnValue.GetValue();
         return new ReturnValue(term.GetValue(), term.ValueType);
     }

@@ -67,10 +67,10 @@ public static class CompileUtils
     {
         "==",
         "!=",
+        "<=",
+        ">=",
         "<",
         ">",
-        "<=",
-        ">="
     };
 
     public static readonly string[] Operators =
@@ -269,31 +269,31 @@ public static class CompileUtils
                 callName = "not_equal";
                 comparison = "!=";
             } break;
-            case ComparisonType.Greater:
-            {
-                callName = "greater";
-                comparison = ">";
-            } break;
             case ComparisonType.GreaterEqual:
             {
                 callName = "greater_equal";
                 comparison = ">=";
             } break;
-            case ComparisonType.Lesser:
+            case ComparisonType.Greater:
             {
-                callName = "lesser";
-                comparison = "<";
+                callName = "greater";
+                comparison = ">";
             } break;
             case ComparisonType.LesserEqual:
             {
                 callName = "lesser_equal";
                 comparison = "<=";
             } break;
+            case ComparisonType.Lesser:
+            {
+                callName = "lesser";
+                comparison = "<";
+            } break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, "Comparison operation was invalid");
         }
 
-        string[] split = token.SplitAt(sanitized.IndexOf(comparison, StringComparison.Ordinal), 2);
+        string[] split = token.SplitAt(sanitized.IndexOf(comparison, StringComparison.Ordinal), 2, StringSplitOptions.RemoveEmptyEntries);
         if (split.Length != 2)
             throw new InvalidParametersException(compiler.CurrentLine, new []{"term","term"});
 
@@ -562,7 +562,7 @@ public static class CompileUtils
         {
             return TokenKind.SpecialFunc;
         }
-        
+
         // there needs to be a space between the operator in order to prevent conflicts with type containers
         if (Operators.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
         {
