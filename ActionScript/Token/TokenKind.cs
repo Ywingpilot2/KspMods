@@ -1,4 +1,6 @@
-﻿namespace ActionLanguage.Token;
+﻿using System;
+
+namespace ActionLanguage.Token;
 
 public enum TokenKind
 {
@@ -12,10 +14,17 @@ public enum TokenKind
     Operator = 6
 }
 
+public enum OperatorKind
+{
+    Math = 0,
+
+    Comparison = 1, 
+    Bool = 2
+}
+
 public enum SpecialFuncKind
 {
     Not = 0,
-    Comparison = 1,
     As = 2,
     New = 3
 }

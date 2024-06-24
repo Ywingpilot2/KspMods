@@ -2,7 +2,7 @@
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms;
 
-namespace ActionLanguage.Token.Functions.Single;
+namespace ActionLanguage.Token.Functions.Modifier;
 
 public class CastCall : TokenCall
 {

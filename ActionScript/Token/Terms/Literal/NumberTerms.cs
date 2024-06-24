@@ -86,34 +86,34 @@ public class NumberTerm : BaseTerm
 
     #region Math
 
-    public override OperatorKind[] AllowedOperators => new[]
+    public override MathOperatorKind[] AllowedMathOps => new[]
     {
-        OperatorKind.Add,
-        OperatorKind.Subtract,
-        OperatorKind.Divide,
-        OperatorKind.Multiply
+        MathOperatorKind.Add,
+        MathOperatorKind.Subtract,
+        MathOperatorKind.Divide,
+        MathOperatorKind.Multiply
     };
 
-    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    public override object ConductMath(MathOperatorKind kind, BaseTerm subject)
     {
         double a = CastToDouble();
         double b = subject.CastToDouble();
         
         switch (kind)
         {
-            case OperatorKind.Add:
+            case MathOperatorKind.Add:
             {
                 return Convert.ChangeType(a + b, NumberType);
             }
-            case OperatorKind.Subtract:
+            case MathOperatorKind.Subtract:
             {
                 return Convert.ChangeType(a - b, NumberType);
             }
-            case OperatorKind.Multiply:
+            case MathOperatorKind.Multiply:
             {
                 return Convert.ChangeType(a * b, NumberType);
             }
-            case OperatorKind.Divide:
+            case MathOperatorKind.Divide:
             {
                 return Convert.ChangeType(a / b, NumberType);
             }
@@ -121,6 +121,20 @@ public class NumberTerm : BaseTerm
                 throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
         }
     }
+
+    #endregion
+
+    #region Comparison
+
+    public override ComparisonOperatorKind[] AllowedComparisons => new[]
+    {
+        ComparisonOperatorKind.Equal,
+        ComparisonOperatorKind.NotEqual,
+        ComparisonOperatorKind.Greater,
+        ComparisonOperatorKind.GreaterEqual,
+        ComparisonOperatorKind.Lesser,
+        ComparisonOperatorKind.LesserEqual
+    };
 
     #endregion
 
@@ -211,33 +225,54 @@ public class TermI : NumberTerm
     
     #region Math
 
-    public override OperatorKind[] AllowedOperators => new[]
+    public override MathOperatorKind[] AllowedMathOps => new[]
     {
-        OperatorKind.Add,
-        OperatorKind.Subtract,
-        OperatorKind.Divide,
-        OperatorKind.Multiply,
-        OperatorKind.And,
-        OperatorKind.Or,
-        OperatorKind.Power,
-        OperatorKind.Remaining
+        MathOperatorKind.Add,
+        MathOperatorKind.Subtract,
+        MathOperatorKind.Divide,
+        MathOperatorKind.Multiply,
+        MathOperatorKind.And,
+        MathOperatorKind.Or,
+        MathOperatorKind.Power,
+        MathOperatorKind.Remaining
     };
 
-    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    public override object ConductMath(MathOperatorKind kind, BaseTerm subject)
     {
         int a = CastToInt();
         int b = subject.CastToInt();
 
         return kind switch
         {
-            OperatorKind.Add => Convert.ChangeType(a + b, NumberType),
-            OperatorKind.Subtract => Convert.ChangeType(a - b, NumberType),
-            OperatorKind.Multiply => Convert.ChangeType(a * b, NumberType),
-            OperatorKind.Divide => Convert.ChangeType(a / b, NumberType),
-            OperatorKind.And => a & b,
-            OperatorKind.Or => a | b,
-            OperatorKind.Power => a ^ b,
-            OperatorKind.Remaining => a % b,
+            MathOperatorKind.Add => Convert.ChangeType(a + b, NumberType),
+            MathOperatorKind.Subtract => Convert.ChangeType(a - b, NumberType),
+            MathOperatorKind.Multiply => Convert.ChangeType(a * b, NumberType),
+            MathOperatorKind.Divide => Convert.ChangeType(a / b, NumberType),
+            MathOperatorKind.And => a & b,
+            MathOperatorKind.Or => a | b,
+            MathOperatorKind.Power => a ^ b,
+            MathOperatorKind.Remaining => a % b,
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+    #endregion
+
+    #region Comparison
+
+    public override bool ConductComparison(ComparisonOperatorKind kind, BaseTerm subject)
+    {
+        int a = (int)Number;
+        int b = subject.CastToInt();
+
+        return kind switch
+        {
+            ComparisonOperatorKind.Equal => a == b,
+            ComparisonOperatorKind.NotEqual => a != b,
+            ComparisonOperatorKind.Greater => a > b,
+            ComparisonOperatorKind.GreaterEqual => a >= b,
+            ComparisonOperatorKind.Lesser => a < b,
+            ComparisonOperatorKind.LesserEqual => a <= b,
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
         };
     }
@@ -280,40 +315,61 @@ public class TermF : NumberTerm
     
     #region Math
 
-    public override OperatorKind[] AllowedOperators => new[]
+    public override MathOperatorKind[] AllowedMathOps => new[]
     {
-        OperatorKind.Add,
-        OperatorKind.Subtract,
-        OperatorKind.Divide,
-        OperatorKind.Multiply
+        MathOperatorKind.Add,
+        MathOperatorKind.Subtract,
+        MathOperatorKind.Divide,
+        MathOperatorKind.Multiply
     };
 
-    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    public override object ConductMath(MathOperatorKind kind, BaseTerm subject)
     {
         float a = CastToFloat();
         float b = subject.CastToFloat();
         
         switch (kind)
         {
-            case OperatorKind.Add:
+            case MathOperatorKind.Add:
             {
                 return Convert.ChangeType(a + b, NumberType);
             }
-            case OperatorKind.Subtract:
+            case MathOperatorKind.Subtract:
             {
                 return Convert.ChangeType(a - b, NumberType);
             }
-            case OperatorKind.Multiply:
+            case MathOperatorKind.Multiply:
             {
                 return Convert.ChangeType(a * b, NumberType);
             }
-            case OperatorKind.Divide:
+            case MathOperatorKind.Divide:
             {
                 return Convert.ChangeType(a / b, NumberType);
             }
             default:
                 throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
         }
+    }
+
+    #endregion
+    
+    #region Comparison
+
+    public override bool ConductComparison(ComparisonOperatorKind kind, BaseTerm subject)
+    {
+        float a = (float)Number;
+        float b = subject.CastToFloat();
+
+        return kind switch
+        {
+            ComparisonOperatorKind.Equal => Math.Abs(a - b) < 0.005,
+            ComparisonOperatorKind.NotEqual => Math.Abs(a - b) > 0.005,
+            ComparisonOperatorKind.Greater => a > b,
+            ComparisonOperatorKind.GreaterEqual => a >= b,
+            ComparisonOperatorKind.Lesser => a < b,
+            ComparisonOperatorKind.LesserEqual => a <= b,
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
     }
 
     #endregion
@@ -354,33 +410,54 @@ public class TermU : NumberTerm
     
     #region Math
 
-    public override OperatorKind[] AllowedOperators => new[]
+    public override MathOperatorKind[] AllowedMathOps => new[]
     {
-        OperatorKind.Add,
-        OperatorKind.Subtract,
-        OperatorKind.Divide,
-        OperatorKind.Multiply,
-        OperatorKind.And,
-        OperatorKind.Or,
-        OperatorKind.Power,
-        OperatorKind.Remaining
+        MathOperatorKind.Add,
+        MathOperatorKind.Subtract,
+        MathOperatorKind.Divide,
+        MathOperatorKind.Multiply,
+        MathOperatorKind.And,
+        MathOperatorKind.Or,
+        MathOperatorKind.Power,
+        MathOperatorKind.Remaining
     };
 
-    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    public override object ConductMath(MathOperatorKind kind, BaseTerm subject)
     {
         uint a = CastToUint();
         uint b = subject.CastToUint();
 
         return kind switch
         {
-            OperatorKind.Add => Convert.ChangeType(a + b, NumberType),
-            OperatorKind.Subtract => Convert.ChangeType(a - b, NumberType),
-            OperatorKind.Multiply => Convert.ChangeType(a * b, NumberType),
-            OperatorKind.Divide => Convert.ChangeType(a / b, NumberType),
-            OperatorKind.And => a & b,
-            OperatorKind.Or => a | b,
-            OperatorKind.Power => a ^ b,
-            OperatorKind.Remaining => a % b,
+            MathOperatorKind.Add => Convert.ChangeType(a + b, NumberType),
+            MathOperatorKind.Subtract => Convert.ChangeType(a - b, NumberType),
+            MathOperatorKind.Multiply => Convert.ChangeType(a * b, NumberType),
+            MathOperatorKind.Divide => Convert.ChangeType(a / b, NumberType),
+            MathOperatorKind.And => a & b,
+            MathOperatorKind.Or => a | b,
+            MathOperatorKind.Power => a ^ b,
+            MathOperatorKind.Remaining => a % b,
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+    #endregion
+    
+    #region Comparison
+
+    public override bool ConductComparison(ComparisonOperatorKind kind, BaseTerm subject)
+    {
+        uint a = (uint)Number;
+        uint b = subject.CastToUint();
+
+        return kind switch
+        {
+            ComparisonOperatorKind.Equal => a == b,
+            ComparisonOperatorKind.NotEqual => a != b,
+            ComparisonOperatorKind.Greater => a > b,
+            ComparisonOperatorKind.GreaterEqual => a >= b,
+            ComparisonOperatorKind.Lesser => a < b,
+            ComparisonOperatorKind.LesserEqual => a <= b,
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
         };
     }
@@ -418,4 +495,25 @@ public class TermD : NumberTerm
         Kind = TermKind.Basic;
         return true;
     }
+    
+    #region Comparison
+
+    public override bool ConductComparison(ComparisonOperatorKind kind, BaseTerm subject)
+    {
+        double a = (double)Number;
+        double b = subject.CastToDouble();
+
+        return kind switch
+        {
+            ComparisonOperatorKind.Equal => Math.Abs(a - b) < 0.005,
+            ComparisonOperatorKind.NotEqual => Math.Abs(a - b) > 0.005,
+            ComparisonOperatorKind.Greater => a > b,
+            ComparisonOperatorKind.GreaterEqual => a >= b,
+            ComparisonOperatorKind.Lesser => a < b,
+            ComparisonOperatorKind.LesserEqual => a <= b,
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+    #endregion
 }

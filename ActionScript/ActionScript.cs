@@ -5,6 +5,7 @@ using ActionLanguage.Library;
 using ActionLanguage.Reflection;
 using ActionLanguage.Token;
 using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Functions.Single;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
@@ -110,7 +111,7 @@ namespace ActionLanguage
                     ReturnValue value = functionCall.Call();
                     functionCall.PostExecution();
 
-                    if (value.Value is ReturnValue)
+                    if (value.Value is ReturnCall)
                     {
                         return;
                     }

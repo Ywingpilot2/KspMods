@@ -12,6 +12,7 @@ public interface IConditionalCall
     public ReturnValue Call();
 
     public IConditionalCall GetLastBranch();
+    public void PostCompilation();
 }
 
 public class IfCall : TokenCall, IConditionalCall
@@ -54,6 +55,7 @@ public class IfCall : TokenCall, IConditionalCall
     public override void PostCompilation()
     {
         ExecutableFunc.PostCompilation();
+        Else?.PostCompilation();
         _condition.PostCompilation();
     }
 
@@ -94,6 +96,7 @@ public class ElseCall : TokenCall, IConditionalCall
     public override void PostCompilation()
     {
         ExecutableFunc.PostCompilation();
+        Else?.PostCompilation();
     }
 
     public IConditionalCall GetLastBranch()

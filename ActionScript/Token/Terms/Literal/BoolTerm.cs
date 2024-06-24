@@ -49,19 +49,18 @@ public sealed class BoolTerm : BaseTerm
 
     #endregion
 
-    public override OperatorKind[] AllowedOperators => new[]
+    public override BoolOperatorKind[] AllowedBoolOps => new[]
     {
-        OperatorKind.And,
-        OperatorKind.Or
+        BoolOperatorKind.And,
+        BoolOperatorKind.Or
     };
 
-    public override object ConductOperation(OperatorKind kind, BaseTerm subject)
+    public override bool ConductBoolOp(BoolOperatorKind kind, BaseTerm subject)
     {
-        bool b = subject.CastToBool();
-        if (kind == OperatorKind.And)
-            return _value && b;
-        else
-            return _value || b;
+        if (kind == BoolOperatorKind.And)
+            return _value && subject.CastToBool();
+
+        return _value || subject.CastToBool();
     }
 
     public override IEnumerable<TermConstructor> GetConstructors()

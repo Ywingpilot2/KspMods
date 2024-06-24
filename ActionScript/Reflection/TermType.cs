@@ -32,7 +32,9 @@ public sealed class TermType
     public bool ContainsType => Term.ContainsType;
     public string ContainedType { get; set; }
     
-    public OperatorKind[] AllowedOperators => Term.AllowedOperators;
+    public MathOperatorKind[] AllowedMathOps => Term.AllowedMathOps;
+    public ComparisonOperatorKind[] AllowedComparisons => Term.AllowedComparisons;
+    public BoolOperatorKind[] AllowedBoolOps => Term.AllowedBoolOps;
     
     public IEnumerable<IFunction> Functions => Term.GetFunctions();
     public IEnumerable<TermField> Fields => Term.GetFields();

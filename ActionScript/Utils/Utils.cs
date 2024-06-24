@@ -8,13 +8,20 @@ using ActionLanguage.Reflection;
 using ActionLanguage.Token;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Functions.Modifier;
+using ActionLanguage.Token.Functions.Operator;
 using ActionLanguage.Token.Functions.Single;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.Terms;
 
 namespace ActionLanguage.Utils;
 
-public enum ComparisonType
+public enum BoolOperatorKind
+{
+    And = 0,
+    Or = 1
+}
+
+public enum ComparisonOperatorKind
 {
     Equal = 0,
     NotEqual = 1,
@@ -24,7 +31,7 @@ public enum ComparisonType
     LesserEqual = 5
 }
 
-public enum OperatorKind
+public enum MathOperatorKind
 {
     And = 0,
     Or = 1,
@@ -48,7 +55,7 @@ public static class CompileUtils
 {
     #region operator stuff
 
-    public static readonly string[] InvalidNames = 
+    private static readonly string[] InvalidNames = 
     {
         "|",
         "&",
@@ -60,10 +67,12 @@ public static class CompileUtils
         "<",
         ">",
         "<=",
-        ">="
+        ">=",
+        "&&",
+        "||"
     };
 
-    public static readonly string[] Comparisons =
+    private static readonly string[] Comparisons =
     {
         "==",
         "!=",
@@ -73,7 +82,7 @@ public static class CompileUtils
         ">",
     };
 
-    public static readonly string[] Operators =
+    private static readonly string[] MathOps =
     {
         "|",
         "&",
@@ -83,6 +92,12 @@ public static class CompileUtils
         "*",
         "^",
         "%"
+    };
+
+    private static readonly string[] BoolOps =
+    {
+        "||",
+        "&&"
     };
 
     #endregion
@@ -183,11 +198,6 @@ public static class CompileUtils
                         FunctionCall call = new FunctionCall(holder, holder.GetFunction("not"), compiler.CurrentLine, HandleToken(token.Remove(0,1), "bool", holder, compiler));
                         return new Input(holder, call);
                     }
-                    case SpecialFuncKind.Comparison:
-                    {
-                        FunctionCall call = HandleComparisonOperation(token, GetComparisonFromToken(token), holder, compiler);
-                        return new Input(holder, call);
-                    }
                     case SpecialFuncKind.As:
                     {
                         string san = token.SanitizeQuotes();
@@ -231,11 +241,26 @@ public static class CompileUtils
             }
             case TokenKind.Operator:
             {
-                OperatorKind op = GetOperator(token);
-                if (!type.AllowedOperators.Contains(op))
-                    throw new InvalidCompilationException(compiler.CurrentLine, $"Type {type.Name} does not support ");
-
-                return new Input(holder, HandleOperation(token, op, holder, compiler, type.Name));
+                switch (GetOperatorKind(token))
+                {
+                    case OperatorKind.Math:
+                    {
+                        MathOperatorKind op = GetMathOp(token);
+                        return new Input(holder, HandleMathOperation(token, op, holder, compiler, type.Name));
+                    }
+                    case OperatorKind.Comparison:
+                    {
+                        ComparisonOperatorKind op = GetComparisonFromToken(token);
+                        return new Input(holder, HandleComparisonOperation(token, op, holder, compiler));
+                    }
+                    case OperatorKind.Bool:
+                    {
+                        BoolOperatorKind op = GetBoolOpFromToken(token);
+                        return new Input(holder, HandleBoolOperation(token, op, holder, compiler));
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
             case TokenKind.LocalField:
             {
@@ -250,70 +275,58 @@ public static class CompileUtils
                 throw new ArgumentOutOfRangeException();
         }
     }
-
-    public static FunctionCall HandleComparisonOperation(string token, ComparisonType type, ITokenHolder holder,
+    
+    public static BoolOpCall HandleBoolOperation(string token, BoolOperatorKind operatorKind, ITokenHolder holder,
         ActionCompiler compiler)
     {
-        string sanitized = token.SanitizeQuotes();
-        string callName;
-        string comparison;
-        switch (type)
-        {
-            case ComparisonType.Equal:
-            {
-                callName = "equal";
-                comparison = "==";
-            } break;
-            case ComparisonType.NotEqual:
-            {
-                callName = "not_equal";
-                comparison = "!=";
-            } break;
-            case ComparisonType.GreaterEqual:
-            {
-                callName = "greater_equal";
-                comparison = ">=";
-            } break;
-            case ComparisonType.Greater:
-            {
-                callName = "greater";
-                comparison = ">";
-            } break;
-            case ComparisonType.LesserEqual:
-            {
-                callName = "lesser_equal";
-                comparison = "<=";
-            } break;
-            case ComparisonType.Lesser:
-            {
-                callName = "lesser";
-                comparison = "<";
-            } break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, "Comparison operation was invalid");
-        }
+        string san = token.SanitizeQuotes().SanitizeParenthesis();
+        string splitter = GetBoolOpStr(operatorKind);
 
-        string[] split = token.SplitAt(sanitized.IndexOf(comparison, StringComparison.Ordinal), 2, StringSplitOptions.RemoveEmptyEntries);
-        if (split.Length != 2)
-            throw new InvalidParametersException(compiler.CurrentLine, new []{"term","term"});
+        string[] split = token.SplitAt(san.IndexOf(splitter, StringComparison.Ordinal));
 
-        FunctionCall call = new FunctionCall(holder, holder.GetFunction(callName), compiler.CurrentLine,
-            HandleToken(split[0].Remove(split[0].Length - 1).Trim(), "term", holder, compiler),
-            HandleToken(split[1].Remove(0,1).Trim(), "term", holder, compiler));
-        return call;
+        string tokenA = split[0].Remove(split[0].Length - 1).Trim();
+        string tokenB = split[1].Remove(0, 1).Trim();
+        TermType typeA = GetTypeFromToken(tokenA, holder, GetTokenKind(tokenA, holder));
+
+        if (!typeA.AllowedBoolOps.Contains(operatorKind))
+            throw new InvalidCompilationException(compiler.CurrentLine, $"Type {typeA.Name} does not support {operatorKind}");
+
+        Input a = HandleToken(tokenA, typeA.Name, holder, compiler);
+        Input b = HandleToken(tokenB, typeA.Name, holder, compiler);
+        return new BoolOpCall(holder, compiler.CurrentLine, a, b, operatorKind);
     }
 
-    public static OperatorCall HandleOperation(string token, OperatorKind kind, ITokenHolder holder,
+    public static ComparisonCall HandleComparisonOperation(string token, ComparisonOperatorKind operatorKind, ITokenHolder holder,
+        ActionCompiler compiler)
+    {
+        string san = token.SanitizeQuotes().SanitizeParenthesis();
+        string splitter = GetComparisonStr(operatorKind);
+
+        string[] split = token.SplitAt(san.IndexOf(splitter, StringComparison.Ordinal));
+
+        string tokenA = split[0].Remove(split[0].Length - 1).Trim();
+        string tokenB = split[1].Remove(0, 1).Trim();
+        TermType typeA = GetTypeFromToken(tokenA, holder, GetTokenKind(tokenA, holder));
+
+        if (!typeA.AllowedComparisons.Contains(operatorKind))
+            throw new InvalidCompilationException(compiler.CurrentLine, $"Type {typeA.Name} does not support {operatorKind}");
+
+        Input a = HandleToken(tokenA, typeA.Name, holder, compiler);
+        Input b = HandleToken(tokenB, typeA.Name, holder, compiler);
+        return new ComparisonCall(holder, compiler.CurrentLine, a, b, operatorKind);
+    }
+
+    public static MathCall HandleMathOperation(string token, MathOperatorKind kind, ITokenHolder holder,
         ActionCompiler compiler, string expectedType)
     {
-        char splitter = GetOperatorChar(kind);
+        char splitter = GetMathChar(kind);
         string[] split = token.SanitizedSplit(splitter, 2, StringSplitOptions.RemoveEmptyEntries);
         if (split.Length == 1)
             throw new InvalidCompilationException(compiler.CurrentLine, $"{token} lacks a second operator argument!");
 
         Input a = HandleToken(split[0].Trim(), expectedType, holder, compiler);
         Input b = HandleToken(split[1].Trim(), expectedType, holder, compiler);
-        return new OperatorCall(holder, compiler.CurrentLine, a, b, kind);
+        return new MathCall(holder, compiler.CurrentLine, a, b, kind);
     }
 
     #endregion
@@ -410,7 +423,6 @@ public static class CompileUtils
                 switch (specialKind)
                 {
                     case SpecialFuncKind.Not:
-                    case SpecialFuncKind.Comparison:
                     {
                         return holder.GetLibraryManager().GetTermType("bool");
                     }
@@ -440,12 +452,23 @@ public static class CompileUtils
             }
             case TokenKind.Operator:
             {
-                OperatorKind operatorKind = GetOperator(token);
-                char split = GetOperatorChar(operatorKind);
-                string opToken = token.SanitizedSplit(split, 2, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
+                switch (GetOperatorKind(token))
+                {
+                    case OperatorKind.Math:
+                    {
+                        MathOperatorKind mathOperatorKind = GetMathOp(token);
+                        char split = GetMathChar(mathOperatorKind);
+                        string opToken = token.SanitizedSplit(split, 2, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
 
-                TokenKind opToKind = GetTokenKind(opToken, holder);
-                return GetTypeFromToken(opToken, holder, opToKind);
+                        TokenKind opToKind = GetTokenKind(opToken, holder);
+                        return GetTypeFromToken(opToken, holder, opToKind);
+                    }
+                    case OperatorKind.Comparison:
+                    case OperatorKind.Bool:
+                        return holder.GetLibraryManager().GetTermType("bool"); // TODO: Actually check the type lol
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
             case TokenKind.LocalField:
             {
@@ -458,36 +481,41 @@ public static class CompileUtils
 
     #region Operator
 
-    public static OperatorKind GetOperator(string token)
+    #region Math
+
+    public static MathOperatorKind GetMathOp(string token)
     {
         string san = token.SanitizeQuotes();
-        string op = Operators.FirstOrDefault(san.Contains);
+        
+        // we do last or default because otherwise we may pickup on value negation
+        // e.g -1 / 2 will be registered as subtraction because of the "-" sign
+        string op = MathOps.LastOrDefault(san.Contains); 
         return op switch
         {
-            "|" => OperatorKind.Or,
-            "&" => OperatorKind.And,
-            "+" => OperatorKind.Add,
-            "-" => OperatorKind.Subtract,
-            "/" => OperatorKind.Divide,
-            "*" => OperatorKind.Multiply,
-            "^" => OperatorKind.Power,
-            "%" => OperatorKind.Remaining,
+            "|" => MathOperatorKind.Or,
+            "&" => MathOperatorKind.And,
+            "+" => MathOperatorKind.Add,
+            "-" => MathOperatorKind.Subtract,
+            "/" => MathOperatorKind.Divide,
+            "*" => MathOperatorKind.Multiply,
+            "^" => MathOperatorKind.Power,
+            "%" => MathOperatorKind.Remaining,
             _ => throw new InvalidCompilationException(0, $"Operator in token {token} is invalid")
         };
     }
 
-    public static char GetOperatorChar(OperatorKind kind)
+    public static char GetMathChar(MathOperatorKind kind)
     {
         return kind switch
         {
-            OperatorKind.And => '&',
-            OperatorKind.Or => '|',
-            OperatorKind.Add => '+',
-            OperatorKind.Subtract => '-',
-            OperatorKind.Multiply => '*',
-            OperatorKind.Divide => '/',
-            OperatorKind.Power => '^',
-            OperatorKind.Remaining => '%',
+            MathOperatorKind.And => '&',
+            MathOperatorKind.Or => '|',
+            MathOperatorKind.Add => '+',
+            MathOperatorKind.Subtract => '-',
+            MathOperatorKind.Multiply => '*',
+            MathOperatorKind.Divide => '/',
+            MathOperatorKind.Power => '^',
+            MathOperatorKind.Remaining => '%',
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
         };
     }
@@ -496,7 +524,7 @@ public static class CompileUtils
 
     #region Comparison
 
-    public static ComparisonType GetComparisonFromToken(string token)
+    public static ComparisonOperatorKind GetComparisonFromToken(string token)
     {
         string san = token.SanitizeQuotes();
         string op = Comparisons.FirstOrDefault(s => san.Contains(s));
@@ -504,36 +532,102 @@ public static class CompileUtils
         {
             case "==":
             {
-                return ComparisonType.Equal;
+                return ComparisonOperatorKind.Equal;
             }
             case "!=":
             {
-                return ComparisonType.NotEqual;
+                return ComparisonOperatorKind.NotEqual;
             }
             case ">":
             {
-                return ComparisonType.Greater;
+                return ComparisonOperatorKind.Greater;
             }
             case ">=":
             {
-                return ComparisonType.GreaterEqual;
+                return ComparisonOperatorKind.GreaterEqual;
             }
             case "<":
             {
-                return ComparisonType.Lesser;
+                return ComparisonOperatorKind.Lesser;
             }
             case "<=":
             {
-                return ComparisonType.LesserEqual;
+                return ComparisonOperatorKind.LesserEqual;
             } 
         }
 
         throw new InvalidCompilationException(0, $"Unable to determine comparison operator from {token}");
     }
 
+    public static string GetComparisonStr(ComparisonOperatorKind kind)
+    {
+        return kind switch
+        {
+            ComparisonOperatorKind.Equal => "==",
+            ComparisonOperatorKind.NotEqual => "!=",
+            ComparisonOperatorKind.Greater => ">",
+            ComparisonOperatorKind.GreaterEqual => ">=",
+            ComparisonOperatorKind.Lesser => "<",
+            ComparisonOperatorKind.LesserEqual => "<=",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+#endregion
+
+    #region Boolean
+
+    public static BoolOperatorKind GetBoolOpFromToken(string token)
+    {
+        string san = token.SanitizeQuotes();
+        string op = BoolOps.FirstOrDefault(s => san.Contains(s));
+        switch (op)
+        {
+            case "&&":
+            {
+                return BoolOperatorKind.And;
+            }
+            case "!||":
+            {
+                return BoolOperatorKind.Or;
+            }
+        }
+
+        throw new InvalidCompilationException(0, $"Unable to determine comparison operator from {token}");
+    }
+
+    public static string GetBoolOpStr(BoolOperatorKind kind)
+    {
+        return kind switch
+        {
+            BoolOperatorKind.And => "&&",
+            BoolOperatorKind.Or => "||",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+    #endregion
+
     #endregion
 
     #region Kind Solving
+
+    public static OperatorKind GetOperatorKind(string token)
+    {
+        string san = token.SanitizeQuotes();
+        
+        if (BoolOps.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
+            return OperatorKind.Bool;
+        
+        if (Comparisons.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
+            return OperatorKind.Comparison;
+
+        // there needs to be a space between the operator in order to prevent conflicts with type containers
+        if (MathOps.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
+            return OperatorKind.Math;
+
+        throw new InvalidCompilationException(0,"not a valid operator");
+    }
 
     public static SpecialFuncKind GetSpecialKind(string token)
     {
@@ -541,9 +635,6 @@ public static class CompileUtils
 
         if (san.StartsWith("!"))
             return SpecialFuncKind.Not;
-
-        if (Comparisons.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
-            return SpecialFuncKind.Comparison;
 
         if (san.Contains(" as "))
             return SpecialFuncKind.As;
@@ -563,16 +654,15 @@ public static class CompileUtils
             return TokenKind.SpecialFunc;
         }
 
-        // there needs to be a space between the operator in order to prevent conflicts with type containers
-        if (Operators.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
-        {
+        if (BoolOps.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
             return TokenKind.Operator;
-        }
         
         if (Comparisons.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
-        {
-            return TokenKind.SpecialFunc;
-        }
+            return TokenKind.Operator;
+
+        // there needs to be a space between the operator in order to prevent conflicts with type containers
+        if (MathOps.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
+            return TokenKind.Operator;
 
         if (TokenIsConstant(token))
         {

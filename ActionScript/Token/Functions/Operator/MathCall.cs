@@ -2,15 +2,15 @@
 using ActionLanguage.Token.Terms;
 using ActionLanguage.Utils;
 
-namespace ActionLanguage.Token.Functions.Modifier;
+namespace ActionLanguage.Token.Functions.Operator;
 
-public class OperatorCall : TokenCall
+public class MathCall : TokenCall
 {
     private Input _a;
     private Input _b;
-    private readonly OperatorKind _kind;
+    private readonly MathOperatorKind _kind;
 
-    public OperatorCall(ITokenHolder script, int line, Input a, Input b, OperatorKind kind) : base(script, line)
+    public MathCall(ITokenHolder script, int line, Input a, Input b, MathOperatorKind kind) : base(script, line)
     {
         _a = a;
         _b = b;
@@ -21,7 +21,7 @@ public class OperatorCall : TokenCall
     {
         BaseTerm a = _a.GetValue();
         BaseTerm b = _b.GetValue();
-        return new ReturnValue(a.ConductOperation(_kind, b), a.ValueType);
+        return new ReturnValue(a.ConductMath(_kind, b), a.ValueType);
     }
 
     public override void PostCompilation()

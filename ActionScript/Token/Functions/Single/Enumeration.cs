@@ -51,7 +51,7 @@ public class ReturnCall : TokenCall
     public override ReturnValue Call()
     {
         if (_returnValue.Type == InputType.Null)
-            return new ReturnValue();
+            return new ReturnValue(this, "return");
         
         BaseTerm term = _returnValue.GetValue();
         return new ReturnValue(term.GetValue(), term.ValueType);

@@ -281,12 +281,53 @@ public abstract class BaseTerm : IToken
 
     #region Operators
 
-    public virtual OperatorKind[] AllowedOperators { get; }
+    #region Math
 
-    public virtual object ConductOperation(OperatorKind kind, BaseTerm subject)
+    public virtual MathOperatorKind[] AllowedMathOps => new MathOperatorKind[0];
+
+    public virtual object ConductMath(MathOperatorKind kind, BaseTerm subject)
     {
         throw new NotImplementedException("This term does not support any operators");
     }
+
+    #endregion
+    
+    #region Comparison
+
+    public virtual ComparisonOperatorKind[] AllowedComparisons => new[]
+    {
+        ComparisonOperatorKind.Equal,
+        ComparisonOperatorKind.NotEqual
+    };
+
+    public virtual bool ConductComparison(ComparisonOperatorKind kind, BaseTerm subject)
+    {
+        if (kind == ComparisonOperatorKind.Equal)
+        {
+            if (subject.GetValue() == null && GetValue() == null)
+                return true;
+
+            return GetValue().Equals(subject.GetValue());
+        }
+
+        if (subject.GetValue() == null && GetValue() == null)
+            return false;
+
+        return GetValue().Equals(subject.GetValue());
+    }
+
+    #endregion
+    
+    #region Bool
+
+    public virtual BoolOperatorKind[] AllowedBoolOps => new BoolOperatorKind[0];
+
+    public virtual bool ConductBoolOp(BoolOperatorKind kind, BaseTerm subject)
+    {
+        throw new NotImplementedException("This term does not support any operators");
+    }
+
+    #endregion
 
     #endregion
 
