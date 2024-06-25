@@ -21,9 +21,18 @@ namespace ActionLanguage.Library
         {
             new Function("to_string", "string", inputTypes: "term", action: terms =>
             {
-                try
+                if (terms[0].CanImplicitCastToStr)
                 {
                     return new ReturnValue(terms[0].CastToStr(), "string");
+                }
+
+                try
+                {
+                    string str = terms[0].GetValue().ToString();
+                    if (str == terms[0].GetValue().GetType().FullName)
+                        return new ReturnValue(terms[0].GetTermType().Name, "string");
+
+                    return new ReturnValue(str, "string");
                 }
                 catch (Exception e)
                 {

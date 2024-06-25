@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ActionLanguage;
 using ActionLanguage.Library;
 using ActionLanguage.Reflection;
@@ -6,6 +7,7 @@ using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
+using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Terms.Graphmatics;
 using ProgrammableMod.Scripting.Terms.Vectors;
 using UnityEngine;
@@ -15,6 +17,7 @@ namespace ProgrammableMod.Scripting.Library;
 public class ComputerLibrary : ILibrary
 {
     public string Name => "computing";
+    private BaseComputer _computer;
 
     public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
     {
@@ -25,12 +28,12 @@ public class ComputerLibrary : ILibrary
             "float"),
         new Function("log", "void", terms =>
         {
-            ScreenMessages.PostScreenMessage(terms[0].CastToStr(), 0.5f, ScreenMessageStyle.UPPER_LEFT);
+            _computer.Log(terms[0].CastToStr());
             return new ReturnValue();
         }, "string"),
-        new Function("logt", "void", terms =>
+        new Function("display", "void", terms =>
         {
-            ScreenMessages.PostScreenMessage(terms[0].CastToStr(), terms[1].CastToFloat(),
+            ScreenMessages.PostScreenMessage(terms[0].CastToStr(), 0.5f,
                 ScreenMessageStyle.UPPER_LEFT);
             return new ReturnValue();
         }, "string")
@@ -39,10 +42,11 @@ public class ComputerLibrary : ILibrary
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 
-    public ComputerLibrary(ActionLibrary baseLibrary)
+    public ComputerLibrary(ActionLibrary baseLibrary, BaseComputer computer)
     {
+        _computer = computer;
         TypeLibrary = new TypeLibrary();
-
+        
         TermType baseType = baseLibrary.TypeLibrary.GetTermType("term", 0);
         TypeLibrary.AddTermType(new TermType(new PiecewiseCTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new Vec2Term(), baseType));

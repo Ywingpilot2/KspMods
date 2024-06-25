@@ -115,9 +115,13 @@ public class SingleExecutableFunc : BaseExecutable
     {
         foreach (TokenCall call in Calls)
         {
+            if (call is ReturnCall)
+                return new ReturnValue(call, "return");
+
             // TODO HACK: In order to break when in lower functions, lower functions(e.g ifs) return a break/continue up the chain
             // This is annoying. We should find a better system asap!
             ReturnValue returnValue = call.Call();
+
             if (returnValue.HasValue)
             {
                 if (returnValue.Value is BreakCall)

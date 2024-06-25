@@ -26,7 +26,7 @@ public class VesselLibrary : ILibrary
         {
             if (_computer.vessel.Autopilot.Enabled)
             {
-                _computer.SetStatus("SAS Enabled, cannot do maneuvers", StatusKind.NotGreat);
+                _computer.SetStatus("SAS Enabled, cannot do manual maneuvers", StatusKind.NotGreat);
                 return new ReturnValue();
             }
             _computer.State.pitch = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
@@ -36,7 +36,7 @@ public class VesselLibrary : ILibrary
         {
             if (_computer.vessel.Autopilot.Enabled)
             {
-                _computer.SetStatus("SAS Enabled, cannot do maneuvers", StatusKind.NotGreat);
+                _computer.SetStatus("SAS Enabled, cannot do manual maneuvers", StatusKind.NotGreat);
                 return new ReturnValue();
             }
             
@@ -47,7 +47,7 @@ public class VesselLibrary : ILibrary
         {
             if (_computer.vessel.Autopilot.Enabled)
             {
-                _computer.SetStatus("SAS Enabled, cannot do maneuvers", StatusKind.NotGreat);
+                _computer.SetStatus("SAS Enabled, cannot do manual maneuvers", StatusKind.NotGreat);
                 return new ReturnValue();
             }
             
@@ -102,7 +102,43 @@ public class VesselLibrary : ILibrary
             return new ReturnValue();
         }, "string"),
         new Function("get_vertical_speed", "double", _ => new ReturnValue(_computer.vessel.verticalSpeed, "double")),
-        new Function("get_horizontal_speed", "double", _ => new ReturnValue(_computer.vessel.horizontalSrfSpeed, "double"))
+        new Function("get_horizontal_speed", "double", _ => new ReturnValue(_computer.vessel.horizontalSrfSpeed, "double")),
+        new Function("get_deltav", "float", _ =>
+        {
+            int currentStage = _computer.vessel.currentStage;
+            DeltaVStageInfo stageDeltaV = _computer.vessel.VesselDeltaV.GetStage(currentStage);
+            if (stageDeltaV == null)
+                return new ReturnValue(0.0f, "float");
+
+            return new ReturnValue(stageDeltaV.deltaVActual, "float");
+        }),
+        new Function("get_burntime", "double", _ =>
+        {
+            int currentStage = _computer.vessel.currentStage;
+            DeltaVStageInfo stageDeltaV = _computer.vessel.VesselDeltaV.GetStage(currentStage);
+            if (stageDeltaV == null)
+                return new ReturnValue(0.0f, "float");
+
+            return new ReturnValue(stageDeltaV.stageBurnTime, "double");
+        }),
+        new Function("get_stage_mass", "double", _ =>
+        {
+            int currentStage = _computer.vessel.currentStage;
+            DeltaVStageInfo stageDeltaV = _computer.vessel.VesselDeltaV.GetStage(currentStage);
+            if (stageDeltaV == null)
+                return new ReturnValue(_computer.vessel.totalMass, "double"); // TODO: Should we actually do this?
+
+            return new ReturnValue(stageDeltaV.stageMass, "double");
+        }),
+        new Function("get_dry_mass", "double", _ =>
+        {
+            int currentStage = _computer.vessel.currentStage;
+            DeltaVStageInfo stageDeltaV = _computer.vessel.VesselDeltaV.GetStage(currentStage);
+            if (stageDeltaV == null)
+                return new ReturnValue(_computer.vessel.totalMass, "double"); // TODO: Should we actually do this?
+
+            return new ReturnValue(stageDeltaV.dryMass, "double");
+        })
     };
 
     public IEnumerable<GlobalTerm> GlobalTerms { get; }

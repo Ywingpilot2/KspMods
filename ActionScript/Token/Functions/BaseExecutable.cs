@@ -115,6 +115,9 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
         
         foreach (BaseTerm term in BaseTerms.Values)
         {
+            if (_compiledValues.ContainsKey(term.Name))
+                continue;
+            
             _compiledValues.Add(term.Name, term.GetValue());
         }
     }

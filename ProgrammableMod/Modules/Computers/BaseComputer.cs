@@ -4,6 +4,7 @@ using ActionLanguage.Exceptions;
 using ActionLanguage.Extensions;
 using ActionLanguage.Library;
 using ProgrammableMod.Scripting.Library;
+using UniLinq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -50,12 +51,12 @@ public abstract class BaseComputer : PartModule, IComputer
     protected ActionScript Script;
 
     #region Logic
-
+    
     private void Execution(FlightCtrlState state)
     {
         if (tokenContainer.shouldRun && HighLogic.LoadedSceneIsFlight)
         {
-            State = new FlightCtrlState();
+            State = state;
 
             try
             {
@@ -68,18 +69,12 @@ public abstract class BaseComputer : PartModule, IComputer
                 ShouldRun = false;
             }
 
-            if (!vessel.Autopilot.Enabled)
-            {
-                state.CopyFrom(State);
-            }
-            else
-            {
-                if (State.mainThrottle != 0 || state.mainThrottle != 0)
-                {
-                    state.mainThrottle = State.mainThrottle;
-                }
-            }
+            PostExecute();
         }
+    }
+
+    protected virtual void PostExecute()
+    {
     }
 
     public override void OnAwake()
@@ -94,7 +89,7 @@ public abstract class BaseComputer : PartModule, IComputer
         {
             new KerbalLibrary(this),
             new VesselLibrary(this),
-            new ComputerLibrary(ActionCompiler.Library)
+            new ComputerLibrary(ActionCompiler.Library, this)
         };
 
         _compiler = new ActionCompiler(Libraries);
@@ -119,6 +114,7 @@ public abstract class BaseComputer : PartModule, IComputer
     // TODO: We should really move this all into a framework of some kind...
     protected bool DisplayEditor;
     protected bool DisplayPopup;
+    protected bool DisplayLog;
     private void OnGUI()
     {
         if (DisplayEditor && (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight))
@@ -130,17 +126,22 @@ public abstract class BaseComputer : PartModule, IComputer
         {
             _popUpRect = GUILayout.Window(new System.Random(482123452).Next(), _popUpRect, DrawPopUp, "Kerbaton Alert!");
         }
+
+        if (DisplayLog && (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight))
+        {
+            _logWindowRect = GUILayout.Window(new System.Random(752236422).Next(), _logWindowRect, DrawLog, "Computer Log");
+        }
     }
 
     private Rect _codeWindowRect = new(Screen.width / 2, Screen.height / 2, 600, 450);
-    private Vector2 _scrollViewVector = Vector2.zero;
+    private Vector2 _scrollCodeVector = Vector2.zero;
     private string _editorText;
     private void DrawCodeEditor(int winId)
     {
         GUI.DragWindow(new Rect(0,0, 600, 20));
         GUILayout.BeginVertical();
         
-        _scrollViewVector = GUILayout.BeginScrollView(_scrollViewVector);
+        _scrollCodeVector = GUILayout.BeginScrollView(_scrollCodeVector);
 
         _editorText = GUILayout.TextArea(_editorText, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
@@ -153,10 +154,42 @@ public abstract class BaseComputer : PartModule, IComputer
             DisplayEditor = false;
         }
 
-        if (GUILayout.Button("Save")) // TODO: cancel button
+        if (GUILayout.Button("Save"))
         {
             tokenContainer.tokens = _editorText;
             DisplayEditor = false;
+        }
+        
+        GUILayout.EndHorizontal();
+
+        GUILayout.EndVertical();
+    }
+
+    private Rect _logWindowRect = new(Screen.width / 2, Screen.height / 2, 600, 450);
+    private Vector2 _scrollLogVector = Vector2.zero;
+    
+    public string logText;
+    private void DrawLog(int winid)
+    {
+        GUI.DragWindow(new Rect(0,0, 600, 20));
+        GUILayout.BeginVertical();
+        
+        _scrollLogVector = GUILayout.BeginScrollView(_scrollLogVector);
+
+        GUILayout.TextArea(logText, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+
+        GUILayout.EndScrollView();
+
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Clear"))
+        {
+            logText = "";
+        }
+
+        if (GUILayout.Button("Close"))
+        {
+            DisplayLog = false;
         }
         
         GUILayout.EndHorizontal();
@@ -204,6 +237,17 @@ public abstract class BaseComputer : PartModule, IComputer
     {
     }
 
+    private string previous;
+    public virtual void Log(string log)
+    {
+        if (previous == log)
+            return;
+
+        previous = log;
+        TimeSpan time = TimeSpan.FromSeconds(vessel.missionTime);
+        logText += $"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}\n";
+    }
+
     #endregion
     
     #region Compilation
@@ -248,8 +292,17 @@ public abstract class BaseComputer : PartModule, IComputer
     [KSPEvent(active = true, guiActive = true, guiName = "Open Code Editor", guiActiveEditor = true)]
     public void OpenEditor()
     {
-        _editorText = tokenContainer.tokens;
+        if (!DisplayEditor)
+        {
+            _editorText = tokenContainer.tokens;
+        }
         DisplayEditor = true;
+    }
+    
+    [KSPEvent(active = true, guiActive = true, guiName = "Open Log", guiActiveEditor = true)]
+    public void OpenLog()
+    {
+        DisplayLog = true;
     }
 
     #endregion
