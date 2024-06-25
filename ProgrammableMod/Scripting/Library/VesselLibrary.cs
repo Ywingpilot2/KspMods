@@ -8,6 +8,7 @@ using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
 using ActionLanguage.Token.Terms.Literal;
 using CommNet;
+using KSP.UI.Screens;
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Exceptions;
 using UnityEngine;
@@ -19,13 +20,13 @@ public class VesselLibrary : ILibrary
     private BaseComputer _computer;
 
     public string Name => "vessel";
-
+    
     public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
     {
         new Function("set_pitch", "void", terms =>
         {
             if (_computer.vessel.Autopilot.Enabled)
-            {
+            { 
                 _computer.SetStatus("SAS Enabled, cannot do manual maneuvers", StatusKind.NotGreat);
                 return new ReturnValue();
             }
@@ -71,7 +72,7 @@ public class VesselLibrary : ILibrary
             
             if (!_computer.vessel.Autopilot.Enabled)
                 _computer.vessel.Autopilot.Enable();
-            
+
             return new ReturnValue();
         }),
         new Function("disable_sas", "void", _ =>
@@ -133,11 +134,17 @@ public class VesselLibrary : ILibrary
         new Function("get_dry_mass", "double", _ =>
         {
             int currentStage = _computer.vessel.currentStage;
+            
             DeltaVStageInfo stageDeltaV = _computer.vessel.VesselDeltaV.GetStage(currentStage);
             if (stageDeltaV == null)
                 return new ReturnValue(_computer.vessel.totalMass, "double"); // TODO: Should we actually do this?
 
             return new ReturnValue(stageDeltaV.dryMass, "double");
+        }),
+        new Function("next_stage", "void", _ =>
+        {
+            StageManager.ActivateNextStage();
+            return new ReturnValue();
         })
     };
 

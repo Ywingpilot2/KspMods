@@ -7,7 +7,9 @@ using ActionLanguage.Extensions;
 using ActionLanguage.Library;
 using ActionLanguage.Reflection;
 using ActionLanguage.Token;
+using ActionLanguage.Token.Fields;
 using ActionLanguage.Token.Functions;
+using ActionLanguage.Token.Functions.Modifier;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
@@ -96,7 +98,6 @@ public sealed class ActionCompiler
             {
                 TokenCall call = ParseFunctionCall(token, holder);
                 holder.AddCall(call);
-                _currentScript.CallTokens++;
             }
             else if (split.Length == 2)
             {
@@ -174,6 +175,20 @@ public sealed class ActionCompiler
                 holder.AddCall(call);
                 _currentScript.CallTokens++;
             } break;
+            case AssignmentKind.Field:
+            {
+                BaseTerm term = holder.GetTerm(values[0]);
+                TermField field = term.GetField(values[1]);
+                if (!field.Set)
+                    throw new FieldReadOnlyException(CurrentLine, field.Name);
+                
+                Input input = CompileUtils.HandleToken(values[2], field.Value.Type, holder, this);
+                AssignmentCall call = new AssignmentCall(term, field.Name, input, holder, CurrentLine);
+                holder.AddCall(call);
+                _currentScript.CallTokens++;
+            } break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(kind), kind, $"Assignment of {token} was invalid");
         }
     }
 
@@ -183,6 +198,8 @@ public sealed class ActionCompiler
 
     public TokenCall ParseFunctionCall(string token, ITokenHolder holder)
     {
+        _currentScript.CallTokens++;
+        
         // Is this a global or local function?
         TokenKind kind = CompileUtils.GetTokenKind(token, holder);
         if (kind == TokenKind.Function)
@@ -236,7 +253,7 @@ public sealed class ActionCompiler
     {
         List<string> inputs =  ParseCallInputs(prms);
         
-        if (inputs.Count != func.InputTypes.Length && !func.AnyCount)
+        if (inputs.Count != func.InputTypes.Length)
             throw new InvalidParametersException(CurrentLine, func.InputTypes);
 
         // Determine tokens

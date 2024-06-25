@@ -49,6 +49,7 @@ public enum AssignmentKind
     Term = 1,
     Assignment = 2,
     Function = 3,
+    Field = 4
 }
 
 public static class CompileUtils
@@ -120,9 +121,22 @@ public static class CompileUtils
         }
         else
         {
-            string[] term = new string[2];
-            term.SetValue(split[0].Trim(), 0);
-            term.SetValue(split[1].Trim(), 1);
+            string[] term;
+            if (split[0].Contains('.'))
+            {
+                term = new string[3];
+                string[] termField = split[0].SanitizedSplit('.', 2);
+                term.SetValue(termField[0].Trim(), 0);
+                term.SetValue(termField[1].Trim(), 1);
+                
+                term.SetValue(split[1].Trim(), 2);
+            }
+            else
+            {
+                term = new string[2];
+                term.SetValue(split[0].Trim(), 0);
+                term.SetValue(split[1].Trim(), 1);
+            }
 
             return term;
         }
@@ -135,6 +149,15 @@ public static class CompileUtils
         
         if (typeName.Length == 1) // This is assigning an existing variable
         {
+            if (typeName[0].Contains('.'))
+            {
+                string pName = token.SanitizedSplit('.', 2)[0].Trim();
+                if (!holder.HasTerm(pName))
+                    throw new TermNotExistException(0, typeName[0]);
+
+                return AssignmentKind.Field;
+            }
+            
             if (!holder.HasTerm(typeName[0]))
                 throw new TermNotExistException(0, typeName[0]);
 

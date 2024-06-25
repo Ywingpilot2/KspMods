@@ -352,3 +352,28 @@ public class ConstructorNotFoundException : CompilationException
         _sig = sig;
     }
 }
+
+public class FieldReadOnlyException : CompilationException
+{
+    private string _name;
+
+    public override string Message
+    {
+        get
+        {
+            if (_name != null)
+            {
+                return $"Field {_name} called at line {LineNumber} is read only, therefore cannot be assigned a value";
+            }
+            else
+            {
+                return $"Field called at line {LineNumber} is read only, therefore cannot be assigned a value";
+            }
+        }
+    }
+
+    public FieldReadOnlyException(int lineNumber, string name) : base(lineNumber)
+    {
+        _name = name;
+    }
+}

@@ -64,6 +64,7 @@
         <Compile Include="Token\Functions\Function.cs" />
         <Compile Include="Token\Functions\FunctionCall.cs" />
         <Compile Include="Token\Functions\LocalFuncCall.cs" />
+        <Compile Include="Token\Functions\Modifier\AssignmentCall.cs" />
         <Compile Include="Token\Functions\Modifier\CastCall.cs" />
         <Compile Include="Token\Functions\Modifier\FieldCall.cs" />
         <Compile Include="Token\Functions\Operator\BoolOpCall.cs" />
