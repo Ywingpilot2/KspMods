@@ -51,7 +51,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
         
         if (!resHandler.UpdateModuleResourceInputs(ref error, rate, 0.9, true) && ShouldRun)
         {
-            ThrowException("Computer has ran out of power! Any unsaved progress, in progress actions, or other important will be inoperable until computer is turned back on");
+            ThrowException("Computer has ran out of power! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on");
         }
     }
 

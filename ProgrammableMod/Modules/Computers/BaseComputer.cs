@@ -8,6 +8,7 @@ using ProgrammableMod.Scripting.Library;
 using UniLinq;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = System.Random;
 
 namespace ProgrammableMod.Modules.Computers;
 
@@ -74,6 +75,17 @@ public abstract class BaseComputer : PartModule, IComputer
             }
         }
     }
+    
+    private string previous;
+    public virtual void Log(string log)
+    {
+        if (previous == log)
+            return;
+
+        previous = log;
+        TimeSpan time = TimeSpan.FromSeconds(vessel.missionTime);
+        logText += $"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}\n";
+    }
 
     #endregion
 
@@ -96,14 +108,14 @@ public abstract class BaseComputer : PartModule, IComputer
 
         _compiler = new ActionCompiler(Libraries);
         ResetStatus();
-        if (tokenContainer.shouldCompile)
+        if (tokenContainer.shouldCompile || ShouldRun)
         {
             CompileScript();
         }
         
         if (HighLogic.LoadedSceneIsFlight)
         {
-            vessel.OnFlyByWire += Execution;
+            AssignGameEvents();
         }
         
         UpdateButton();
@@ -234,7 +246,7 @@ public abstract class BaseComputer : PartModule, IComputer
 
     #endregion
 
-    #region Events
+    #region Script Events
 
     /// <summary>
     /// Called just before <see cref="Execution"/> is called
@@ -255,26 +267,44 @@ public abstract class BaseComputer : PartModule, IComputer
     {
     }
 
-    private string previous;
-    public virtual void Log(string log)
-    {
-        if (previous == log)
-            return;
+    #endregion
 
-        previous = log;
-        TimeSpan time = TimeSpan.FromSeconds(vessel.missionTime);
-        logText += $"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}\n";
+    #region Game Events
+
+    private void AssignGameEvents()
+    {
+        vessel.OnFlyByWire += Execution;
+        GameEvents.onPartDestroyed.Add(OnBlownUp);
+        GameEvents.onCrash.Add(OnCrash);
     }
 
-    public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
+    private void RemoveGameEvents()
     {
-        DisplayPopup = displayPopup;
-        if (kind == StatusKind.Uhoh)
+        vessel.OnFlyByWire -= Execution;
+        GameEvents.onPartDestroyed.Remove(OnBlownUp);
+    }
+
+    private void OnCrash(EventReport data)
+    {
+        Random rng = new Random();
+        if (rng.Next(0, 100) <= 40)
         {
-            ShouldRun = false;
-            tokenContainer.shouldCompile = false;
+            ThrowException($"Oh no, an unknown error has occured! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {rng.Next(404)}");
         }
-        SetStatus(message, kind);
+    }
+    
+    private void OnBlownUp(Part data)
+    {
+        Random rng = new Random();
+        if (rng.Next(0, 10) <= 5 || data.flightID == part.flightID)
+        {
+            ThrowException($"Oh no, an unknown error has occured! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {rng.Next(404)}");
+        }
+
+        if (data.flightID == part.flightID)
+        {
+            RemoveGameEvents();
+        }
     }
 
     #endregion
@@ -402,6 +432,17 @@ public abstract class BaseComputer : PartModule, IComputer
     #endregion
 
     #region Status
+    
+    public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
+    {
+        DisplayPopup = displayPopup;
+        if (kind == StatusKind.Uhoh)
+        {
+            ShouldRun = false;
+            tokenContainer.shouldCompile = false;
+        }
+        SetStatus(message, kind);
+    }
 
     public void SetStatus(string newStatus, StatusKind kind)
     {
