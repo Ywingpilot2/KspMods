@@ -1,13 +1,13 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using ActionLanguage;
 using JetBrains.Annotations;
 
 namespace ProgrammableMod.Modules.Computers;
 
-public class ComputerModule : BaseComputer
+public class ComputerModule : BaseComputer, IResourceConsumer
 {
-    [KSPField]
-    public float tokenLimit;
+    #region Display
 
     [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Avaliable")] [UsedImplicitly]
     public string tokenField;
@@ -15,11 +15,44 @@ public class ComputerModule : BaseComputer
     [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Used")] [UsedImplicitly]
     public string tokensUsed;
 
-    public override void OnAwake()
+    #endregion
+
+    #region Module Fields
+
+    [KSPField]
+    public float tokenLimit;
+
+    [KSPField]
+    public string requiredResource;
+
+    [KSPField]
+    public string requiredConsumption;
+
+    #endregion
+
+    #region Resource Handling
+
+    private double _consumptionAmount;
+    private List<PartResourceDefinition> _consumedResources; 
+
+    public List<PartResourceDefinition> GetConsumedResources()
     {
-        base.OnAwake();
-        tokenField = tokenLimit.ToString(CultureInfo.CurrentCulture);
-        tokensUsed = "none";
+        return _consumedResources;
+    }
+
+    #endregion
+
+    #region Logic
+
+    protected override void PreExecute()
+    {
+        string error = "";
+        double rate = ShouldRun ? CalculateCost(Script) : 0.0;
+        
+        if (!resHandler.UpdateModuleResourceInputs(ref error, rate, 0.9, true) && ShouldRun)
+        {
+            ThrowException("Computer has ran out of power! Any unsaved progress, in progress actions, or other important will be inoperable until computer is turned back on");
+        }
     }
 
     public override bool ValidateScript(ActionScript script, out string reason)
@@ -36,7 +69,7 @@ public class ComputerModule : BaseComputer
         return true;
     }
 
-    protected float CalculateCost(ActionScript script)
+    private static float CalculateCost(ActionScript script)
     {
         int termCost = script.TermTokens * 5;
         int callCost = script.CallTokens;
@@ -46,8 +79,57 @@ public class ComputerModule : BaseComputer
         return total;
     }
 
-    public override string GetInfo()
+    #endregion
+
+    #region Display
+
+    public override string GetModuleDisplayName() => "Processor Chips";
+
+    public override string GetInfo() => $"State of the art chips with a token limit of {tokenLimit} and consumption rate of {requiredConsumption} {requiredResource} per token.\nNOT FOR EATING!";
+
+    #endregion
+
+    public override void OnAwake()
     {
-        return $"Has a token limit of {tokenLimit}";
+        base.OnAwake();
+        tokenField = tokenLimit.ToString(CultureInfo.CurrentCulture);
+        tokensUsed = "none";
+
+        if (_consumedResources == null)
+            _consumedResources = new List<PartResourceDefinition>();
+        else
+            _consumedResources.Clear();
+
+        for (int i = 0; i < resHandler.inputResources.Count; i++)
+        {
+            _consumedResources.Add(PartResourceLibrary.Instance.GetDefinition(resHandler.inputResources[i].name));
+        }
+    }
+
+    public override void OnStart(StartState state)
+    {
+        base.OnStart(state);
+        
+        if (string.IsNullOrEmpty(requiredResource))
+            requiredResource = "ElectricCharge";
+
+        if (string.IsNullOrEmpty(requiredConsumption))
+            requiredConsumption = "1.0";
+
+        if (!double.TryParse(requiredConsumption, NumberStyles.Float, new NumberFormatInfo(), out _consumptionAmount))
+            _consumptionAmount = 1.0;
+        
+        if (resHandler.inputResources.Count != 0)
+            return;
+
+        ModuleResource resource = new()
+        {
+            name = requiredResource,
+            title = KSPUtil.PrintModuleName(requiredResource),
+            id = requiredResource.GetHashCode(),
+            rate = _consumptionAmount
+        };
+        
+        resHandler.inputResources.Add(resource);
     }
 }

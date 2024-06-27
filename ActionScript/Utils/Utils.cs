@@ -152,11 +152,17 @@ public static class CompileUtils
             if (typeName[0].Contains('.'))
             {
                 string pName = token.SanitizedSplit('.', 2)[0].Trim();
+                if (!NameIsValid(pName, holder))
+                    throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]}");
+                
                 if (!holder.HasTerm(pName))
                     throw new TermNotExistException(0, typeName[0]);
 
                 return AssignmentKind.Field;
             }
+            
+            if (!NameIsValid(typeName[0], holder))
+                throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]}");
             
             if (!holder.HasTerm(typeName[0]))
                 throw new TermNotExistException(0, typeName[0]);
@@ -165,8 +171,9 @@ public static class CompileUtils
         }
         
         string name = typeName[1].Trim();
-        if (InvalidNames.Any(s => name.Contains(s)))
-            throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]} as it contains operators");
+        if (!NameIsValid(name, holder))
+            throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]}");
+        
         TokenKind kind = GetTokenKind(split[1].Trim(), holder);
         return kind switch
         {
@@ -179,6 +186,17 @@ public static class CompileUtils
             TokenKind.Operator => AssignmentKind.Function,
             _ => throw new ArgumentOutOfRangeException()
         };
+    }
+
+    public static bool NameIsValid(string name, ITokenHolder holder)
+    {
+        if (InvalidNames.Any(name.Contains))
+            return false;
+
+        if (holder.GetLibraryManager().HasTermType(name))
+            return false;
+
+        return true;
     }
 
     #endregion

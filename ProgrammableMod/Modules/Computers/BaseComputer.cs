@@ -3,6 +3,7 @@ using ActionLanguage;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Extensions;
 using ActionLanguage.Library;
+using JetBrains.Annotations;
 using ProgrammableMod.Scripting.Library;
 using UniLinq;
 using UnityEngine;
@@ -21,7 +22,7 @@ public abstract class BaseComputer : PartModule, IComputer
 {
     protected ILibrary[] Libraries;
     
-    [KSPField(isPersistant = false, guiActive = true, guiName = "Program Status", guiActiveEditor = true)]
+    [KSPField(isPersistant = false, guiActive = true, guiName = "Program Status", guiActiveEditor = true)] [UsedImplicitly]
     public string status = "Operating";
     
     [KSPField(isPersistant = false, guiActive = false, guiName = "Error")]
@@ -45,37 +46,38 @@ public abstract class BaseComputer : PartModule, IComputer
                 runTime = Time.fixedTime;
             }
             tokenContainer.shouldRun = value;
+            UpdateButton();
         }
     }
     
     protected ActionScript Script;
 
-    #region Logic
-    
+    #region Execution
+
     private void Execution(FlightCtrlState state)
     {
+        OnExecute();
+        
         if (tokenContainer.shouldRun && HighLogic.LoadedSceneIsFlight)
         {
             State = state;
 
             try
             {
+                PreExecute();
                 Script.Execute();
+                PostExecute();
             }
             catch (Exception e)
             {
-                exception = e.Message;
-                DisplayPopup = true;
-                ShouldRun = false;
+                ThrowException(e.Message);
             }
-
-            PostExecute();
         }
     }
 
-    protected virtual void PostExecute()
-    {
-    }
+    #endregion
+
+    #region Logic
 
     public override void OnAwake()
     {
@@ -117,6 +119,9 @@ public abstract class BaseComputer : PartModule, IComputer
     protected bool DisplayLog;
     private void OnGUI()
     {
+        if (!HighLogic.LoadedSceneIsGame)
+            return;
+        
         if (DisplayEditor && (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight))
         {
             _codeWindowRect = GUILayout.Window(new System.Random(23123452).Next(), _codeWindowRect, DrawCodeEditor, "Edit Script");
@@ -204,8 +209,7 @@ public abstract class BaseComputer : PartModule, IComputer
         GUILayout.BeginVertical();
         
         GUILayout.Label("An error has occured! Message:");
-        //GUILayout.BeginArea(new Rect(200, (250 - 20) / 2, 400, 250 - 20)); // TODO: causing weird issues
-        
+
         GUILayout.Label(exception);
 
         GUILayout.BeginHorizontal();
@@ -215,7 +219,6 @@ public abstract class BaseComputer : PartModule, IComputer
             DisplayPopup = false;
             ShouldRun = false;
             tokenContainer.shouldCompile = false;
-            UpdateButton();
         }
         
         if (GUILayout.Button("Continue Execution"))
@@ -233,6 +236,21 @@ public abstract class BaseComputer : PartModule, IComputer
 
     #region Events
 
+    /// <summary>
+    /// Called just before <see cref="Execution"/> is called
+    /// </summary>
+    protected virtual void OnExecute()
+    {
+    }
+
+    protected virtual void PreExecute()
+    {
+    }
+    
+    protected virtual void PostExecute()
+    {
+    }
+
     protected virtual void OnCompiled()
     {
     }
@@ -248,6 +266,17 @@ public abstract class BaseComputer : PartModule, IComputer
         logText += $"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}\n";
     }
 
+    public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
+    {
+        DisplayPopup = displayPopup;
+        if (kind == StatusKind.Uhoh)
+        {
+            ShouldRun = false;
+            tokenContainer.shouldCompile = false;
+        }
+        SetStatus(message, kind);
+    }
+
     #endregion
     
     #region Compilation
@@ -260,10 +289,7 @@ public abstract class BaseComputer : PartModule, IComputer
             ActionScript script = _compiler.Compile(tokenContainer.tokens);
             if (!ValidateScript(script, out string reason))
             {
-                ShouldRun = false;
-                tokenContainer.shouldCompile = false;
-                UpdateButton();
-                SetStatus(reason, StatusKind.Uhoh);
+                ThrowException(reason);
             }
 
             Script = script;
@@ -272,10 +298,7 @@ public abstract class BaseComputer : PartModule, IComputer
         }
         catch (Exception e)
         {
-            ShouldRun = false;
-            tokenContainer.shouldCompile = false;
-            UpdateButton();
-            SetStatus(e.Message, StatusKind.Uhoh);
+            ThrowException(e.Message);
         }
         finally
         {
@@ -311,7 +334,7 @@ public abstract class BaseComputer : PartModule, IComputer
 
     #region Flight
     
-    [KSPAction("Toggle Script")]
+    [KSPAction("Toggle Computer")]
     public void Toggle()
     {
         if (tokenContainer.shouldRun)
@@ -321,33 +344,27 @@ public abstract class BaseComputer : PartModule, IComputer
     }
 
     [KSPEvent(active = true, guiActive = true, guiName = "Start execution")]
-    [KSPAction("Execute Script")]
+    [KSPAction("Turn On")]
     public void Execute()
     {
         ShouldRun = true;
-        UpdateButton();
     }
 
     [KSPEvent(active = false, guiActive = true, guiName = "Stop execution")]
-    [KSPAction("Stop Script")]
+    [KSPAction("Turn Off")]
     public void StopExecuting()
     {
         ShouldRun = false;
-        UpdateButton();
     }
 
     #endregion
 
     #region Editor
 
-    [KSPField(guiActiveEditor = true, guiName = "Execution")]
-    public string execEditorStatus = "Start inactive";
-
     [KSPEvent(guiActiveEditor = true, guiName = "Toggle startup")]
     public void ToggleStart()
     {
         ShouldRun = !ShouldRun;
-        UpdateButton();
     }
 
     #endregion
@@ -371,11 +388,13 @@ public abstract class BaseComputer : PartModule, IComputer
         {
             if (tokenContainer.shouldRun)
             {
-                execEditorStatus = "Start active";
+                Events["ToggleStart"].guiName = "Start On";
+                Events["ToggleStart"].assigned = true;
             }
             else
             {
-                execEditorStatus = "Start inactive";
+                Events["ToggleStart"].guiName = "Start Off";
+                Events["ToggleStart"].assigned = false;
             }
         }
     }
