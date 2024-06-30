@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using ActionLanguage;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Extensions;
 using ActionLanguage.Library;
 using JetBrains.Annotations;
+using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Library;
 using UniLinq;
 using UnityEngine;
@@ -19,7 +23,7 @@ public enum StatusKind
     Uhoh = 2
 }
 
-public abstract class BaseComputer : PartModule, IComputer
+public abstract class BaseComputer : PartModule
 {
     protected ILibrary[] Libraries;
     
@@ -32,6 +36,7 @@ public abstract class BaseComputer : PartModule, IComputer
     [KSPField(isPersistant = true)]
     public TokenContainer tokenContainer;
 
+    [KSPField(isPersistant = true)]
     public float runTime;
 
     internal FlightCtrlState State;
@@ -45,6 +50,7 @@ public abstract class BaseComputer : PartModule, IComputer
             if (value)
             {
                 runTime = Time.fixedTime;
+                ResetStatus();
             }
             tokenContainer.shouldRun = value;
             UpdateButton();
@@ -54,11 +60,11 @@ public abstract class BaseComputer : PartModule, IComputer
     protected ActionScript Script;
 
     #region Execution
-
+    
     private void Execution(FlightCtrlState state)
     {
         OnExecute();
-        
+
         if (tokenContainer.shouldRun && HighLogic.LoadedSceneIsFlight)
         {
             State = state;
@@ -66,8 +72,18 @@ public abstract class BaseComputer : PartModule, IComputer
             try
             {
                 PreExecute();
-                Script.Execute();
+
+                CancellationTokenSource cancel = new CancellationTokenSource();
+                cancel.CancelAfter(80);
+                
+                Parallel.Invoke(new ParallelOptions{CancellationToken = cancel.Token, MaxDegreeOfParallelism = 2}, Script.Execute);
+                cancel.Token.ThrowIfCancellationRequested();
+
                 PostExecute();
+            }
+            catch (OperationCanceledException)
+            {
+                ThrowException("Our engineers typically suggest writing scripts which don't loop forever, so they have shut down the script to prevent such a time paradox.");
             }
             catch (Exception e)
             {
@@ -75,13 +91,18 @@ public abstract class BaseComputer : PartModule, IComputer
             }
         }
     }
-    
+
     private string previous;
+    private int count;
     public virtual void Log(string log)
     {
         if (previous == log)
             return;
 
+        if (count == 250)
+            logText = "";
+
+        count++;
         previous = log;
         TimeSpan time = TimeSpan.FromSeconds(vessel.missionTime);
         logText += $"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}\n";
@@ -286,6 +307,10 @@ public abstract class BaseComputer : PartModule, IComputer
 
     private void OnCrash(EventReport data)
     {
+        // not our crash
+        if (data.origin.missionID != part.missionID)
+            return;
+        
         Random rng = new Random();
         if (rng.Next(0, 100) <= 40)
         {
@@ -465,6 +490,11 @@ public abstract class BaseComputer : PartModule, IComputer
                 UpdateException(StatusKind.Exceptional);
             } break;
         }
+
+        if (!string.IsNullOrEmpty(newStatus))
+        {
+            Log($"Status update: {newStatus}");
+        }
     }
 
     private void UpdateException(StatusKind kind)
@@ -516,7 +546,7 @@ public class TokenContainer : IConfigNode
             {
                 if (node.HasValue($"script-line{i}"))
                 {
-                    tokens += $"{node.GetValue($"script-line{i}").SanitizedReplace("|[|", "{").SanitizedReplace("|]|","}")}\n";
+                    tokens += $"{Dirty(node.GetValue($"script-line{i}"))}\n";
                 }
             }
         }
@@ -538,7 +568,7 @@ public class TokenContainer : IConfigNode
         node.AddValue("script-length", lines.Length);
         for (int i = 0; i < lines.Length; i++)
         {
-            node.AddValue($"script-line{i}", lines[i].Trim().SanitizedReplace("{", "|{|").SanitizedReplace("}", "|}|"));
+            node.AddValue($"script-line{i}", Clean(lines[i]));
         }
 
         if (shouldCompile)
@@ -551,4 +581,8 @@ public class TokenContainer : IConfigNode
             node.AddValue("script-startup", "");
         }
     }
+
+    private string Clean(string dirty) => dirty.Trim().SanitizedReplace("{", "|{|").SanitizedReplace("}", "|}|").SanitizedReplace("\t", "|t|");
+
+    private string Dirty(string clean) => clean.SanitizedReplace("|[|", "{").SanitizedReplace("|]|", "}").SanitizedReplace("|t|", "\t");
 }

@@ -93,8 +93,10 @@ public class UserFunction : BaseExecutable, IFunction
         {
             if (call is ReturnCall)
                 return call.Call();
-                
+            
+            call.PreExecution();
             ReturnValue returnValue = call.Call();
+            call.PostExecution();
 
             if (returnValue.HasValue)
             {

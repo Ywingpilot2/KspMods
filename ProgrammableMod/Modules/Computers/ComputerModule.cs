@@ -58,13 +58,13 @@ public class ComputerModule : BaseComputer, IResourceConsumer
     public override bool ValidateScript(ActionScript script, out string reason)
     {
         float total = CalculateCost(script);
-        tokensUsed = total.ToString(CultureInfo.CurrentCulture);
         if (total > tokenLimit)
         {
             reason = $"Token limit surpassed! Current cost: {total}";
             return false;
         }
         
+        tokensUsed = total.ToString(CultureInfo.CurrentCulture);
         reason = "working";
         return true;
     }

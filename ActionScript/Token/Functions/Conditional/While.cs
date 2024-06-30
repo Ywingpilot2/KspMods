@@ -70,7 +70,9 @@ public class WhileFunction : BaseExecutable
                 
                 // TODO HACK: In order to break when in lower functions, lower functions(e.g ifs) return a break/continue up the chain
                 // This is annoying. We should find a better system asap!
+                call.PreExecution();
                 ReturnValue returnValue = call.Call();
+                call.PostExecution();
                 if (returnValue.HasValue)
                 {
                     if (returnValue.Value is BreakCall)
@@ -96,8 +98,10 @@ public class WhileFunction : BaseExecutable
 
     public override void PostCompilation()
     {
+        if (!HasCompiled)
+            _condition.PostCompilation();
+        
         base.PostCompilation();
-        _condition.PostCompilation();
     }
 
     public WhileFunction(Input condition, ITokenHolder holder) : base(holder)

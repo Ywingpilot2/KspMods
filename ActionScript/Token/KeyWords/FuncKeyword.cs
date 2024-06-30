@@ -19,6 +19,7 @@ public struct FuncKeyword : IKeyword
         _script = script;
         UserFunction function = ParseFunction(token);
         _script.AddFunc(function);
+        ParseFunctionTokens(token, function);
     }
     
     public UserFunction ParseFunction(string token)
@@ -43,8 +44,6 @@ public struct FuncKeyword : IKeyword
         }
 
         UserFunction function = new UserFunction(_script, name, returnType, inputMapping);
-
-        ParseFunctionTokens(token, function);
 
         return function;
     }

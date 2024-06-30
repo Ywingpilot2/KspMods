@@ -19,3 +19,12 @@ public class ControlLostException : ExecutionException
     {
     }
 }
+
+public class TooSlowException : ExecutionException
+{
+    public override string Message => "Our engineers typically suggest writing scripts which don't loop forever, so they have shut down the script to prevent such a time paradox.";
+
+    public TooSlowException(int lineNumber) : base(lineNumber)
+    {
+    }
+}

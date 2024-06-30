@@ -81,7 +81,6 @@
     <ItemGroup>
         <Compile Include="Modules\Computers\BaseComputer.cs" />
         <Compile Include="Modules\Computers\ComputerModule.cs" />
-        <Compile Include="Modules\Computers\IComputer.cs" />
         <Compile Include="Modules\Test\GuiTestModule.cs" />
         <Compile Include="Modules\Test\ThrottleTest.cs" />
         <Compile Include="Scripting\Exceptions\ExecutionException.cs" />

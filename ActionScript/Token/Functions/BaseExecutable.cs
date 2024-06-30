@@ -91,23 +91,19 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
         {
             term.SetValue(_compiledValues[term.Name]);
         }
-
-        foreach (TokenCall call in Calls)
-        {
-            call.PreExecution();
-        }
     }
 
     public virtual void PostExecution()
     {
-        foreach (TokenCall call in Calls)
-        {
-            call.PostExecution();
-        }
     }
 
+    protected bool HasCompiled;
     public virtual void PostCompilation()
     {
+        if (HasCompiled)
+            return;
+        HasCompiled = true;
+        
         foreach (TokenCall call in Calls)
         {
             call.PostCompilation();
