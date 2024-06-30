@@ -296,7 +296,6 @@ public abstract class BaseComputer : PartModule
     {
         vessel.OnFlyByWire += Execution;
         GameEvents.onPartDestroyed.Add(OnBlownUp);
-        GameEvents.onCrash.Add(OnCrash);
     }
 
     private void RemoveGameEvents()
@@ -305,21 +304,12 @@ public abstract class BaseComputer : PartModule
         GameEvents.onPartDestroyed.Remove(OnBlownUp);
     }
 
-    private void OnCrash(EventReport data)
-    {
-        // not our crash
-        if (data.origin.missionID != part.missionID)
-            return;
-        
-        Random rng = new Random();
-        if (rng.Next(0, 100) <= 40)
-        {
-            ThrowException($"Oh no, an unknown error has occured! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {rng.Next(404)}");
-        }
-    }
-    
     private void OnBlownUp(Part data)
     {
+        // not our crash
+        if (data.missionID != part.missionID)
+            return;
+        
         Random rng = new Random();
         if (rng.Next(0, 10) <= 5 || data.flightID == part.flightID)
         {
