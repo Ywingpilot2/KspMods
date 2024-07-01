@@ -15,7 +15,7 @@ public class ExecutionException : ActionException
 public class InvalidActionException : ExecutionException
 {
     private string _message;
-    public override string Message => _message ?? $"An action script has encountered an error at {LineNumber}!";
+    public override string Message => $"Invalid action conducted at {LineNumber}, {_message}";
 
     public InvalidActionException(int lineNumber, string message) : base(lineNumber)
     {

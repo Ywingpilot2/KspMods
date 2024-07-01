@@ -1,4 +1,5 @@
 ﻿using System;
+using ActionLanguage.Exceptions;
 using ProgrammableMod.Modules.Computers;
 using UniLinq;
 using UnityEngine;
@@ -11,7 +12,8 @@ namespace ProgrammableMod.Scripting.Terms.Vessel;
 public class MylStagingManager
 {
     private BaseComputer _computer;
-    public int CurrentStage => _computer.vessel.currentStage;
+
+    #region Current stage info
 
     public double CurrentStageMass() => GetStageMass(_computer.vessel.currentStage);
     public double CurrentDryMass() => GetStageDryMass(_computer.vessel.currentStage);
@@ -19,8 +21,15 @@ public class MylStagingManager
     public float GetCurrentDeltaV() => GetStageDeltaV(_computer.vessel.currentStage);
     public double GetCurrentBurnTime() => GetStageBurnTime(_computer.vessel.currentStage);
 
+    #endregion
+
+    #region Stage Info
+
     public MylStageInfo GetStage(int stage)
     {
+        if (!ValidateStage(stage))
+            stage = 0;
+        
         if (_computer.vessel.VesselDeltaV.OperatingStageInfo.ElementAtOrDefault(stage) == null)
             return new MylStageInfo();
         
@@ -30,6 +39,9 @@ public class MylStagingManager
 
     private double GetStageBurnTime(int stage)
     {
+        if (!ValidateStage(stage))
+            stage = 0;
+        
         DeltaVStageInfo info = _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
         if (info == null)
             return 0.0f;
@@ -39,6 +51,9 @@ public class MylStagingManager
 
     private float GetStageDeltaV(int stage)
     {
+        if (!ValidateStage(stage))
+            stage = 0;
+        
         DeltaVStageInfo info = _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
         if (info == null)
             return 0.0f;
@@ -48,6 +63,9 @@ public class MylStagingManager
     
     private double GetStageMass(int stage)
     {
+        if (!ValidateStage(stage))
+            stage = 0;
+        
         DeltaVStageInfo info = _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
         if (info == null)
             return _computer.vessel.totalMass;
@@ -57,12 +75,17 @@ public class MylStagingManager
 
     private double GetStageDryMass(int stage)
     {
+        if (!ValidateStage(stage))
+            stage = 0;
+        
         DeltaVStageInfo info = _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
         if (info == null)
             return _computer.vessel.totalMass;
 
         return info.dryMass;
     }
+
+    #endregion
 
     public MylStageInfo NextStage()
     {
@@ -77,7 +100,23 @@ public class MylStagingManager
 
         return info;
     }
-    
+
+    public bool ValidateStage(int stage)
+    {
+        if (stage == -1)
+            return false;
+
+        if (_computer.vessel.VesselDeltaV.OperatingStageInfo.ElementAtOrDefault(stage) == null)
+        {
+            return false;
+        }
+
+        if (_computer.vessel.VesselDeltaV.OperatingStageInfo.Count == 0)
+            throw new InvalidActionException(0, "Vessel has no stages");
+
+        return true;
+    }
+
     public MylStagingManager(BaseComputer computer)
     {
         _computer = computer;
