@@ -270,7 +270,7 @@ public abstract class BaseComputer : PartModule
 
         GUILayout.BeginHorizontal();
 
-        if (HighLogic.LoadedSceneIsFlight && ShouldRun)
+        if (executionException)
         {
             if (GUILayout.Button("Break Execution"))
             {
@@ -482,12 +482,14 @@ public abstract class BaseComputer : PartModule
     #endregion
 
     #region Status
-    
+
+    private bool executionException = false;
     public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
     {
         DisplayPopup = displayPopup;
         if (kind == StatusKind.Uhoh)
         {
+            executionException = ShouldRun;
             ShouldRun = false;
             tokenContainer.shouldCompile = false;
         }
