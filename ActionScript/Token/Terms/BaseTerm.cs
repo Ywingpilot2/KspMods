@@ -292,7 +292,7 @@ public abstract class BaseTerm : IToken
 
     public virtual object ConductMath(MathOperatorKind kind, BaseTerm subject)
     {
-        throw new NotImplementedException("This term does not support any operators");
+        throw new NotImplementedException($"{ValueType} does not support any operators");
     }
 
     #endregion
@@ -329,7 +329,7 @@ public abstract class BaseTerm : IToken
 
     public virtual bool ConductBoolOp(BoolOperatorKind kind, BaseTerm subject)
     {
-        throw new NotImplementedException("This term does not support any operators");
+        throw new NotImplementedException($"{ValueType} term does not support any operators");
     }
 
     #endregion
@@ -345,7 +345,7 @@ public abstract class BaseTerm : IToken
     /// <returns>A bool indicating whether the operation was a success. If false a <see cref="CompilationException"/> will be thrown</returns>
     public virtual bool Parse(string value)
     {
-        throw new NotImplementedException();
+        throw new InvalidActionException(0, $"{ValueType} can't parse {value} as a literal");
     }
 
     public abstract bool SetValue(object value);

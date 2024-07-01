@@ -64,8 +64,25 @@ public sealed class ActionCompiler
             catch (ActionException e)
             {
                 if (e.LineNumber == 0)
-                    e.LineNumber = _currentLine;
+                    e.LineNumber = CurrentLine;
                 throw;
+            }
+            catch (AggregateException e)
+            {
+                if (e.InnerException != null && e.InnerExceptions.Count == 1)
+                    throw new InvalidCompilationException(CurrentLine, e.InnerException.Message);
+
+                string errors = "\n";
+                foreach (Exception innerException in e.InnerExceptions)
+                {
+                    errors += innerException.Message;
+                }
+
+                throw new InvalidCompilationException(CurrentLine, errors);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidCompilationException(CurrentLine, e.Message);
             }
 #endif
             finally

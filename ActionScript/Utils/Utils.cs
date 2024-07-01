@@ -184,7 +184,7 @@ public static class CompileUtils
             TokenKind.LocalFunc => AssignmentKind.Function,
             TokenKind.SpecialFunc => AssignmentKind.Function,
             TokenKind.Operator => AssignmentKind.Function,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported equality operator ")
         };
     }
 
@@ -277,7 +277,7 @@ public static class CompileUtils
                         return new Input(holder, call);
                     }
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new InvalidActionException(0, $"{kind} is not a supported call");
                 }
             }
             case TokenKind.Operator:
@@ -300,7 +300,7 @@ public static class CompileUtils
                         return new Input(holder, HandleBoolOperation(token, op, holder, compiler));
                     }
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new InvalidActionException(0, $"{kind} is not a supported operator ");
                 }
             }
             case TokenKind.LocalField:
@@ -313,7 +313,7 @@ public static class CompileUtils
                 return new Input(holder, call);
             }
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new InvalidActionException(0, $"Could not determine the kind of token \"{token}\" is, are you sure its a valid?");
         }
     }
     
@@ -488,7 +488,7 @@ public static class CompileUtils
                         return type;
                     }
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new InvalidActionException(0, $"{kind} is not a supported call");
                 }
             }
             case TokenKind.Operator:
@@ -508,7 +508,7 @@ public static class CompileUtils
                     case OperatorKind.Bool:
                         return holder.GetLibraryManager().GetTermType("bool"); // TODO: Actually check the type lol
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new InvalidActionException(0, $"{kind} is not a supported operator");
                 }
             }
             case TokenKind.LocalField:
@@ -516,7 +516,7 @@ public static class CompileUtils
                 return GetTypeFromField(token, holder);
             }
             default:
-                throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+                throw new InvalidActionException(0, $"Could not determine the kind of token \"{token}\" is, are you sure its a valid?");
         }
     }
 
@@ -557,7 +557,7 @@ public static class CompileUtils
             MathOperatorKind.Divide => '/',
             MathOperatorKind.Power => '^',
             MathOperatorKind.Remaining => '%',
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported operator")
         };
     }
 
@@ -610,7 +610,7 @@ public static class CompileUtils
             ComparisonOperatorKind.GreaterEqual => ">=",
             ComparisonOperatorKind.Lesser => "<",
             ComparisonOperatorKind.LesserEqual => "<=",
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported operator")
         };
     }
 
@@ -643,7 +643,7 @@ public static class CompileUtils
         {
             BoolOperatorKind.And => "&&",
             BoolOperatorKind.Or => "||",
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported operator")
         };
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using ActionLanguage.Exceptions;
 using ActionLanguage.Library;
 using ActionLanguage.Reflection;
 using ActionLanguage.Token.Functions;
@@ -118,7 +119,7 @@ public class NumberTerm : BaseTerm
                 return Convert.ChangeType(a / b, NumberType);
             }
             default:
-                throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+                throw new InvalidActionException(0, $"{kind} is not a supported math operator for {ValueType}");
         }
     }
 
@@ -250,7 +251,7 @@ public class TermI : NumberTerm
             MathOperatorKind.Or => a | b,
             MathOperatorKind.Power => a ^ b,
             MathOperatorKind.Remaining => a % b,
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported math operator for {ValueType}")
         };
     }
 
@@ -271,7 +272,7 @@ public class TermI : NumberTerm
             ComparisonOperatorKind.GreaterEqual => a >= b,
             ComparisonOperatorKind.Lesser => a < b,
             ComparisonOperatorKind.LesserEqual => a <= b,
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported equality operator for {ValueType}")
         };
     }
 
@@ -345,7 +346,7 @@ public class TermF : NumberTerm
                 return Convert.ChangeType(a / b, NumberType);
             }
             default:
-                throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+                throw new InvalidActionException(0, $"{kind} is not a supported math operator for {ValueType}");
         }
     }
 
@@ -366,7 +367,7 @@ public class TermF : NumberTerm
             ComparisonOperatorKind.GreaterEqual => a >= b,
             ComparisonOperatorKind.Lesser => a < b,
             ComparisonOperatorKind.LesserEqual => a <= b,
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported equality operator for {ValueType}")
         };
     }
 
@@ -435,7 +436,7 @@ public class TermU : NumberTerm
             MathOperatorKind.Or => a | b,
             MathOperatorKind.Power => a ^ b,
             MathOperatorKind.Remaining => a % b,
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported equality operator for {ValueType}")
         };
     }
 
@@ -456,7 +457,7 @@ public class TermU : NumberTerm
             ComparisonOperatorKind.GreaterEqual => a >= b,
             ComparisonOperatorKind.Lesser => a < b,
             ComparisonOperatorKind.LesserEqual => a <= b,
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported equality operator for {ValueType}")
         };
     }
 
@@ -509,7 +510,7 @@ public class TermD : NumberTerm
             ComparisonOperatorKind.GreaterEqual => a >= b,
             ComparisonOperatorKind.Lesser => a < b,
             ComparisonOperatorKind.LesserEqual => a <= b,
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            _ => throw new InvalidActionException(0, $"{kind} is not a supported equality operator for {ValueType}")
         };
     }
 

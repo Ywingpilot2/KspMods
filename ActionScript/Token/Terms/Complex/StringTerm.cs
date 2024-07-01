@@ -68,7 +68,7 @@ public sealed class StringTerm : BaseTerm
         }
         else
         {
-            throw new InvalidTermCastException(Line); // TODO: Get the current executing line
+            throw new InvalidTermCastException(0);
         }
     }
 
@@ -80,7 +80,7 @@ public sealed class StringTerm : BaseTerm
         }
         else
         {
-            throw new InvalidTermCastException(Line); // TODO: Get the current executing line
+            throw new InvalidTermCastException(0);
         }
     }
 
@@ -92,7 +92,7 @@ public sealed class StringTerm : BaseTerm
         }
         else
         {
-            throw new InvalidTermCastException(Line); // TODO: Get the current executing line
+            throw new InvalidTermCastException(0);
         }
     }
 

@@ -119,18 +119,31 @@ public sealed class ActionScript : ITokenHolder
 #if DEBUG
             finally{} // I am too lazy to remove the try catch entirely when on debug
 #else
-catch (ActionException e)
+            catch (ActionException e)
+            {
+                if (e.LineNumber == 0)
                 {
-                    if (e.LineNumber == 0)
-                    {
-                        e.LineNumber = functionCall.Line;
-                    }
-                    throw;
+                    e.LineNumber = functionCall.Line;
                 }
-                catch (Exception e)
+                throw;
+            }
+            catch (AggregateException e)
+            {
+                if (e.InnerException != null && e.InnerExceptions.Count == 1)
+                    throw new InvalidActionException(CurrentLine, e.InnerException.Message);
+
+                string errors = "\n";
+                foreach (Exception innerException in e.InnerExceptions)
                 {
-                    throw new InvalidActionException(functionCall.Line, $"Internal error occured at {functionCall.Line}: \n{e.Message}\n{e.StackTrace}");
+                    errors += innerException.Message;
                 }
+
+                throw new InvalidActionException(CurrentLine, errors);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidActionException(functionCall.Line, e.Message);
+            }
 #endif
         }
     }

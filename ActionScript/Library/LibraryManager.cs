@@ -126,7 +126,9 @@ public class LibraryManager
 
     public ILibrary GetLibrary(string name)
     {
-        // TODO: Throw CompilationException if not found
+        if (!_libraries.ContainsKey(name))
+            throw new InvalidCompilationException(0,
+                $"Library of name {name} does not exist, are you sure you spelt it correctly?");
         return _libraries[name];
     }
 
