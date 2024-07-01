@@ -83,7 +83,7 @@ public abstract class BaseTerm : IToken
             object b = terms[1].GetValue();
             return new ReturnValue(a.Equals(b), "bool");
         }),
-        new Function("to-string", "string", terms =>
+        new Function("to_string", "string", terms =>
         {
             if (terms[0].CanImplicitCastToStr)
             {

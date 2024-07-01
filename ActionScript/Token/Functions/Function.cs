@@ -150,6 +150,6 @@ public class UserFunction : BaseExecutable, IFunction
 
     public override bool HasTerm(string name)
     {
-        return BaseTerms.ContainsKey(name);
+        return BaseTerms.ContainsKey(name) || GetLibraryManager().HasGlobalTerm(name);
     }
 }

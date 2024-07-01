@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using ActionLanguage;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Library;
+using ActionLanguage.Reflection;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
@@ -11,6 +13,7 @@ using CommNet;
 using KSP.UI.Screens;
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Exceptions;
+using ProgrammableMod.Scripting.Terms.Vessel;
 using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Library;
@@ -21,8 +24,8 @@ public class VesselLibrary : ILibrary
 
     public string Name => "vessel";
     
-    public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
-    {
+    public IEnumerable<IFunction> GlobalFunctions { get; }
+   /*{
         new Function("set_pitch", "void", terms =>
         {
             if (_computer.vessel.Autopilot.Enabled)
@@ -60,7 +63,6 @@ public class VesselLibrary : ILibrary
             _computer.State.mainThrottle = Mathf.Clamp(terms[0].CastToFloat(), 0.0F, 1.0F);
             return new ReturnValue();
         }, "float"),
-        new Function("get_start", "float", _ => new ReturnValue(_computer.runTime, "float")),
         new Function("get_angular_velocity", "vec3", _ => new ReturnValue(_computer.vessel.angularVelocity, "vec3")),
         new Function("get_surf_velocity", "vec3", _ => new ReturnValue(_computer.vessel.srf_velocity, "vec3")),
         new Function("get_accel", "vec3", _ => new ReturnValue(_computer.vessel.acceleration, "vec3")),
@@ -144,9 +146,10 @@ public class VesselLibrary : ILibrary
         new Function("next_stage", "void", _ =>
         {
             StageManager.ActivateNextStage();
+            
             return new ReturnValue();
         })
-    };
+    };*/ 
 
     public IEnumerable<GlobalTerm> GlobalTerms { get; }
     public IEnumerable<IKeyword> Keywords { get; }
@@ -155,5 +158,17 @@ public class VesselLibrary : ILibrary
     public VesselLibrary(BaseComputer computer)
     {
         _computer = computer;
+        TypeLibrary = new TypeLibrary();
+
+        TermType baseType = ActionCompiler.Library.TypeLibrary.GetTermType("term", 0);
+        TypeLibrary.AddTermType(new TermType(new VesselTerm(), baseType));
+        TypeLibrary.AddTermType(new TermType(new StagingTerm(), baseType));
+        TypeLibrary.AddTermType(new TermType(new StageInfoTerm(), baseType));
+        TypeLibrary.AddTermType(new TermType(new SASTerm(), baseType));
+
+        GlobalTerms = new[]
+        {
+            new GlobalTerm(new VesselTerm { Name = "VESSEL", Computer = computer, Kind = TermKind.Class })
+        };
     }
 }

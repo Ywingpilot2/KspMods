@@ -36,7 +36,8 @@ public class ComputerLibrary : ILibrary
             ScreenMessages.PostScreenMessage(terms[0].CastToStr(), 0.5f,
                 ScreenMessageStyle.UPPER_LEFT);
             return new ReturnValue();
-        }, "string")
+        }, "string"),
+        new Function("get_start", "float", _ => new ReturnValue(_computer.runTime, "float")),
     };
     public IEnumerable<GlobalTerm> GlobalTerms { get; }
     public IEnumerable<IKeyword> Keywords { get; }

@@ -227,9 +227,11 @@ public sealed class ActionCompiler
 
     private LocalCall ParseLocalCall(string token, ITokenHolder holder)
     {
-        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
+        string noPrms = token.SanitizeParenthesis();
+
+        string[] split = token.SplitAt(noPrms.LastIndexOf('.'), 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
         string termToken = split[0].Trim();
-        string[] funcToken = split[1].Trim().SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
+        string[] funcToken = split[1].Trim().Remove(0,1).SanitizedSplit('(', 2, StringSplitOptions.RemoveEmptyEntries);
 
         TermType type = CompileUtils.GetTypeFromToken(termToken, holder, CompileUtils.GetTokenKind(termToken, holder));
         Input term = CompileUtils.HandleToken(termToken, type.Name, holder, this);
@@ -239,10 +241,7 @@ public sealed class ActionCompiler
         prms = prms.Remove(prms.Length - 1);
 
         IFunction func = type.GetFunction(name);
-        List<Input> inputTokens = new List<Input>()
-        {
-            term
-        };
+        List<Input> inputTokens = new List<Input>();
         
         inputTokens.AddRange(ParseInputTokens(prms, func, holder));
 

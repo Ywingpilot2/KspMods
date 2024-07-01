@@ -49,6 +49,9 @@
             <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
             <Private>false</Private>
         </Reference>
+        <Reference Include="UnityEngine.AudioModule">
+          <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
             <Private>false</Private>
@@ -87,9 +90,15 @@
         <Compile Include="Scripting\Library\ComputerLibrary.cs" />
         <Compile Include="Scripting\Library\KerbalLibrary.cs" />
         <Compile Include="Scripting\Library\VesselLibrary.cs" />
+        <Compile Include="Scripting\Terms\BaseVesselTerm.cs" />
         <Compile Include="Scripting\Terms\Graphmatics\PiecewiseCurve.cs" />
+        <Compile Include="Scripting\Terms\KerbNet\KerbNetTerm.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec2Term.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec3Term.cs" />
+        <Compile Include="Scripting\Terms\Vessel\SASTerm.cs" />
+        <Compile Include="Scripting\Terms\Vessel\StagingManager.cs" />
+        <Compile Include="Scripting\Terms\Vessel\StagingTerm.cs" />
+        <Compile Include="Scripting\Terms\Vessel\VesselTerm.cs" />
         <Compile Include="SuperComputer.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

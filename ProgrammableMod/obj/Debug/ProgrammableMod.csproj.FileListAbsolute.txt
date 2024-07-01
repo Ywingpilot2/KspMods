@@ -74,3 +74,4 @@ C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\Gam
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\ActionScript.dll
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\ActionScript.pdb
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\obj\Debug\ProgrammableMod.csproj.CopyComplete
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\UnityEngine.AudioModule.dll

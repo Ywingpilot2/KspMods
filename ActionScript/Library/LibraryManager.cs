@@ -115,7 +115,11 @@ public class LibraryManager
         {
             foreach (GlobalTerm globalTerm in library.GlobalTerms)
             {
-                _globals.Add(globalTerm.Name, GetTermType(globalTerm.TypeName).Construct(globalTerm.Name, 0, this));
+                BaseTerm term = GetTermType(globalTerm.TypeName).Construct(globalTerm.Name, 0, this);
+                if (globalTerm.Source != null)
+                    term.CopyFrom(globalTerm.Source);
+                
+                _globals.Add(globalTerm.Name, term);
             }
         }
     }

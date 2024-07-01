@@ -75,15 +75,35 @@ public abstract class BaseComputer : PartModule
 
                 CancellationTokenSource cancel = new CancellationTokenSource();
                 cancel.CancelAfter(80);
-                
-                Parallel.Invoke(new ParallelOptions{CancellationToken = cancel.Token, MaxDegreeOfParallelism = 2}, Script.Execute);
+
+                Parallel.Invoke(new ParallelOptions { CancellationToken = cancel.Token, MaxDegreeOfParallelism = 2 },
+                    Script.Execute);
                 cancel.Token.ThrowIfCancellationRequested();
 
                 PostExecute();
             }
             catch (OperationCanceledException)
             {
-                ThrowException("Our engineers typically suggest writing scripts which don't loop forever, so they have shut down the script to prevent such a time paradox.");
+                ThrowException(
+                    "Our engineers typically suggest writing scripts which don't loop forever, so they have shut down the script to prevent such a time paradox.");
+            }
+            catch (AggregateException e)
+            {
+                if (e.InnerExceptions.Count == 1 && e.InnerException != null)
+                {
+                    ThrowException(e.InnerException.Message);
+                }
+                else
+                {
+                    string error = "Big problem, multiple errors have occured! The errors:\n";
+                    
+                    foreach (Exception innerException in e.InnerExceptions)
+                    {
+                        error += innerException.Message;
+                    }
+                    
+                    ThrowException(error);
+                }
             }
             catch (Exception e)
             {
@@ -92,18 +112,21 @@ public abstract class BaseComputer : PartModule
         }
     }
 
-    private string previous;
-    private int count;
+    private string _previous;
+    private int _count;
     public virtual void Log(string log)
     {
-        if (previous == log)
+        if (_previous == log)
             return;
 
-        if (count == 250)
+        if (_count == 250)
+        {
             logText = "";
+            _count = 0;
+        }
 
-        count++;
-        previous = log;
+        _count++;
+        _previous = log;
         TimeSpan time = TimeSpan.FromSeconds(vessel.missionTime);
         logText += $"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}\n";
     }
@@ -122,7 +145,7 @@ public abstract class BaseComputer : PartModule
     {
         Libraries = new ILibrary[]
         {
-            new KerbalLibrary(this),
+            new KerbalLibrary(this, ActionCompiler.Library),
             new VesselLibrary(this),
             new ComputerLibrary(ActionCompiler.Library, this)
         };
@@ -133,7 +156,7 @@ public abstract class BaseComputer : PartModule
         {
             CompileScript();
         }
-        
+
         if (HighLogic.LoadedSceneIsFlight)
         {
             AssignGameEvents();
@@ -157,17 +180,17 @@ public abstract class BaseComputer : PartModule
         
         if (DisplayEditor && (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight))
         {
-            _codeWindowRect = GUILayout.Window(new System.Random(23123452).Next(), _codeWindowRect, DrawCodeEditor, "Edit Script");
+            _codeWindowRect = GUILayout.Window(new Random(23123452).Next(), _codeWindowRect, DrawCodeEditor, "Edit Script");
         }
         
         if (DisplayPopup && (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor))
         {
-            _popUpRect = GUILayout.Window(new System.Random(482123452).Next(), _popUpRect, DrawPopUp, "Kerbaton Alert!");
+            _popUpRect = GUILayout.Window(new Random(482123452).Next(), _popUpRect, DrawPopUp, "Kerbaton Alert!");
         }
 
         if (DisplayLog && (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight))
         {
-            _logWindowRect = GUILayout.Window(new System.Random(752236422).Next(), _logWindowRect, DrawLog, "Computer Log");
+            _logWindowRect = GUILayout.Window(new Random(752236422).Next(), _logWindowRect, DrawLog, "Computer Log");
         }
     }
 
@@ -247,19 +270,31 @@ public abstract class BaseComputer : PartModule
 
         GUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Break Execution"))
+        if (HighLogic.LoadedSceneIsFlight && ShouldRun)
         {
-            DisplayPopup = false;
-            ShouldRun = false;
-            tokenContainer.shouldCompile = false;
-        }
+            if (GUILayout.Button("Break Execution"))
+            {
+                DisplayPopup = false;
+                ShouldRun = false;
+                tokenContainer.shouldCompile = false;
+            }
         
-        if (GUILayout.Button("Continue Execution"))
+            if (GUILayout.Button("Continue Execution"))
+            {
+                DisplayPopup = false;
+                ShouldRun = true;
+            }
+        }
+        else
         {
-            DisplayPopup = false;
-            ShouldRun = true;
+            if (GUILayout.Button("OK"))
+            {
+                DisplayPopup = false;
+                ShouldRun = false;
+                tokenContainer.shouldCompile = false;
+            }
         }
-        
+
         GUILayout.EndHorizontal();
         
         GUILayout.EndVertical();
@@ -307,7 +342,7 @@ public abstract class BaseComputer : PartModule
     private void OnBlownUp(Part data)
     {
         // not our crash
-        if (data.missionID != part.missionID)
+        if (data.missionID != part.missionID || data.isVesselEVA)
             return;
         
         Random rng = new Random();

@@ -31,11 +31,7 @@ public class EnumeratorTerm : BaseTerm
             Value.GetEnumerator().Reset();
             return new ReturnValue();
         });
-        yield return new Function("get_current", "term", terms =>
-        {
-            EnumeratorTerm term = (EnumeratorTerm)terms[0];
-            return new ReturnValue(term.Value.GetEnumerator().Current, term.ContainedType);
-        });
+        yield return new Function("get_current", "term", terms => new ReturnValue(Value.GetEnumerator().Current, ContainedType));
     }
 
     #endregion

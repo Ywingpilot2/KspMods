@@ -28,38 +28,27 @@ public sealed class StringTerm : BaseTerm
     #endregion
 
     #region Functions
-
-    private readonly IEnumerable<IFunction> _functions = new IFunction[]
+    
+    public override IEnumerable<IFunction> GetFunctions()
     {
-        new Function("upper", "string", terms => new ReturnValue(terms[0].CastToStr().ToUpper(), "string")),
-        new Function("lower", "string", terms => new ReturnValue(terms[0].CastToStr().ToLower(), "string")),
-        new Function("remove", "string", inputTypes: "string", action: terms =>
-        {
-            BaseTerm ths = terms[0];
-            BaseTerm remove = terms[1];
+        foreach (IFunction function in base.GetFunctions()) yield return function;
 
-            string str = ths.CastToStr();
+        yield return new Function("upper", "string", _ => new ReturnValue(_value.ToUpper(), "string"));
+        yield return new Function("lower", "string", terms => new ReturnValue(_value.ToLower(), "string"));
+        yield return new Function("remove", "string", inputTypes: "string", action: terms =>
+        {
+            BaseTerm remove = terms[0];
+
+            string str = _value;
             string rem = remove.CastToStr();
             if (str.IndexOf(rem, StringComparison.Ordinal) == -1)
                 return new ReturnValue(str, "string");
 
             return new ReturnValue(str.Remove(str.IndexOf(rem, StringComparison.Ordinal), rem.Length), "string");
-        }),
-        new Function("replace", "string", inputTypes: new[] { "string", "string" },
-            action: terms =>
-            {
-                return new ReturnValue(terms[0].CastToStr().Replace(terms[1].CastToStr(), terms[2].CastToStr()),
-                    "string");
-            })
-    };
-    public override IEnumerable<IFunction> GetFunctions()
-    {
-        foreach (IFunction function in base.GetFunctions()) yield return function;
-        
-        foreach (IFunction function in _functions)
-        {
-            yield return function;
-        }
+        });
+        yield return new Function("replace", "string", inputTypes: new[] { "string", "string" },
+            action: terms => new ReturnValue(_value.Replace(terms[0].CastToStr(), terms[1].CastToStr()),
+                "string"));
     }
 
     #endregion

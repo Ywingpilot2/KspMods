@@ -107,17 +107,17 @@ public class ArrayTerm : EnumeratorTerm
         }
         
         // TODO: Find a way to make the return type the contained type, that way we don't need to always cast
-        yield return new Function("get", "term", terms =>
+        yield return new Function("get", ContainedType, terms =>
         {
-            TermArray array = (TermArray)terms[0].GetValue();
-            BaseTerm term = array.GetValue(terms[1].CastToInt());
+            TermArray array = (TermArray)Value;
+            BaseTerm term = array.GetValue(terms[0].CastToInt());
             return new ReturnValue(term.GetValue(), array.ValueType);
         }, "int");
         yield return new Function("set", "void", terms =>
         {
-            TermArray array = (TermArray)terms[0].GetValue();
-            BaseTerm term = terms[1];
-            BaseTerm i = terms[2];
+            TermArray array = (TermArray)Value;
+            BaseTerm term = terms[0];
+            BaseTerm i = terms[1];
             array.SetValue(term, i.CastToInt());
             return new ReturnValue();
         }, "term", "int");

@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using ActionLanguage.Library;
+using ActionLanguage.Reflection;
 using ActionLanguage.Token.Functions;
 using ActionLanguage.Token.Interaction;
 using ActionLanguage.Token.KeyWords;
 using ActionLanguage.Token.Terms;
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Exceptions;
+using ProgrammableMod.Scripting.Terms.KerbNet;
 using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Library;
@@ -16,10 +18,9 @@ namespace ProgrammableMod.Scripting.Library;
 public class KerbalLibrary : ILibrary
 {
     public string Name => "kerbnet";
-    private BaseComputer _computer;
 
-    public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
-    {
+    public IEnumerable<IFunction> GlobalFunctions { get; }
+    /*{
         new Function("get_time", "float", _ =>
         {
             EstablishConnection();
@@ -51,23 +52,26 @@ public class KerbalLibrary : ILibrary
             EstablishConnection();
             return new ReturnValue(_computer.vessel.missionTime, "double");
         })
-    };
+    };*/
     public IEnumerable<GlobalTerm> GlobalTerms { get; }
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 
-    /// <summary>
-    /// Connect to the <see cref="KerbinSuperComputer"/>!
-    /// Warranty void if connection unstable.
-    /// </summary>
-    private void EstablishConnection()
+    public KerbalLibrary(BaseComputer computer, ActionLibrary library)
     {
-        if (!_computer.vessel.Connection.IsConnected)
-            throw new KerbnetLostException(0);
-    }
-
-    public KerbalLibrary(BaseComputer computer)
-    {
-        _computer = computer;
+        TypeLibrary = new TypeLibrary();
+        KerbNetTerm kerb = new KerbNetTerm
+        {
+            Kind = TermKind.Class, 
+            Computer = computer,
+            Name = "KERBNET",
+            
+        };
+        TypeLibrary.AddTermType(new TermType(kerb, library.TypeLibrary.GetTermType("term", 0)));
+        
+        GlobalTerms = new[]
+        {
+            new GlobalTerm(kerb)
+        };
     }
 }

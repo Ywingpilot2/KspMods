@@ -195,17 +195,15 @@ public class TermI : NumberTerm
             yield return function;
         }
 
-        yield return new Function("increment", "void", terms =>
+        yield return new Function("increment", "void", _ =>
         {
-            BaseTerm term = terms[0];
-            term.SetValue(term.CastToInt() + 1);
+            SetValue(CastToInt() + 1);
 
             return new ReturnValue();
         });
-        yield return new Function("decrement", "void", terms =>
+        yield return new Function("decrement", "void", _ =>
         {
-            BaseTerm term = terms[0];
-            term.SetValue(term.CastToInt() - 1);
+            SetValue(CastToInt() - 1);
 
             return new ReturnValue();
         });

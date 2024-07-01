@@ -426,7 +426,7 @@ public static class CompileUtils
 
     public static TermType GetTypeFromLocalFunc(string token, ITokenHolder holder)
     {
-        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries);
+        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
 
         string termToken = split[0].Trim();
         TermType termType = GetTypeFromToken(termToken, holder, GetTokenKind(termToken, holder));
@@ -715,9 +715,9 @@ public static class CompileUtils
             return TokenKind.SpecialFunc;
         }
 
+        string noPrms = san.SanitizeParenthesis();
         if (san.EndsWith(")"))
         {
-            string noPrms = san.SanitizeParenthesis();
             if (noPrms.Contains('.'))
                 return TokenKind.LocalFunc;
             else
@@ -729,9 +729,9 @@ public static class CompileUtils
             return TokenKind.SpecialFunc;
         }
 
-        if (san.Contains('.'))
+        if (noPrms.Contains('.'))
         {
-            string[] split = san.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+            string[] split = noPrms.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
             TokenKind inKind = GetTokenKind(split[0].Trim(), holder);
             if (inKind != TokenKind.Invalid)
                 return TokenKind.LocalField;
