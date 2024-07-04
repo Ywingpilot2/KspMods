@@ -40,7 +40,7 @@ public class GuiTestModule : PartModule
             };
 
         ColumnControl columnControl = new ColumnControl(random.Next(),
-            new ButtonControl(random.Next(), "Cancel", _ => Stop()),
+            new ButtonControl(random.Next(), "Cancel", (_,_) => Stop()),
             new ButtonControl(random.Next(), "Save", Save));
         control.Add(columnControl);
 
@@ -48,7 +48,7 @@ public class GuiTestModule : PartModule
         _isOpen = true;
     }
 
-    private void Save(Control control)
+    private void Save(object sender, EventArgs e)
     {
         _text = _textControl.Text;
         Debug.Log(_text);

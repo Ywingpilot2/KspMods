@@ -7,33 +7,33 @@ namespace AeroDynamicKerbalInterfaces.Controls.Buttons;
 public class ButtonControl : Control
 {
     public override string Style { get; set; } = "ButtonBase";
+    public event EventHandler? OnPressed;
 
-    protected readonly Action<ButtonControl> OnPressed;
-    
     public override void Draw()
     {
         if (GUILayout.Button(Content, GetStyle(), LayoutOptions))
         {
-            OnPressed.Invoke(this);
+            OnPressed?.Invoke(this, EventArgs.Empty);
+            
         }
     }
 
-    public ButtonControl(int id, GUIContent content, Action<ButtonControl> onPressed, params Control[] children) : base(id, content, children)
+    public ButtonControl(int id, GUIContent content, EventHandler? onPressed = null, params Control[] children) : base(id, content, children)
+    {
+        OnPressed += onPressed;
+    }
+
+    public ButtonControl(int id, EventHandler? onPressed = null) : base(id)
     {
         OnPressed = onPressed;
     }
 
-    public ButtonControl(int id, Action<ButtonControl> onPressed) : base(id)
+    public ButtonControl(int id, Texture content, EventHandler? onPressed = null) : base(id, content)
     {
         OnPressed = onPressed;
     }
 
-    public ButtonControl(int id, Texture content, Action<ButtonControl> onPressed) : base(id, content)
-    {
-        OnPressed = onPressed;
-    }
-
-    public ButtonControl(int id, string content, Action<ButtonControl> onPressed) : base(id, content)
+    public ButtonControl(int id, string content, EventHandler? onPressed = null) : base(id, content)
     {
         OnPressed = onPressed;
     }

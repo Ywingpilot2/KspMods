@@ -130,6 +130,20 @@ public abstract class Control : ICollection<Control>
     {
     }
 
+    /// <summary>
+    /// This is called when a control is first added to the <see cref="AeroInterfaceManager"/>
+    /// </summary>
+    public virtual void OnCreation()
+    {
+    }
+
+    /// <summary>
+    /// This is called when a control is removed directly from <see cref="AeroInterfaceManager"/>(e.g a window is closed)
+    /// </summary>
+    public virtual void OnDestruction()
+    {
+    }
+
     #endregion
 
     #region Collection

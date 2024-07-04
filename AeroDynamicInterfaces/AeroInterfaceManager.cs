@@ -8,7 +8,7 @@ namespace AeroDynamicKerbalInterfaces;
 [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
 public class AeroInterfaceManager : MonoBehaviour
 {
-    private static Dictionary<int, Control> _controls;
+    private static readonly Dictionary<int, Control> Controls;
 
     private void OnGUI()
     {
@@ -21,7 +21,7 @@ public class AeroInterfaceManager : MonoBehaviour
         GUI.skin = null;
     }
 
-    public static bool HasControl(int id) => _controls.ContainsKey(id);
+    public static bool HasControl(int id) => Controls.ContainsKey(id);
 
     /// <summary>
     /// Fetches a <see cref="Control"/> and searches down the entire UI chain to find it
@@ -69,7 +69,7 @@ public class AeroInterfaceManager : MonoBehaviour
         if (!HasControl(id))
             return null;
 
-        return _controls[id];
+        return Controls[id];
     }
 
     public static bool AddControl(Control control)
@@ -77,24 +77,29 @@ public class AeroInterfaceManager : MonoBehaviour
         if (HasControl(control.Id))
             return false;
         
-        _controls.Add(control.Id, control);
+        Controls.Add(control.Id, control);
+        control.OnCreation();
         return true;
     }
 
     public static void RemoveControl(int id)
     {
-        _controls.Remove(id);
+        if (!HasControl(id))
+            return;
+        
+        Controls[id].OnDestruction();
+        Controls.Remove(id);
     }
 
     public static IEnumerable<Control> EnumerateControls()
     {
-        foreach (Control control in _controls.Values)
+        foreach (Control control in Controls.Values)
         {
             yield return control;
         }
     }
 
-    public static void Clear() => _controls.Clear();
+    public static void Clear() => Controls.Clear();
 
     private void Start()
     {
@@ -108,6 +113,6 @@ public class AeroInterfaceManager : MonoBehaviour
 
     static AeroInterfaceManager()
     {
-        _controls = new Dictionary<int, Control>();
+        Controls = new Dictionary<int, Control>();
     }
 }

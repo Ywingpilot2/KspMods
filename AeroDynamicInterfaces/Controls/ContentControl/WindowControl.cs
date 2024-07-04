@@ -9,6 +9,7 @@ public class WindowControl : Control
 {
     public override string Style { get; set; } = "WindowBase";
     public string HeaderStyle { get; set; } = "LabelHead";
+    public event EventHandler? OnClose;
 
     private Rect _windowRect;
 
@@ -33,7 +34,11 @@ public class WindowControl : Control
             control.Draw();
         }
         GUILayout.EndVertical();
-        
+    }
+
+    public override void OnDestruction()
+    {
+        OnClose?.Invoke(this, EventArgs.Empty);
     }
 
     public WindowControl(int id, GUIContent content, Rect rect, params Control[] children) : base(id, content, children)

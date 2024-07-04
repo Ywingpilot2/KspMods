@@ -5,14 +5,18 @@ namespace AeroDynamicKerbalInterfaces.Controls.Fields;
 
 public class TextFieldControl : Control
 {
-    public string Text => Content.text;
-    private readonly Action<TextFieldControl>? _onUpdated;
+    public string Text
+    {
+        get => Content.text;
+        set => Content.text = value;
+    }
+    private readonly EventHandler? _onUpdated;
 
     public TextFieldControl(int id) : base(id)
     {
     }
 
-    public TextFieldControl(int id, string content, Action<TextFieldControl>? onUpdated = null) : base(id, content)
+    public TextFieldControl(int id, string content, EventHandler? onUpdated = null) : base(id, content)
     {
         _onUpdated = onUpdated;
     }
@@ -21,7 +25,7 @@ public class TextFieldControl : Control
     {
         string upd = GUILayout.TextArea(Content.text, GetStyle(), LayoutOptions);
         if (upd != Content.text)
-            _onUpdated?.Invoke(this);
+            _onUpdated?.Invoke(this, EventArgs.Empty);
 
         Content.text = upd;
     }

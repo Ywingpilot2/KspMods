@@ -36,7 +36,7 @@ public sealed class ExceptionBoxControl : Control
             new LabelControl(rng.Next(), "An error has occured! Message:"),
             new LabelControl(rng.Next(), message), 
             new FillerControl(rng.Next()), 
-            new ButtonControl(rng.Next(), "OK", _ => Close()));
+            new ButtonControl(rng.Next(), "OK", (_,_) => Close()));
         
         Add(window);
     }

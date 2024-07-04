@@ -61,8 +61,8 @@ public sealed class CodeEditorControl : Control
             };
 
         ColumnControl columnControl = new ColumnControl(rng.Next(),
-            new ButtonControl(rng.Next(), "Cancel", _ => Hide()),
-            new ButtonControl(rng.Next(), "Save", _ => Save()));
+            new ButtonControl(rng.Next(), "Cancel", (_,_) => Hide()),
+            new ButtonControl(rng.Next(), "Save", (_,_) => Save()));
         control.Add(columnControl);
         
         Add(control);

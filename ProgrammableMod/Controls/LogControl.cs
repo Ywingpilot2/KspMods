@@ -72,8 +72,8 @@ public sealed class LogControl : Control
         rows.Add(scroll);
 
         ColumnControl columns = new ColumnControl(rng.Next());
-        columns.Add(new ButtonControl(rng.Next(), "Clear", _ => ClearLog()));
-        columns.Add(new ButtonControl(rng.Next(), "Close", _ => Close()));
+        columns.Add(new ButtonControl(rng.Next(), "Clear", (_,_) => ClearLog()));
+        columns.Add(new ButtonControl(rng.Next(), "Close", (_,_) => Close()));
         
         rows.Add(columns);
         windowControl.Add(rows);
