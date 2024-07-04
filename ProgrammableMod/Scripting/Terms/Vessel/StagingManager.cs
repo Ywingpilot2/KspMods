@@ -11,7 +11,7 @@ namespace ProgrammableMod.Scripting.Terms.Vessel;
 /// </summary>
 public class MylStagingManager
 {
-    private BaseComputer _computer;
+    private readonly BaseComputer _computer;
 
     #region Current stage info
 

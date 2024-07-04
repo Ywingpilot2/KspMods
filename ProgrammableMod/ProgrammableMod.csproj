@@ -51,6 +51,7 @@
         </Reference>
         <Reference Include="UnityEngine.AudioModule">
           <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
@@ -82,6 +83,9 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Controls\CodeEditorControl.cs" />
+        <Compile Include="Controls\ExceptionBox.cs" />
+        <Compile Include="Controls\LogControl.cs" />
         <Compile Include="Modules\Computers\BaseComputer.cs" />
         <Compile Include="Modules\Computers\ComputerModule.cs" />
         <Compile Include="Modules\Test\GuiTestModule.cs" />
@@ -106,6 +110,10 @@
       <ProjectReference Include="..\ActionScript\ActionScript.csproj">
         <Project>{c12fe528-ce49-4194-bed0-7e1064622a12}</Project>
         <Name>ActionScript</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\AeroDynamicInterfaces\AeroDynamicInterfaces.csproj">
+        <Project>{0aef6641-0fa8-43b3-9e25-56a47ad3ba3e}</Project>
+        <Name>AeroDynamicInterfaces</Name>
       </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

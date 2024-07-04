@@ -21,7 +21,7 @@ public class KerbinSuperComputer : MonoBehaviour
 
 public class ValueStasher : IConfigNode
 {
-    private Dictionary<string, object> _stashedValues;
+    private readonly Dictionary<string, object> _stashedValues;
 
     public void StashValue(string name, object value)
     {

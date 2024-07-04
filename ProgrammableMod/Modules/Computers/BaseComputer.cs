@@ -6,7 +6,9 @@ using ActionLanguage;
 using ActionLanguage.Exceptions;
 using ActionLanguage.Extensions;
 using ActionLanguage.Library;
+using AeroDynamicKerbalInterfaces;
 using JetBrains.Annotations;
+using ProgrammableMod.Controls;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Library;
 using UniLinq;
@@ -119,16 +121,10 @@ public abstract class BaseComputer : PartModule
         if (_previous == log)
             return;
 
-        if (_count == 250)
-        {
-            logText = "";
-            _count = 0;
-        }
-
         _count++;
         _previous = log;
         TimeSpan time = TimeSpan.FromSeconds(vessel.missionTime);
-        logText += $"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}\n";
+        _logControl.Log($"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}");
     }
 
     #endregion
@@ -151,6 +147,8 @@ public abstract class BaseComputer : PartModule
         };
 
         _compiler = new ActionCompiler(Libraries);
+        _logControl = new LogControl(new Random(GetHashCode()).Next(), _ => _logOpen = false);
+        
         ResetStatus();
         if (tokenContainer.shouldCompile || ShouldRun)
         {
@@ -163,141 +161,6 @@ public abstract class BaseComputer : PartModule
         }
         
         UpdateButton();
-    }
-
-    #endregion
-
-    #region GUI Handling
-
-    // TODO: We should really move this all into a framework of some kind...
-    protected bool DisplayEditor;
-    protected bool DisplayPopup;
-    protected bool DisplayLog;
-    private void OnGUI()
-    {
-        if (!HighLogic.LoadedSceneIsGame)
-            return;
-        
-        if (DisplayEditor && (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight))
-        {
-            _codeWindowRect = GUILayout.Window(new Random(23123452).Next(), _codeWindowRect, DrawCodeEditor, "Edit Script");
-        }
-        
-        if (DisplayPopup && (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor))
-        {
-            _popUpRect = GUILayout.Window(new Random(482123452).Next(), _popUpRect, DrawPopUp, "Kerbaton Alert!");
-        }
-
-        if (DisplayLog && (HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight))
-        {
-            _logWindowRect = GUILayout.Window(new Random(752236422).Next(), _logWindowRect, DrawLog, "Computer Log");
-        }
-    }
-
-    private Rect _codeWindowRect = new(Screen.width / 2, Screen.height / 2, 600, 450);
-    private Vector2 _scrollCodeVector = Vector2.zero;
-    private string _editorText;
-    private void DrawCodeEditor(int winId)
-    {
-        GUI.DragWindow(new Rect(0,0, 600, 20));
-        GUILayout.BeginVertical();
-        
-        _scrollCodeVector = GUILayout.BeginScrollView(_scrollCodeVector);
-
-        _editorText = GUILayout.TextArea(_editorText, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-
-        GUILayout.EndScrollView();
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Cancel"))
-        {
-            DisplayEditor = false;
-        }
-
-        if (GUILayout.Button("Save"))
-        {
-            tokenContainer.tokens = _editorText;
-            DisplayEditor = false;
-        }
-        
-        GUILayout.EndHorizontal();
-
-        GUILayout.EndVertical();
-    }
-
-    private Rect _logWindowRect = new(Screen.width / 2, Screen.height / 2, 600, 450);
-    private Vector2 _scrollLogVector = Vector2.zero;
-    
-    public string logText;
-    private void DrawLog(int winid)
-    {
-        GUI.DragWindow(new Rect(0,0, 600, 20));
-        GUILayout.BeginVertical();
-        
-        _scrollLogVector = GUILayout.BeginScrollView(_scrollLogVector);
-
-        GUILayout.TextArea(logText, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-
-        GUILayout.EndScrollView();
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Clear"))
-        {
-            logText = "";
-        }
-
-        if (GUILayout.Button("Close"))
-        {
-            DisplayLog = false;
-        }
-        
-        GUILayout.EndHorizontal();
-
-        GUILayout.EndVertical();
-    }
-    
-    private Rect _popUpRect = new(Screen.width / 2, Screen.height / 2, 400, 250);
-    private void DrawPopUp(int winId)
-    {
-        GUI.DragWindow(new Rect(0,0, 400, 20));
-        GUILayout.BeginVertical();
-        
-        GUILayout.Label("An error has occured! Message:");
-
-        GUILayout.Label(exception);
-
-        GUILayout.BeginHorizontal();
-
-        if (executionException)
-        {
-            if (GUILayout.Button("Break Execution"))
-            {
-                DisplayPopup = false;
-                ShouldRun = false;
-                tokenContainer.shouldCompile = false;
-            }
-        
-            if (GUILayout.Button("Continue Execution"))
-            {
-                DisplayPopup = false;
-                ShouldRun = true;
-            }
-        }
-        else
-        {
-            if (GUILayout.Button("OK"))
-            {
-                DisplayPopup = false;
-                ShouldRun = false;
-                tokenContainer.shouldCompile = false;
-            }
-        }
-
-        GUILayout.EndHorizontal();
-        
-        GUILayout.EndVertical();
     }
 
     #endregion
@@ -392,20 +255,24 @@ public abstract class BaseComputer : PartModule
 
     #region UI Buttons
 
+    private bool _editorOpen;
     [KSPEvent(active = true, guiActive = true, guiName = "Open Code Editor", guiActiveEditor = true)]
     public void OpenEditor()
     {
-        if (!DisplayEditor)
-        {
-            _editorText = tokenContainer.tokens;
-        }
-        DisplayEditor = true;
+        if (_editorOpen)
+            return;
+        
+        _editorOpen = true;
+        CodeEditorControl.Show(tokenContainer.tokens, "Code Editor",
+            control => tokenContainer.tokens = control.Text, _ => _editorOpen = false);
     }
-    
+
+    private LogControl _logControl;
+    private bool _logOpen;
     [KSPEvent(active = true, guiActive = true, guiName = "Open Log", guiActiveEditor = true)]
     public void OpenLog()
     {
-        DisplayLog = true;
+        AeroInterfaceManager.AddControl(_logControl);
     }
 
     #endregion
@@ -486,7 +353,7 @@ public abstract class BaseComputer : PartModule
     private bool executionException = false;
     public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
     {
-        DisplayPopup = displayPopup;
+        ExceptionBoxControl.Show(message);
         if (kind == StatusKind.Uhoh)
         {
             executionException = ShouldRun;

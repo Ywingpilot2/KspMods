@@ -17,7 +17,7 @@ namespace ProgrammableMod.Scripting.Library;
 public class ComputerLibrary : ILibrary
 {
     public string Name => "computing";
-    private BaseComputer _computer;
+    private readonly BaseComputer _computer;
 
     public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
     {

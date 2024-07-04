@@ -1,0 +1,29 @@
+﻿using UnityEngine;
+
+namespace AeroDynamicKerbalInterfaces.Controls.Fields;
+
+public class LabelControl : Control
+{
+    public override string Style { get; set; } = "LabelBase";
+
+    public LabelControl(int id, GUIContent content, params Control[] children) : base(id, content, children)
+    {
+    }
+
+    public LabelControl(int id) : base(id)
+    {
+    }
+
+    public LabelControl(int id, Texture content) : base(id, content)
+    {
+    }
+
+    public LabelControl(int id, string content) : base(id, content)
+    {
+    }
+
+    public override void Draw()
+    {
+        GUILayout.Label(Content, GetStyle(), LayoutOptions);
+    }
+}
