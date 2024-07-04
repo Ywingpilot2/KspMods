@@ -14,7 +14,7 @@ public class InvalidCompilationException : CompilationException
 {
     private string _message;
 
-    public override string Message => $"A Compiler error has occured at {LineNumber}: {_message}";
+    public override string Message => $"A Compiler error has occured at line {LineNumber}: {_message}";
 
     public InvalidCompilationException(int lineNumber, string message) : base(lineNumber)
     {
