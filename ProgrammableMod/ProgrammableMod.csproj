@@ -107,9 +107,9 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\ActionScript\ActionScript.csproj">
+      <ProjectReference Include="..\SteelLanguage\SteelLanguage.csproj">
         <Project>{c12fe528-ce49-4194-bed0-7e1064622a12}</Project>
-        <Name>ActionScript</Name>
+        <Name>SteelLanguage</Name>
       </ProjectReference>
       <ProjectReference Include="..\AeroDynamicInterfaces\AeroDynamicInterfaces.csproj">
         <Project>{0aef6641-0fa8-43b3-9e25-56a47ad3ba3e}</Project>

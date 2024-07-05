@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MethLabMod", "MethLabMod\Me
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgrammableMod", "ProgrammableMod\ProgrammableMod.csproj", "{591DD7C2-A79A-4A7A-8C77-59A63064B985}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionScript", "ActionScript\ActionScript.csproj", "{C12FE528-CE49-4194-BED0-7E1064622A12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteelLanguage", "SteelLanguage\SteelLanguage.csproj", "{C12FE528-CE49-4194-BED0-7E1064622A12}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionTest", "ActionTest\ActionTest.csproj", "{8A5FA8EE-20C4-47D4-92B9-42A2F4070E00}"
 EndProject

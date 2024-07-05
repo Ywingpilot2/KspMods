@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using ActionLanguage;
-using ActionLanguage.Library;
-using ActionLanguage.Reflection;
-using ActionLanguage.Token.Fields;
-using ActionLanguage.Token.Functions;
-using ActionLanguage.Token.Interaction;
-using ActionLanguage.Token.KeyWords;
-using ActionLanguage.Token.Terms;
-using ActionLanguage.Token.Terms.Literal;
+using SteelLanguage;
+using SteelLanguage.Library;
+using SteelLanguage.Reflection;
+using SteelLanguage.Token.Fields;
+using SteelLanguage.Token.Functions;
+using SteelLanguage.Token.Interaction;
+using SteelLanguage.Token.KeyWords;
+using SteelLanguage.Token.Terms;
 
 namespace ActionTest
 {
@@ -40,7 +39,7 @@ namespace ActionTest
         public IEnumerable<IKeyword> Keywords { get; }
         public TypeLibrary TypeLibrary { get; }
 
-        public ProgramLibrary(ActionLibrary baseLibrary)
+        public ProgramLibrary(SteelLibrary baseLibrary)
         {
             TypeLibrary = new TypeLibrary();
             
@@ -50,8 +49,8 @@ namespace ActionTest
     
     internal static class Program
     {
-        private static Dictionary<string, ActionScript> _compiled = new Dictionary<string, ActionScript>();
-        private static ActionCompiler _compiler = new ActionCompiler(new ProgramLibrary(ActionCompiler.Library));
+        private static Dictionary<string, SteelScript> _compiled = new Dictionary<string, SteelScript>();
+        private static SteelCompiler _compiler = new SteelCompiler(new ProgramLibrary(SteelCompiler.Library));
         
         public class ProgramTerm : BaseTerm
         {
@@ -151,7 +150,7 @@ namespace ActionTest
             CompileScript(fullPath)?.Execute();
         }
 
-        private static ActionScript CompileScript(string fullPath)
+        private static SteelScript CompileScript(string fullPath)
         {
             FileInfo fileInfo = new FileInfo(fullPath);
             if (!fileInfo.Exists)
@@ -161,7 +160,7 @@ namespace ActionTest
             }
             
             StreamReader reader = new StreamReader(fullPath);
-            ActionScript script = _compiler.Compile(reader);
+            SteelScript script = _compiler.Compile(reader);
 
             if (_compiled.ContainsKey(fileInfo.Name))
             {

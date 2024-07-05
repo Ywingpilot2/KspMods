@@ -1,4 +1,4 @@
-﻿using ActionLanguage.Exceptions;
+﻿using SteelLanguage.Exceptions;
 
 namespace ProgrammableMod.Scripting.Exceptions;
 

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using ActionLanguage;
 using JetBrains.Annotations;
+using SteelLanguage;
 
 namespace ProgrammableMod.Modules.Computers;
 
@@ -55,7 +55,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
         }
     }
 
-    public override bool ValidateScript(ActionScript script, out string reason)
+    public override bool ValidateScript(SteelScript script, out string reason)
     {
         float total = CalculateCost(script);
         if (total > tokenLimit)
@@ -69,7 +69,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
         return true;
     }
 
-    private static float CalculateCost(ActionScript script)
+    private static float CalculateCost(SteelScript script)
     {
         int termCost = script.TermTokens * 5;
         int callCost = script.CallTokens;

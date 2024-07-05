@@ -2,15 +2,14 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using ActionLanguage;
-using ActionLanguage.Exceptions;
-using ActionLanguage.Extensions;
-using ActionLanguage.Library;
 using AeroDynamicKerbalInterfaces;
 using JetBrains.Annotations;
 using ProgrammableMod.Controls;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Library;
+using SteelLanguage;
+using SteelLanguage.Extensions;
+using SteelLanguage.Library;
 using UniLinq;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -42,7 +41,7 @@ public abstract class BaseComputer : PartModule
     public float runTime;
 
     internal FlightCtrlState State;
-    private ActionCompiler _compiler;
+    private SteelCompiler _compiler;
 
     public bool ShouldRun
     {
@@ -59,7 +58,7 @@ public abstract class BaseComputer : PartModule
         }
     }
     
-    protected ActionScript Script;
+    protected SteelScript Script;
 
     #region Execution
     
@@ -141,12 +140,12 @@ public abstract class BaseComputer : PartModule
     {
         Libraries = new ILibrary[]
         {
-            new KerbalLibrary(this, ActionCompiler.Library),
+            new KerbalLibrary(this, SteelCompiler.Library),
             new VesselLibrary(this),
-            new ComputerLibrary(ActionCompiler.Library, this)
+            new ComputerLibrary(SteelCompiler.Library, this)
         };
 
-        _compiler = new ActionCompiler(Libraries);
+        _compiler = new SteelCompiler(Libraries);
         _logControl = new LogControl(new Random(GetHashCode()).Next(), _ => _logOpen = false);
         
         ResetStatus();
@@ -229,7 +228,7 @@ public abstract class BaseComputer : PartModule
     {
         try
         {
-            ActionScript script = _compiler.Compile(tokenContainer.tokens);
+            SteelScript script = _compiler.Compile(tokenContainer.tokens);
             if (!ValidateScript(script, out string reason))
             {
                 ThrowException(reason);
@@ -249,7 +248,7 @@ public abstract class BaseComputer : PartModule
         }
     }
 
-    public abstract bool ValidateScript(ActionScript script, out string reason);
+    public abstract bool ValidateScript(SteelScript script, out string reason);
 
     #endregion
 
