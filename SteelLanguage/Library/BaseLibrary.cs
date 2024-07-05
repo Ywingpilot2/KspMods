@@ -122,7 +122,7 @@ public class SteelLibrary : ILibrary
         new ImportKeyword()
     };
     public TypeLibrary TypeLibrary { get; }
-        
+    
     public SteelLibrary()
     {
         TypeLibrary = new TypeLibrary();
@@ -130,9 +130,12 @@ public class SteelLibrary : ILibrary
         TermType baseType = new TermType(new Term(), isAbstract:true);
         TermType numberType = new TermType(new NumberTerm(), baseType, true);
         TermType enumerableType = new TermType(new EnumeratorTerm(), baseType, true);
+        TermType enumType = new TermType(new EnumTerm(), baseType, true);
+        
         TypeLibrary.AddTermType(baseType);
         TypeLibrary.AddTermType(numberType);
         TypeLibrary.AddTermType(enumerableType);
+        TypeLibrary.AddTermType(enumType);
         TypeLibrary.AddTermType(new TermType(new VoidTerm(), isAbstract:true));
         TypeLibrary.AddTermType(new TermType(new TermI(), numberType));
         TypeLibrary.AddTermType(new TermType(new TermU(), numberType));

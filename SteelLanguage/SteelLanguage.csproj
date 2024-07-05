@@ -90,6 +90,7 @@
         <Compile Include="Token\Terms\BaseTerm.cs" />
         <Compile Include="Token\Terms\Complex\Enumerators\TermArray.cs" />
         <Compile Include="Token\Terms\Complex\EnumeratorTerm.cs" />
+        <Compile Include="Token\Terms\Complex\EnumTerm.cs" />
         <Compile Include="Token\Terms\Complex\StringTerm.cs" />
         <Compile Include="Token\Terms\Literal\BoolTerm.cs" />
         <Compile Include="Token\Terms\Literal\NullTerm.cs" />

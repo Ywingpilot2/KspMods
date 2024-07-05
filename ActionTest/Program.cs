@@ -10,6 +10,7 @@ using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.KeyWords;
 using SteelLanguage.Token.Terms;
+using SteelLanguage.Token.Terms.Complex;
 
 namespace ActionTest
 {
@@ -42,8 +43,11 @@ namespace ActionTest
         public ProgramLibrary(SteelLibrary baseLibrary)
         {
             TypeLibrary = new TypeLibrary();
+            TermType type = baseLibrary.TypeLibrary.GetTermType("term", 0);
+            TermType enumType = baseLibrary.TypeLibrary.GetTermType("enum", 0);
             
-            TypeLibrary.AddTermType(new TermType(new Program.ProgramTerm(), baseLibrary.TypeLibrary.GetTermType("term", 0)));
+            TypeLibrary.AddTermType(new TermType(new Program.ProgramTerm(), type));
+            TypeLibrary.AddTermType(new TermType(new Program.YuriEnum(), enumType));
         }
     }
     
@@ -84,6 +88,18 @@ namespace ActionTest
             {
                 return _value;
             }
+        }
+        
+        public class YuriEnum : EnumTerm
+        {
+            public override string ValueType => "yuri_kind";
+
+            protected override TermField[] Values => new[]
+            {
+                new TermField("squid", "yuri_kind", 0),
+                new TermField("octo", "yuri_kind", 1),
+                new TermField("both", "yuri_kind", 2)
+            };
         }
 
         public static void Main(string[] args)

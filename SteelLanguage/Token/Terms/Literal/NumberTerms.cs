@@ -175,12 +175,23 @@ public class TermI : NumberTerm
 
     public override bool CanImplicitCastToBool => true;
 
+    public override object CastToType(string name)
+    {
+        if (TypeLibrary.GetTermType(name).IsSubclassOf("enum"))
+        {
+            return Number;
+        }
+        
+        return base.CastToType(name);
+    }
+
     public override bool Parse(string value)
     {
         if (int.TryParse(value, NumberStyles.Integer & NumberStyles.AllowLeadingSign, new NumberFormatInfo(), out int i))
         {
             Number = i;
             Kind = TermKind.Basic;
+            
             return true;
         }
         else
