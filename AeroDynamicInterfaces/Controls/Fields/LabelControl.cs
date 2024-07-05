@@ -6,8 +6,9 @@ public class LabelControl : Control
 {
     public override string Style { get; set; } = "LabelBase";
 
-    public LabelControl(int id, GUIContent content, params Control[] children) : base(id, content, children)
+    public LabelControl(int id, GUIContent content, params GUILayoutOption[] options) : base(id, content)
     {
+        LayoutOptions = options;
     }
 
     public LabelControl(int id) : base(id)

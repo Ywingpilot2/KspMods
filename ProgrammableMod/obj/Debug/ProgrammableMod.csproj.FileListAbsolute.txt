@@ -71,7 +71,8 @@ C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\obj\Deb
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\obj\Debug\ProgrammableMod.pdb
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\ProgrammableMod.dll
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\ProgrammableMod.pdb
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\ActionScript.dll
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\ActionScript.pdb
 C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\obj\Debug\ProgrammableMod.csproj.CopyComplete
-C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\UnityEngine.AudioModule.dll
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\AeroDynamicInterfaces.dll
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\SteelLanguage.dll
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\SteelLanguage.pdb
+C:\Users\Myles\Desktop\stuff\CS_projects\KSPMods\KspMods\ProgrammableMod\bin\GameData\Plugins\AeroDynamicInterfaces.pdb

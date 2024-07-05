@@ -18,9 +18,10 @@ public class ButtonControl : Control
         }
     }
 
-    public ButtonControl(int id, GUIContent content, EventHandler? onPressed = null, params Control[] children) : base(id, content, children)
+    public ButtonControl(int id, GUIContent content, EventHandler? onPressed = null, params GUILayoutOption[] options) : base(id, content)
     {
         OnPressed += onPressed;
+        LayoutOptions = options;
     }
 
     public ButtonControl(int id, EventHandler? onPressed = null) : base(id)

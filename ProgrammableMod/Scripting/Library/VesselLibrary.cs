@@ -158,10 +158,13 @@ public class VesselLibrary : ILibrary
         TypeLibrary = new TypeLibrary();
 
         TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term", 0);
+        TermType enumType = SteelCompiler.Library.TypeLibrary.GetTermType("enum", 0);
+        
         TypeLibrary.AddTermType(new TermType(new VesselTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new StagingTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new StageInfoTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new SASTerm(), baseType));
+        TypeLibrary.AddTermType(new TermType(new SASTypeTerm(), enumType));
 
         GlobalTerms = new[]
         {

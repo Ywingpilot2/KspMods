@@ -34,7 +34,7 @@ public class KerbNetTerm : BaseVesselTerm
     /// </summary>
     private void EstablishConnection()
     {
-        if (!Computer.vessel.Connection.IsConnected || Computer.vessel.IsFirstFrame())
+        if (!Computer.vessel.Connection.IsConnected || Computer.Compiling)
             throw new KerbnetLostException(0);
     }
 }

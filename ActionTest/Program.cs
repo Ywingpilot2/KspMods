@@ -94,11 +94,11 @@ namespace ActionTest
         {
             public override string ValueType => "yuri_kind";
 
-            protected override TermField[] Values => new[]
+            protected override string[] Values => new[]
             {
-                new TermField("squid", "yuri_kind", 0),
-                new TermField("octo", "yuri_kind", 1),
-                new TermField("both", "yuri_kind", 2)
+                "squid",
+                "octo",
+                "both"
             };
         }
 

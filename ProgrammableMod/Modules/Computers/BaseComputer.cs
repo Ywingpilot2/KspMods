@@ -53,11 +53,15 @@ public abstract class BaseComputer : PartModule
                 runTime = Time.fixedTime;
                 ResetStatus();
             }
+            else
+            {
+                Running = false;
+            }
             tokenContainer.shouldRun = value;
             UpdateButton();
         }
     }
-    
+
     protected SteelScript Script;
 
     #region Execution
@@ -166,6 +170,9 @@ public abstract class BaseComputer : PartModule
 
     #region Script Events
 
+    public bool Running;
+    public bool Compiling;
+    
     /// <summary>
     /// Called just before <see cref="Execution"/> is called
     /// </summary>
@@ -179,10 +186,12 @@ public abstract class BaseComputer : PartModule
     
     protected virtual void PostExecute()
     {
+        Running = true;
     }
 
     protected virtual void OnCompiled()
     {
+        Compiling = false;
     }
 
     #endregion
@@ -204,7 +213,7 @@ public abstract class BaseComputer : PartModule
     private void OnBlownUp(Part data)
     {
         // not our crash
-        if (data.missionID != part.missionID || data.isVesselEVA)
+        if (data.vessel.id != part.vessel.id || data.isVesselEVA)
             return;
         
         Random rng = new Random();
@@ -226,6 +235,7 @@ public abstract class BaseComputer : PartModule
     [KSPEvent(active = true, guiActive = true, guiName = "Compile Script", guiActiveEditor = true, guiActiveUnfocused = true, unfocusedRange = 15f)]
     public void CompileScript()
     {
+        Compiling = true;
         try
         {
             SteelScript script = _compiler.Compile(tokenContainer.tokens);

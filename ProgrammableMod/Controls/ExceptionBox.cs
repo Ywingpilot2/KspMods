@@ -34,8 +34,7 @@ public sealed class ExceptionBoxControl : Control
         System.Random rng = new System.Random(GetHashCode());
         WindowControl window = new WindowControl(rng.Next(), new GUIContent("Error Window"), new(Screen.width / 2, Screen.height / 2, 400, 250), 
             new LabelControl(rng.Next(), "An error has occured! Message:"),
-            new LabelControl(rng.Next(), message), 
-            new FillerControl(rng.Next()), 
+            new ScrollViewControl(rng.Next(), new LabelControl(rng.Next(), new GUIContent(message), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true))),
             new ButtonControl(rng.Next(), "OK", (_,_) => Close()));
         
         Add(window);

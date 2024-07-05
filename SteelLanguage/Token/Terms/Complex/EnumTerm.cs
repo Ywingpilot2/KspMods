@@ -16,7 +16,7 @@ public class EnumTerm : BaseTerm
     /// These all need to be ints with their type property set to <see cref="ValueType"/>
     /// they will be passed through the reflection system as Static <see cref="TermField"/>s
     /// </summary>
-    protected virtual TermField[] Values { get; }
+    protected virtual string[] Values { get; }
     protected int Value { get; set; }
 
     public override IEnumerable<TermField> GetStaticFields()
@@ -26,13 +26,23 @@ public class EnumTerm : BaseTerm
             yield return staticField;
         }
 
-        foreach (TermField value in Values)
+        for (var i = 0; i < Values.Length; i++)
         {
-            yield return value;
+            var name = Values[i];
+            yield return new TermField(name, ValueType, i);
         }
     }
 
     public override bool CanImplicitCastToInt => true;
+    public override int CastToInt()
+    {
+        return Value;
+    }
+
+    public override string CastToStr()
+    {
+        return Values[Value];
+    }
 
     public override bool SetValue(object value)
     {
