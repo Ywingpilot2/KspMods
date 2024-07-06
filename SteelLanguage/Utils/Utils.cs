@@ -451,9 +451,10 @@ public static class CompileUtils
 
     public static TermType GetTypeFromLocalFunc(string token, ITokenHolder holder)
     {
-        string[] split = token.SanitizedSplit('.', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+        string noPrms = token.SanitizeParenthesis();
+        string[] split = token.SplitAt(noPrms.LastIndexOf('.'), options: StringSplitOptions.RemoveEmptyEntries);
 
-        string termToken = split[0].Trim();
+        string termToken = split[0].Trim().Remove(split[0].Length - 1);
         TermType termType = GetTypeFromToken(termToken, holder, GetTokenKind(termToken, holder));
 
         string funcName = split[1].SanitizedSplit('(', 2)[0].Trim();

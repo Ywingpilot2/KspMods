@@ -17,6 +17,18 @@ public class KerbinSuperComputer : MonoBehaviour
        // ...or we could add restrictions to the stasher and only let basic types(e.g ints or vecs) through
        // that would be annoying though, complex classes such as piecewise or arrays wouldn't be stashable then
     }
+
+    /// <summary>
+    /// Gets an enum value at the specified index of the enum
+    /// </summary>
+    /// <param name="idx">The index to get the value from</param>
+    /// <returns>The enum value</returns>
+    public static Enum EnumFromInt(int idx, Type enumType)
+    {
+        Array values = enumType.GetEnumValues();
+        object value = values.GetValue(idx);
+        return (Enum)Enum.ToObject(enumType, value);
+    }
 }
 
 public class ValueStasher : IConfigNode

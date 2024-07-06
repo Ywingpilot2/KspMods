@@ -99,6 +99,7 @@
         <Compile Include="Scripting\Terms\KerbNet\KerbNetTerm.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec2Term.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec3Term.cs" />
+        <Compile Include="Scripting\Terms\Vessel\ActionGroupTerm.cs" />
         <Compile Include="Scripting\Terms\Vessel\SASTerm.cs" />
         <Compile Include="Scripting\Terms\Vessel\StagingManager.cs" />
         <Compile Include="Scripting\Terms\Vessel\StagingTerm.cs" />

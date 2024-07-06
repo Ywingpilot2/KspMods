@@ -165,6 +165,7 @@ public class VesselLibrary : ILibrary
         TypeLibrary.AddTermType(new TermType(new StageInfoTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new SASTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new SASTypeTerm(), enumType));
+        TypeLibrary.AddTermType(new TermType(new ActionGroupTerm(), enumType));
 
         GlobalTerms = new[]
         {

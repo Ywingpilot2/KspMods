@@ -42,19 +42,15 @@ public class SASTerm : BaseVesselTerm
         
         yield return new Function("enable_sas", "void", _ =>
         {
-            if (Computer.vessel.Connection.ControlState != VesselControlState.ProbeFull
-                && Computer.vessel.Connection.ControlState != VesselControlState.KerbalFull)
-                throw new ControlLostException(0);
-
             if (!Computer.vessel.Autopilot.Enabled)
-                Computer.vessel.Autopilot.Enable();
+                Computer.vessel.ActionGroups.SetGroup(KSPActionGroup.SAS, true);
 
             return new ReturnValue();
         });
         yield return new Function("disable_sas", "void", _ =>
         {
             if (Computer.vessel.Autopilot.Enabled)
-                Computer.vessel.Autopilot.Disable();
+                Computer.vessel.ActionGroups.SetGroup(KSPActionGroup.SAS, false);
 
             return new ReturnValue();
         });
