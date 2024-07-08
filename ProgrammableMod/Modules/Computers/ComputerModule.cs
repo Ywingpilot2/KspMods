@@ -83,9 +83,9 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
     #region Display
 
-    public override string GetModuleDisplayName() => "Processor Chips";
+    public override string GetModuleDisplayName() => "Processing Chips";
 
-    public override string GetInfo() => $"State of the art chips with a token limit of {tokenLimit} and consumption rate of {requiredConsumption} {requiredResource} per token.\nNOT FOR EATING!";
+    public override string GetInfo() => $"Computer chips for processing tokens and instructions. These are not snacks.\n- Token limit of {tokenLimit}\n- Consumes {requiredConsumption} {requiredResource} per token";
 
     #endregion
 
