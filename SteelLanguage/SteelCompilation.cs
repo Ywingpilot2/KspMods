@@ -291,17 +291,30 @@ public sealed class SteelCompiler
         if (hasParams)
         {
             string type = func.InputTypes[func.InputTypes.Length - 1].Split(' ')[1].Trim();
-
             Input[] grouping = new Input[inputs.Count - inputTokens.Count];
             
             int j = 0;
+            bool parm = true; // as in the cheese
             for (int i = inputTokens.Count; i < inputs.Count; i++, j++)
             {
                 string input = inputs[i];
+                if (CompileUtils.GetTokenKind(input, holder) == TokenKind.Term)
+                {
+                    TermType termType = CompileUtils.GetTypeFromTerm(input, holder);
+
+                    if (termType.Name.StartsWith("array") && termType.ContainedType == type && i >= inputs.Count - 1)
+                    {
+                        inputTokens.Add(CompileUtils.HandleToken(input, $"array<{type}>", holder, this));
+                        parm = false;
+                        break;
+                    }
+                }
+                
                 grouping.SetValue(CompileUtils.HandleToken(input, type, holder, this), j);
             }
             
-            inputTokens.Add(new Input(holder, new ParamsCall(holder, CurrentLine, type, grouping)));
+            if (parm)
+                inputTokens.Add(new Input(holder, new ParamsCall(holder, CurrentLine, type, grouping)));
         }
 
         return inputTokens;
