@@ -80,3 +80,14 @@ public class FunctionLacksReturnException : ExecutionException
         _function = function;
     }
 }
+
+public class UserException : ExecutionException
+{
+    private string _message;
+    public override string Message => _message;
+
+    public UserException(int lineNumber, string message) : base(lineNumber)
+    {
+        _message = message;
+    }
+}

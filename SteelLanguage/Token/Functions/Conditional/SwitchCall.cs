@@ -27,7 +27,8 @@ public class SwitchCall : TokenCall
 
             return _default.Execute();
         }
-        
+
+        bool continueToDefault = true;
         for (int i = _cases[value]; i < _keys.Length; i++)
         {
             SingleExecutableFunc func = _values[i];
@@ -40,6 +41,7 @@ public class SwitchCall : TokenCall
             {
                 if (returnValue.Value is BreakCall)
                 {
+                    continueToDefault = false;
                     break;
                 }
                 
@@ -53,7 +55,7 @@ public class SwitchCall : TokenCall
             }
         }
 
-        if (_default != null)
+        if (continueToDefault && _default != null)
         {
             _default.PostExecution();
             ReturnValue returnValue = _default.Execute();
@@ -76,6 +78,13 @@ public class SwitchCall : TokenCall
     public override void PostCompilation()
     {
         _check.PostCompilation();
+
+        foreach (SingleExecutableFunc func in _values)
+        {
+            func.PostCompilation();
+        }
+        
+        _default?.PostCompilation();
     }
     
     public SwitchCall(ITokenHolder container, int line, Input check, IEnumerable<object> cases, IEnumerable<SingleExecutableFunc> funcs, SingleExecutableFunc def) : base(container, line)

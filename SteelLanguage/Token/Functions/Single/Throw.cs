@@ -14,7 +14,7 @@ public class ThrowCall : TokenCall
 
     public override ReturnValue Call()
     {
-        throw new InvalidActionException(Line, _input.GetValue().CastToStr());
+        throw new UserException(Line, _input.GetValue().CastToStr());
     }
 
     public override void PostCompilation()

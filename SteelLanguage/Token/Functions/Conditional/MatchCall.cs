@@ -75,6 +75,13 @@ public class MatchCall : TokenCall
     public override void PostCompilation()
     {
         _check.PostCompilation();
+
+        foreach (SingleExecutableFunc func in _values)
+        {
+            func.PostCompilation();
+        }
+        
+        _default?.PostCompilation();
     }
     
     public MatchCall(ITokenHolder container, int line, Input check, IEnumerable<Input> cases, IEnumerable<SingleExecutableFunc> funcs, SingleExecutableFunc def) : base(container, line)
