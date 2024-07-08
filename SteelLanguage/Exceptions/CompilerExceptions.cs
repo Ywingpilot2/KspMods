@@ -379,3 +379,27 @@ public class FieldReadOnlyException : CompilationException
         _name = name;
     }
 }
+
+public class TokenMustBeConstantException : CompilationException
+{
+    private string _token;
+    public override string Message
+    {
+        get
+        {
+            if (_token != null)
+            {
+                return $"The function called at {LineNumber} expects a constant parameter(e.g 1, \"string\", true), but instead got {_token}";
+            }
+            else
+            {
+                return $"Function called at {LineNumber} only accepts constants";
+            }
+        }
+    }
+    
+    public TokenMustBeConstantException(int lineNumber, string invalidToken) : base(lineNumber)
+    {
+        _token = invalidToken;
+    }
+}

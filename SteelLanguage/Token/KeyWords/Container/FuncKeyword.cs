@@ -4,24 +4,24 @@ using SteelLanguage.Exceptions;
 using SteelLanguage.Extensions;
 using SteelLanguage.Token.Functions;
 
-namespace SteelLanguage.Token.KeyWords;
+namespace SteelLanguage.Token.KeyWords.Container;
 
-public struct FuncKeyword : IKeyword
+public class FuncKeyword : ContainerKeyword
 {
-    public string Name => "func";
+    public override string Name => "func";
 
     private SteelCompiler _compiler;
     private SteelScript _script;
-    public void CompileKeyword(string token, SteelCompiler compiler, SteelScript script, ITokenHolder holder)
+    public override void CompileKeyword(string token, SteelCompiler compiler, SteelScript script, ITokenHolder holder)
     {
         _compiler = compiler;
         _script = script;
         UserFunction function = ParseFunction(token);
         _script.AddFunc(function);
-        ParseFunctionTokens(token, function);
+        ParseTokens(function, compiler, token);
     }
-    
-    public UserFunction ParseFunction(string token)
+
+    private UserFunction ParseFunction(string token)
     {
         string[] split = token.SanitizedSplit(' ', 3);
         string returnType = split[1].Trim();
@@ -51,39 +51,5 @@ public struct FuncKeyword : IKeyword
         UserFunction function = new UserFunction(_script, name, returnType, inputMapping);
 
         return function;
-    }
-
-    private void ParseFunctionTokens(string funcToken, UserFunction function)
-    {
-        string line = _compiler.ReadCleanLine();
-        while (line != "{")
-        {
-            line = _compiler.ReadCleanLine();
-            if (line == null)
-                throw new FunctionLacksEndException(_compiler.CurrentLine, funcToken);
-        }
-
-        line = _compiler.ReadCleanLine();
-        bool hasReturned = false;
-        while (line != "}")
-        {
-            if (line == null)
-                throw new FunctionLacksEndException(_compiler.CurrentLine, funcToken);
-
-            if (line == "" || hasReturned)
-            {
-                line = _compiler.ReadCleanLine();
-                continue;
-            }
-
-            if (line.StartsWith("return"))
-            {
-                hasReturned = true;
-                
-            }
-            _compiler.ParseToken(line, function);
-            
-            line = _compiler.ReadCleanLine();
-        }
     }
 }

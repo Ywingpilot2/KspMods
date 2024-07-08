@@ -4,6 +4,8 @@ using SteelLanguage.Reflection;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.KeyWords;
+using SteelLanguage.Token.KeyWords.Container;
+using SteelLanguage.Token.KeyWords.Single;
 using SteelLanguage.Token.Terms;
 using SteelLanguage.Token.Terms.Complex;
 using SteelLanguage.Token.Terms.Complex.Enumerators;
@@ -135,7 +137,9 @@ public class SteelLibrary : ILibrary
         new ElseIfKeyword(),
         new ElseKeyword(),
         new ForeachKeyword(),
-        new ImportKeyword()
+        new ImportKeyword(),
+        new SwitchKeyword(),
+        new MatchKeyword()
     };
     public TypeLibrary TypeLibrary { get; }
     

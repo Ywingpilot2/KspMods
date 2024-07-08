@@ -656,7 +656,7 @@ public static class CompileUtils
             {
                 return BoolOperatorKind.And;
             }
-            case "!||":
+            case "||":
             {
                 return BoolOperatorKind.Or;
             }

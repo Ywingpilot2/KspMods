@@ -5,13 +5,13 @@ using SteelLanguage.Token.Functions.Conditional;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Utils;
 
-namespace SteelLanguage.Token.KeyWords;
+namespace SteelLanguage.Token.KeyWords.Container;
 
-public class IfKeyword : IKeyword
+public class IfKeyword : ContainerKeyword
 {
-    public virtual string Name => "if";
+    public override string Name => "if";
     
-    public virtual void CompileKeyword(string token, SteelCompiler compiler, SteelScript script, ITokenHolder tokenHolder)
+    public override void CompileKeyword(string token, SteelCompiler compiler, SteelScript script, ITokenHolder tokenHolder)
     {
         string value = token.SanitizedSplit('(', 2)[1];
         value = value.Remove(value.Length - 1);
@@ -20,43 +20,6 @@ public class IfKeyword : IKeyword
         IfCall ifCall = new IfCall(tokenHolder, compiler.CurrentLine, input);
         ParseTokens(ifCall.ExecutableFunc, compiler);
         tokenHolder.AddCall(ifCall);
-    }
-
-    protected void ParseTokens(SingleExecutableFunc func, SteelCompiler compiler)
-    {
-        string line;
-        while (true)
-        {
-            line = compiler.ReadCleanLine();
-            if (line == "")
-                continue;
-            
-            if (line == null)
-                throw new FunctionLacksEndException(compiler.CurrentLine, null);
-            
-            if (line == "{")
-                break;
-            
-            compiler.ParseToken(line, func);
-            return;
-        }
-
-        line = compiler.ReadCleanLine();
-        while (line != "}")
-        {
-            if (line == null)
-                throw new FunctionLacksEndException(compiler.CurrentLine, null);
-
-            if (line == "")
-            {
-                line = compiler.ReadCleanLine();
-                continue;
-            }
-
-            compiler.ParseToken(line, func);
-            
-            line = compiler.ReadCleanLine();
-        }
     }
 }
 

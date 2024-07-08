@@ -1,4 +1,4 @@
-﻿namespace SteelLanguage.Token.KeyWords;
+﻿namespace SteelLanguage.Token.KeyWords.Container;
 
 public interface IKeyword
 {

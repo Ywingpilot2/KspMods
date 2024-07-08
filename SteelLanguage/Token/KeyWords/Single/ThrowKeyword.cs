@@ -1,9 +1,10 @@
 ﻿using SteelLanguage.Extensions;
 using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
+using SteelLanguage.Token.KeyWords.Container;
 using SteelLanguage.Utils;
 
-namespace SteelLanguage.Token.KeyWords;
+namespace SteelLanguage.Token.KeyWords.Single;
 
 public struct ThrowKeyword : IKeyword
 {

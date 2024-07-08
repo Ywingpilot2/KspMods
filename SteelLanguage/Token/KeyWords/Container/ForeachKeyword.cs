@@ -1,5 +1,4 @@
 ﻿using System;
-using SteelLanguage.Exceptions;
 using SteelLanguage.Extensions;
 using SteelLanguage.Reflection;
 using SteelLanguage.Token.Functions.Conditional;
@@ -7,14 +6,14 @@ using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 using SteelLanguage.Utils;
 
-namespace SteelLanguage.Token.KeyWords;
+namespace SteelLanguage.Token.KeyWords.Container;
 
-public struct ForeachKeyword : IKeyword
+public class ForeachKeyword : ContainerKeyword
 {
-    public string Name => "foreach";
+    public override string Name => "foreach";
 
     private SteelCompiler _compiler;
-    public void CompileKeyword(string token, SteelCompiler compiler, SteelScript script, ITokenHolder tokenHolder)
+    public override void CompileKeyword(string token, SteelCompiler compiler, SteelScript script, ITokenHolder tokenHolder)
     {
         _compiler = compiler;
 
@@ -36,36 +35,8 @@ public struct ForeachKeyword : IKeyword
         BaseTerm term = type.Construct(name, compiler.CurrentLine, script.GetLibraryManager());
         func.AddTerm(term);
 
-        ParseForeachTokens(token, func);
+        ParseTokens(func, compiler);
         
         tokenHolder.AddCall(new ForeachCall(tokenHolder, compiler.CurrentLine, func));
-    }
-    
-    private void ParseForeachTokens(string foreachToken, ForeachFunc foreachFunc)
-    {
-        string line = _compiler.ReadCleanLine();
-        while (line != "{")
-        {
-            line = _compiler.ReadCleanLine();
-            if (line == null)
-                throw new FunctionLacksEndException(_compiler.CurrentLine, foreachToken);
-        }
-
-        line = _compiler.ReadCleanLine();
-        while (line != "}")
-        {
-            if (line == null)
-                throw new FunctionLacksEndException(_compiler.CurrentLine, foreachToken);
-
-            if (line == "")
-            {
-                line = _compiler.ReadCleanLine();
-                continue;
-            }
-
-            _compiler.ParseToken(line, foreachFunc);
-            
-            line = _compiler.ReadCleanLine();
-        }
     }
 }
