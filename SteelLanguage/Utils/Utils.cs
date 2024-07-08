@@ -267,12 +267,8 @@ public static class CompileUtils
                         string sig = string.Join(" ", types);
                         if (!type.HasConstructor(sig))
                             throw new ConstructorNotFoundException(compiler.CurrentLine, sig);
-                        
-                        Input[] inputs = new Input[inputTokens.Count];
-                        for (int i = 0; i < inputTokens.Count; i++)
-                        {
-                            inputs.SetValue(HandleToken(inputTokens[i], types[i], holder, compiler), i);
-                        }
+
+                        Input[] inputs = compiler.ParseInputTokens(prms, type.GetConstructor(sig), holder).ToArray();
 
                         ConstructorCall call = new ConstructorCall(holder, compiler.CurrentLine, sig, type, inputs);
                         return new Input(holder, call);
@@ -750,6 +746,9 @@ public static class CompileUtils
         if (san.Contains(" as "))
             return TokenKind.SpecialFunc;
         
+        if (holder.HasTerm(token))
+            return TokenKind.Term;
+        
         if (TokenIsConstant(token))
             return TokenKind.Constant;
 
@@ -766,9 +765,6 @@ public static class CompileUtils
                 return TokenKind.StaticField;
             }
         }
-
-        if (holder.HasTerm(token))
-            return TokenKind.Term;
 
         if (holder.GetLibraryManager().HasTermType(token))
             return TokenKind.Type;

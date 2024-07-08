@@ -240,6 +240,7 @@ public class FunctionReturnsVoidException : CompilationException
 public class FunctionParamsInvalidException : CompilationException
 {
     private string _token;
+    private string _reason;
 
     public override string Message
     {
@@ -247,7 +248,7 @@ public class FunctionParamsInvalidException : CompilationException
         {
             if (_token != null)
             {
-                return $"Function {_token} at line {LineNumber} has invalid parameters";
+                return $"Function {_token} at line {LineNumber} has invalid parameters: {_reason}";
             }
             else
             {
@@ -256,9 +257,10 @@ public class FunctionParamsInvalidException : CompilationException
         }
     }
 
-    public FunctionParamsInvalidException(int lineNumber, string token) : base(lineNumber)
+    public FunctionParamsInvalidException(int lineNumber, string token, string reason = "Parameter had no associated type or name") : base(lineNumber)
     {
         _token = token;
+        _reason = reason;
     }
 }
 

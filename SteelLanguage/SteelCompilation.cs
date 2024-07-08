@@ -265,19 +265,43 @@ public sealed class SteelCompiler
         return new LocalCall(holder, func.Name, inputTokens, CurrentLine, term);
     }
 
-    private List<Input> ParseInputTokens(string prms, IFunction func, ITokenHolder holder)
+    public List<Input> ParseInputTokens(string prms, IFunction func, ITokenHolder holder)
     {
         List<string> inputs =  ParseCallInputs(prms);
-        
-        if (inputs.Count != func.InputTypes.Length)
-            throw new InvalidParametersException(CurrentLine, func.InputTypes);
 
         // Determine tokens
         List<Input> inputTokens = new List<Input>();
+        bool hasParams = false;
+        
         for (var i = 0; i < inputs.Count; i++)
         {
             var input = inputs[i];
+            if (i >= func.InputTypes.Length)
+                throw new InvalidParametersException(CurrentLine, inputs.ToArray());
+            
+            if (func.InputTypes[i].StartsWith("params"))
+            {
+                hasParams = true;
+                break;
+            }
+            
             inputTokens.Add(CompileUtils.HandleToken(input, func.InputTypes[i], holder, this));
+        }
+
+        if (hasParams)
+        {
+            string type = func.InputTypes[func.InputTypes.Length - 1].Split(' ')[1].Trim();
+
+            Input[] grouping = new Input[inputs.Count - inputTokens.Count];
+            
+            int j = 0;
+            for (int i = inputTokens.Count; i < inputs.Count; i++, j++)
+            {
+                string input = inputs[i];
+                grouping.SetValue(CompileUtils.HandleToken(input, type, holder, this), j);
+            }
+            
+            inputTokens.Add(new Input(holder, new ParamsCall(holder, CurrentLine, type, grouping)));
         }
 
         return inputTokens;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Extensions;
 using SteelLanguage.Token.Functions;
@@ -32,11 +33,17 @@ public struct FuncKeyword : IKeyword
         List<string> inputTokens = _compiler.ParseCallInputs(prms);
 
         Dictionary<string, string> inputMapping = new Dictionary<string, string>();
-        foreach (string inputToken in inputTokens)
+        for (var i = 0; i < inputTokens.Count; i++)
         {
-            string[] inTs = inputToken.SanitizedSplit(' ', 2);
+            var inputToken = inputTokens[i];
+            string[] inTs = inputToken.SanitizedSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries,
+                ScanDirection.RightToLeft);
+            
             if (inTs.Length != 2)
                 throw new FunctionParamsInvalidException(_compiler.CurrentLine, token);
+
+            if (inTs[0].StartsWith("params") && i != inputTokens.Count - 1)
+                throw new FunctionParamsInvalidException(_compiler.CurrentLine, token, "\"params\" can only be used as the last parameter");
             
             inputMapping.Add(inTs[1], inTs[0]);
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Library;
+using SteelLanguage.Reflection;
 using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
@@ -125,7 +126,18 @@ public class UserFunction : BaseExecutable, IFunction
             _inputNames.SetValue(input.Key, idx);
 
             LibraryManager manager = GetLibraryManager();
-            AddTerm(manager.GetTermType(input.Value).Construct(input.Key, 0, manager));
+            TermType type;
+
+            if (input.Value.StartsWith("params"))
+            {
+                type = manager.GetTermType($"array<{input.Value.Split(' ')[1].Trim()}>");
+            }
+            else
+            {
+                type = manager.GetTermType(input.Value);
+            }
+
+            AddTerm(type.Construct(input.Key, 0, manager));
             idx++;
         }
     }

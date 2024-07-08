@@ -67,6 +67,7 @@
         <Compile Include="Token\Functions\Modifier\AssignmentCall.cs" />
         <Compile Include="Token\Functions\Modifier\CastCall.cs" />
         <Compile Include="Token\Functions\Modifier\FieldCall.cs" />
+        <Compile Include="Token\Functions\Modifier\ParamsCall.cs" />
         <Compile Include="Token\Functions\Operator\BoolOpCall.cs" />
         <Compile Include="Token\Functions\Operator\ComparisonCall.cs" />
         <Compile Include="Token\Functions\Operator\MathCall.cs" />

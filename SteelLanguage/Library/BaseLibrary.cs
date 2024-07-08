@@ -19,26 +19,7 @@ public class SteelLibrary : ILibrary
 
     public IEnumerable<IFunction> GlobalFunctions { get; } = new IFunction[]
     {
-        new Function("to_string", "string", inputTypes: "term", action: terms =>
-        {
-            if (terms[0].CanImplicitCastToStr)
-            {
-                return new ReturnValue(terms[0].CastToStr(), "string");
-            }
-
-            try
-            {
-                string str = terms[0].GetValue().ToString();
-                if (str == terms[0].GetValue().GetType().FullName)
-                    return new ReturnValue(terms[0].GetTermType().Name, "string");
-
-                return new ReturnValue(str, "string");
-            }
-            catch (Exception e)
-            {
-                return new ReturnValue(terms[0].GetTermType().Name, "string");
-            }
-        }),
+        new Function("to_string", "string", inputTypes: "term", action: terms => new ReturnValue(TermToString(terms[0]), "string")),
         new Function("equal", "bool", inputTypes:new []{"term", "term"}, action: terms =>
         {
             object a = terms[0].GetValue();
@@ -100,7 +81,42 @@ public class SteelLibrary : ILibrary
             BaseTerm term = terms[0];
             return term.Kind == TermKind.Null ? new ReturnValue(term.GetValue() == null, "bool") : new ReturnValue(false, "bool");
         }),
+        new Function("concat", "string", terms =>
+        {
+            string str = terms[0].CastToStr();
+            TermArray array = (TermArray)terms[1].GetValue();
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                BaseTerm term = array.GetValue(i);
+
+                str = str.Replace($"{{{i}}}", TermToString(term));
+            }
+
+            return new ReturnValue(str, "string");
+        }, "string", "params term")
     };
+
+    public static string TermToString(BaseTerm term)
+    {
+        if (term.CanImplicitCastToStr)
+        {
+            return term.CastToStr();
+        }
+
+        try
+        {
+            string str = term.GetValue().ToString();
+            if (str == term.GetValue().GetType().FullName)
+                return term.GetTermType().Name;
+
+            return str;
+        }
+        catch (Exception)
+        {
+            return term.GetTermType().Name;
+        }
+    }
 
     public IEnumerable<GlobalTerm> GlobalTerms => new[]
     {

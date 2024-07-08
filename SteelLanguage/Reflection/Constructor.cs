@@ -5,9 +5,12 @@ using SteelLanguage.Token.Terms;
 
 namespace SteelLanguage.Reflection;
 
-public struct TermConstructor : IExecutable
+public struct TermConstructor : IFunction
 {
-    public string[] Inputs { get; }
+    public string Name => GetSig();
+    public string ReturnType { get; }
+
+    public string[] InputTypes { get; }
     public ConstructorKind Kind { get; }
     
     private Func<BaseTerm[], ReturnValue> _action;
@@ -24,18 +27,18 @@ public struct TermConstructor : IExecutable
             return "";
         }
 
-        return string.Join(" ", Inputs);
+        return string.Join(" ", InputTypes);
     }
 
     public TermConstructor()
     {
-        Inputs = new string[0];
+        InputTypes = new string[0];
     }
 
-    public TermConstructor(Func<BaseTerm[], ReturnValue> action, params string[] inputs)
+    public TermConstructor(Func<BaseTerm[], ReturnValue> action, params string[] inputTypes)
     {
         _action = action;
-        Inputs = inputs;
+        InputTypes = inputTypes;
         Kind = ConstructorKind.Filled;
     }
 
