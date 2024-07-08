@@ -84,7 +84,7 @@ public abstract class BaseTerm : IToken
 
     public virtual bool SetField(string name, object value)
     {
-        throw new FieldReadOnlyException(0, name);
+        return false;
     }
     
     public bool HasField(string name)

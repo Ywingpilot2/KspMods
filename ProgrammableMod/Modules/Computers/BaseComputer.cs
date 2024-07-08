@@ -138,6 +138,7 @@ public abstract class BaseComputer : PartModule
     {
         base.OnAwake();
         tokenContainer = new TokenContainer();
+        State = new FlightCtrlState(); // to prevent compiler issues
     }
 
     public override void OnStart(StartState state)

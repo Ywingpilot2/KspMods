@@ -8,15 +8,20 @@ public class AssignmentCall : TokenCall
 {
     private Input Input { get; }
 
-    private bool _isField;
-    private string _term;
-    private string _field;
+    private readonly bool _isField;
+    private readonly string _term;
+    private readonly string _field;
 
     public override ReturnValue Call()
     {
         if (_isField)
         {
-            if (!GetTerm(_term).SetField(_field, Input.GetValue().GetValue()))
+            BaseTerm term = Input.GetValue();
+            object value = term.GetValue();
+            if (GetTerm(_term).GetField(_field).Value.Type != term.ValueType)
+                value = term.CastToType(GetTerm(_term).GetField(_field).Value.Type);
+            
+            if (!GetTerm(_term).SetField(_field, value))
                 throw new InvalidAssignmentException(Line, GetTerm(_term));
         }
         else

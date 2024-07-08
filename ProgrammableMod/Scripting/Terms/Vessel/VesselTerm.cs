@@ -33,6 +33,61 @@ public class VesselTerm : BaseVesselTerm
         yield return new TermField("total_mass", "double", Computer.vessel != null ? Computer.vessel.totalMass : 0.0);
         yield return new TermField("stage_manager", "staging", _manager);
         yield return new TermField("sas", "autopilot", Computer);
+        
+        // navigation
+        yield return new TermField("throttle", "float", Computer.State.mainThrottle, true);
+        yield return new TermField("yaw", "float", Computer.State.yaw, true);
+        yield return new TermField("pitch", "float", Computer.State.pitch, true);
+        yield return new TermField("roll", "float", Computer.State.roll, true);
+        
+        // rcs
+        yield return new TermField("rcs_x", "float", Computer.State.X, true);
+        yield return new TermField("rcs_y", "float", Computer.State.Y, true);
+        yield return new TermField("rcs_z", "float", Computer.State.Z, true);
+    }
+
+    public override bool SetField(string name, object value)
+    {
+        switch (name)
+        {
+            case "throttle":
+            {
+                Computer.State.mainThrottle = (float)value;
+                return true;
+            }
+            case "yaw":
+            {
+                Computer.State.yaw = (float)value;
+                return true;
+            }
+            case "pitch":
+            {
+                Computer.State.pitch = (float)value;
+                return true;
+            }
+            case "roll":
+            {
+                Computer.State.roll = (float)value;
+                return true;
+            }
+            case "rcs_x":
+            {
+                Computer.State.X = (float)value;
+                return true;
+            }
+            case "rcs_y":
+            {
+                Computer.State.Y = (float)value;
+                return true;
+            }
+            case "rcs_z":
+            {
+                Computer.State.Z = (float)value;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     #endregion
@@ -46,26 +101,6 @@ public class VesselTerm : BaseVesselTerm
             yield return function;
         }
         
-        yield return new Function("set_pitch", "void", terms =>
-        {
-            Computer.State.pitch = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
-            return new ReturnValue();
-        }, "float");
-        yield return new Function("set_yaw", "void", terms =>
-        {
-            Computer.State.yaw = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
-            return new ReturnValue();
-        }, "float");
-        yield return new Function("set_roll", "void", terms =>
-        {
-            Computer.State.roll = Mathf.Clamp(terms[0].CastToFloat(), -1.0F, 1.0F);
-            return new ReturnValue();
-        }, "float");
-        yield return new Function("set_throttle", "void", terms =>
-        {
-            Computer.State.mainThrottle = Mathf.Clamp(terms[0].CastToFloat(), 0.0F, 1.0F);
-            return new ReturnValue();
-        }, "float");
         yield return new Function("toggle_action", "void", terms =>
         {
             int idx = terms[0].CastToInt();
