@@ -83,7 +83,7 @@ public sealed class TermType
         return false;
     }
 
-    public bool CanImplicitCastTo(string name) => Term.CanImplicitCastToType(name);
+    public bool CanImplicitCastTo(TermType type) => Term.CanImplicitCastToType(type);
 
     public bool HasFunction(string name) => Term.HasFunction(name);
     public IFunction GetFunction(string name) => Term.GetFunction(name);

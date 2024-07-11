@@ -208,7 +208,7 @@ public static class CompileUtils
     {
         TokenKind kind = GetTokenKind(token, holder);
         TermType type = GetTypeFromToken(token, holder, kind);
-        if (type.Name != expectedType && !type.CanImplicitCastTo(expectedType) && !type.IsSubclassOf(expectedType))
+        if (type.Name != expectedType && !type.CanImplicitCastTo(holder.GetLibraryManager().GetTermType(expectedType)) && !type.IsSubclassOf(expectedType))
             throw new InvalidTermCastException(compiler.CurrentLine, type.Name, expectedType);
         
         switch (kind)
@@ -255,7 +255,7 @@ public static class CompileUtils
                     {
                         string[] split = token.SanitizedSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
                         string[] typePrms = split[1].SanitizedSplit('(', 2);
-                        string prms = typePrms[1].Trim(')'); // TODO: Trimming is expensive and wasteful!
+                        string prms = typePrms[1].TrimEnd(')');
                         List<string> inputTokens = compiler.ParseCallInputs(prms);
 
                         string[] types = new string[inputTokens.Count];
@@ -528,7 +528,7 @@ public static class CompileUtils
                     }
                     case OperatorKind.Comparison:
                     case OperatorKind.Bool:
-                        return holder.GetLibraryManager().GetTermType("bool"); // TODO: Actually check the type lol
+                        return holder.GetLibraryManager().GetTermType("bool");
                     default:
                         throw new InvalidActionException(0, $"{kind} is not a supported operator");
                 }

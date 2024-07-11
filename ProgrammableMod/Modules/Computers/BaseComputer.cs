@@ -55,7 +55,7 @@ public abstract class BaseComputer : PartModule
             }
             else
             {
-                Running = false;
+                running = false;
             }
             tokenContainer.shouldRun = value;
             UpdateButton();
@@ -171,8 +171,8 @@ public abstract class BaseComputer : PartModule
 
     #region Script Events
 
-    public bool Running;
-    public bool Compiling;
+    public bool running;
+    public bool compiling;
     
     /// <summary>
     /// Called just before <see cref="Execution"/> is called
@@ -187,12 +187,12 @@ public abstract class BaseComputer : PartModule
     
     protected virtual void PostExecute()
     {
-        Running = true;
+        running = true;
     }
 
     protected virtual void OnCompiled()
     {
-        Compiling = false;
+        compiling = false;
     }
 
     #endregion
@@ -213,11 +213,11 @@ public abstract class BaseComputer : PartModule
 
     private void OnBlownUp(Part data)
     {
-        // not our crash
+        // not our crash, or bob is trying to break in again...
         if (data.vessel.id != part.vessel.id || data.isVesselEVA)
             return;
         
-        Random rng = new Random();
+        Random rng = new();
         if (rng.Next(0, 10) <= 5 || data.flightID == part.flightID)
         {
             ThrowException($"Oh no, an unknown error has occured! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {rng.Next(404)}");
@@ -236,7 +236,7 @@ public abstract class BaseComputer : PartModule
     [KSPEvent(active = true, guiActive = true, guiName = "Compile Script", guiActiveEditor = true, guiActiveUnfocused = true, unfocusedRange = 15f)]
     public void CompileScript()
     {
-        Compiling = true;
+        compiling = true;
         try
         {
             SteelScript script = _compiler.Compile(tokenContainer.tokens);
@@ -360,13 +360,11 @@ public abstract class BaseComputer : PartModule
 
     #region Status
 
-    private bool executionException = false;
     public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
     {
         ExceptionBoxControl.Show(message);
         if (kind == StatusKind.Uhoh)
         {
-            executionException = ShouldRun;
             ShouldRun = false;
             tokenContainer.shouldCompile = false;
         }

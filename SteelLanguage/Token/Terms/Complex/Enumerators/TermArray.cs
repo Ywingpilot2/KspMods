@@ -9,7 +9,7 @@ using SteelLanguage.Token.Terms.Literal;
 
 namespace SteelLanguage.Token.Terms.Complex.Enumerators;
 
-public struct TermArray : IEnumerable
+public class TermArray : IEnumerable
 {
     public string ValueType { get; }
     public int Length { get; }
@@ -56,28 +56,6 @@ public class ArrayTerm : EnumeratorTerm
 {
     public override string ValueType => "array";
 
-    public override bool SetValue(object value)
-    {
-        // TODO: This is really expensive!!!!
-        if (value is TermArray array)
-        {
-            Value = array;
-            ContainedType = array.ValueType;
-            Kind = TermKind.Class;
-            return true;
-        }
-
-        if (value == null)
-        {
-            Value = null;
-            ContainedType = null;
-            Kind = TermKind.Null;
-            return true;
-        }
-
-        return false;
-    }
-
     public override IEnumerable<TermField> GetFields()
     {
         foreach (TermField field in base.GetFields())
@@ -104,7 +82,6 @@ public class ArrayTerm : EnumeratorTerm
             yield return function;
         }
         
-        // TODO: Find a way to make the return type the contained type, that way we don't need to always cast
         yield return new Function("get", ContainedType, terms =>
         {
             TermArray array = (TermArray)Value;
@@ -127,6 +104,27 @@ public class ArrayTerm : EnumeratorTerm
         {
             Value = array.Value;
             ContainedType = array.ContainedType; // TODO: Should we do this if the contained types don't match?
+            return true;
+        }
+
+        return false;
+    }
+    
+    public override bool SetValue(object value)
+    {
+        if (value is TermArray array)
+        {
+            Value = array;
+            ContainedType = array.ValueType;
+            Kind = TermKind.Class;
+            return true;
+        }
+
+        if (value == null)
+        {
+            Value = null;
+            ContainedType = null;
+            Kind = TermKind.Null;
             return true;
         }
 

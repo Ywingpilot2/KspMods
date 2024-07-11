@@ -237,9 +237,9 @@ public abstract class BaseTerm : IToken
         throw new InvalidTermCastException(Line, ValueType, "bool");
     }
 
-    public virtual bool CanImplicitCastToType(string name)
+    public virtual bool CanImplicitCastToType(TermType type)
     {
-        switch (name)
+        switch (type.Name)
         {
             case "bool":
             {

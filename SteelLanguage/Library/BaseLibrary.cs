@@ -151,11 +151,13 @@ public class SteelLibrary : ILibrary
         TermType numberType = new TermType(new NumberTerm(), baseType, true);
         TermType enumerableType = new TermType(new EnumeratorTerm(), baseType, true);
         TermType enumType = new TermType(new EnumTerm(), baseType, true);
+        TermType collectionType = new TermType(new CollectionTerm(), enumerableType, true, true);
         
         TypeLibrary.AddTermType(baseType);
         TypeLibrary.AddTermType(numberType);
         TypeLibrary.AddTermType(enumerableType);
         TypeLibrary.AddTermType(enumType);
+        TypeLibrary.AddTermType(collectionType);
         TypeLibrary.AddTermType(new TermType(new VoidTerm(), isAbstract:true));
         TypeLibrary.AddTermType(new TermType(new TermI(), numberType));
         TypeLibrary.AddTermType(new TermType(new TermU(), numberType));
@@ -165,5 +167,6 @@ public class SteelLibrary : ILibrary
         TypeLibrary.AddTermType(new TermType(new BoolTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new ArrayTerm(), enumerableType, isNullable:true));
         TypeLibrary.AddTermType(new TermType(new NullTerm(), baseType, isNullable:true));
+        TypeLibrary.AddTermType(new TermType(new ListTerm(), collectionType, isNullable:true));
     }
 }

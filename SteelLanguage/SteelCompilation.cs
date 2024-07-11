@@ -154,7 +154,7 @@ public sealed class SteelCompiler
             {
                 TermType type = manager.GetTermType(values[0]);
                 BaseTerm from = holder.GetTerm(values[2]);
-                if (!from.CanImplicitCastToType(type.Name) && !from.GetTermType().IsSubclassOf(type.Name))
+                if (!from.CanImplicitCastToType(type) && !from.GetTermType().IsSubclassOf(type.Name))
                     throw new InvalidAssignmentException(CurrentLine);
 
                 BaseTerm term;

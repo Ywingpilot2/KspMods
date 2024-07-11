@@ -13,15 +13,14 @@ public class NullTerm : BaseTerm
 
     public override bool CanImplicitCastToStr => true;
 
-    public override bool CanImplicitCastToType(string name)
+    public override bool CanImplicitCastToType(TermType type)
     {
-        TermType type = TypeLibrary.GetTermType(name);
         if (type.IsNullable)
         {
             return true;
         }
         
-        return base.CanImplicitCastToType(name);
+        return base.CanImplicitCastToType(type);
     }
 
     public override bool SetValue(object value)

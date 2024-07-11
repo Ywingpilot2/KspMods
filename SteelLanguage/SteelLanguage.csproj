@@ -94,6 +94,9 @@
         <Compile Include="Token\KeyWords\Single\ReturnKeyword.cs" />
         <Compile Include="Token\KeyWords\Single\ThrowKeyword.cs" />
         <Compile Include="Token\Terms\BaseTerm.cs" />
+        <Compile Include="Token\Terms\Complex\Enumerators\CollectionTerm.cs" />
+        <Compile Include="Token\Terms\Complex\Enumerators\ListTerm.cs" />
+        <Compile Include="Token\Terms\Complex\Enumerators\ReadOnlyCollectionTerm.cs" />
         <Compile Include="Token\Terms\Complex\Enumerators\TermArray.cs" />
         <Compile Include="Token\Terms\Complex\EnumeratorTerm.cs" />
         <Compile Include="Token\Terms\Complex\EnumTerm.cs" />

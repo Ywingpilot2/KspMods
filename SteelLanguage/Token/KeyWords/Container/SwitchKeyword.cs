@@ -42,7 +42,7 @@ public class SwitchKeyword : ContainerKeyword
         List<SingleExecutableFunc> funcs = new List<SingleExecutableFunc>();
 
         SingleExecutableFunc def = null;
-        SingleExecutableFunc func = new SingleExecutableFunc(holder);
+        SingleExecutableFunc func = new(holder);
         
         while (line != "}")
         {
@@ -70,7 +70,7 @@ public class SwitchKeyword : ContainerKeyword
                     throw new TokenMustBeConstantException(compiler.CurrentLine, value);
 
                 TermType type = CompileUtils.GetTypeFromConstant(value, holder);
-                if (type.Name != expectedType && !type.CanImplicitCastTo(expectedType))
+                if (type.Name != expectedType && !type.CanImplicitCastTo(holder.GetLibraryManager().GetTermType(expectedType)))
                     throw new FunctionParamsInvalidException(compiler.CurrentLine, value, $"expected type was {expectedType}, instead got {type.Name}");
 
                 BaseTerm term = type.Construct(Guid.NewGuid().ToString(), 0, holder.GetLibraryManager());
