@@ -1,4 +1,5 @@
-﻿using SteelLanguage.Token.Functions.Single;
+﻿using System;
+using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 
@@ -91,6 +92,8 @@ public class WhileFunction : BaseExecutable
                         return returnValue;
                 }
             }
+            
+            GC.Collect();
         }
 
         return new ReturnValue();

@@ -45,7 +45,7 @@ public struct Input
                     throw new TypeNotExistException(Call.Line, value.Type);
 
                 TermType type = _script.GetLibraryManager().GetTermType(value.Type);
-                BaseTerm term = type.Construct(Guid.NewGuid().ToString(), Call.Line, _script.GetLibraryManager());
+                BaseTerm term = type.Construct(null, Call.Line, _script.GetLibraryManager());
                 if (term.SetValue(value.Value) && term.Kind == TermKind.Null)
                 {
                     term.Kind = TermKind.Basic;

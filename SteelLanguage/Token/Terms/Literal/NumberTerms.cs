@@ -37,6 +37,7 @@ public class NumberTerm : BaseTerm
 
     protected ValueType Number;
     protected virtual Type NumberType { get; }
+    protected static NumberFormatInfo Info = new NumberFormatInfo();
 
     protected static string[] NumberTypes = new[]
     {
@@ -231,12 +232,12 @@ public class TermI : NumberTerm
         yield return new TermField("min", "int", int.MinValue);
         yield return new TermField("max", "int", int.MaxValue);
     }
-
+    
     public override bool SetValue(object value)
     {
         if (value is IConvertible convertible)
         {
-            Number = convertible.ToInt32(new NumberFormatInfo());
+            Number = convertible.ToInt32(Info);
             Kind = TermKind.Basic;
             return true;
         }

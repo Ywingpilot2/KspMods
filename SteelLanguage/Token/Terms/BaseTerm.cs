@@ -104,15 +104,20 @@ public abstract class BaseTerm : IToken
 
     #region Functions
 
-    private readonly IEnumerable<IFunction> _functions = new IFunction[]
+    /// <summary>
+    /// This method enumerates over all of the <see cref="IFunction"/>s this Term has.
+    /// It is suggested to iterate over the base.GetFunctions as well, that way functions such as Equals are included in the enumeration
+    /// </summary>
+    /// <returns>An enumerable which provides the terms functions</returns>
+    public virtual IEnumerable<IFunction> GetFunctions()
     {
-        new Function("equals", "bool", inputTypes:new []{"term"}, action: terms =>
+        yield return new Function("equals", "bool", inputTypes: new[] { "term" }, action: terms =>
         {
             object a = terms[0].GetValue();
             object b = terms[1].GetValue();
             return new ReturnValue(a.Equals(b), "bool");
-        }),
-        new Function("to_string", "string", terms =>
+        });
+        yield return new Function("to_string", "string", terms =>
         {
             if (terms[0].CanImplicitCastToStr)
             {
@@ -122,20 +127,7 @@ public abstract class BaseTerm : IToken
             {
                 return new ReturnValue(terms[0].GetValue().ToString(), "string");
             }
-        })
-    };
-    
-    /// <summary>
-    /// This method enumerates over all of the <see cref="IFunction"/>s this Term has.
-    /// It is suggested to iterate over the base.GetFunctions as well, that way functions such as Equals are included in the enumeration
-    /// </summary>
-    /// <returns>An enumerable which provides the terms functions</returns>
-    public virtual IEnumerable<IFunction> GetFunctions()
-    {
-        foreach (IFunction function in _functions)
-        {
-            yield return function;
-        }
+        });
     }
 
     public IFunction GetFunction(string name)

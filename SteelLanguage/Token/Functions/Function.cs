@@ -33,7 +33,6 @@ public struct Function : IFunction
     public string Name { get; }
     public string ReturnType { get; }
     public string[] InputTypes { get; }
-    public bool AnyCount { get; }
     private Func<BaseTerm[], ReturnValue> Action { get; }
 
     public ReturnValue Execute(params BaseTerm[] terms)
@@ -60,15 +59,6 @@ public struct Function : IFunction
         InputTypes = inputTypes;
         Action = action;
     }
-        
-    public Function(string name, string returnType, Func<BaseTerm[], ReturnValue> action, bool anyCount, params string[] inputTypes)
-    {
-        Name = name;
-        ReturnType = returnType;
-        InputTypes = inputTypes;
-        AnyCount = anyCount;
-        Action = action;
-    }
 }
     
 public class UserFunction : BaseExecutable, IFunction
@@ -76,7 +66,6 @@ public class UserFunction : BaseExecutable, IFunction
     public string Name { get; }
     public string ReturnType { get; }
     public string[] InputTypes { get; }
-    public bool AnyCount { get; }
     private readonly string[] _inputNames;
 
     public override ReturnValue Execute(params BaseTerm[] terms)

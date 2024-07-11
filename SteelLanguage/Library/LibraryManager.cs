@@ -66,7 +66,7 @@ public class LibraryManager
     
     public bool HasTermType(string name)
     {
-        foreach (ILibrary library in EnumerateLibraries())
+        foreach (ILibrary library in _libraries.Values)
         {
             if (library.TypeLibrary == null)
                 continue;
@@ -80,7 +80,7 @@ public class LibraryManager
 
     public TermType GetTermType(string name)
     {
-        foreach (ILibrary library in EnumerateLibraries())
+        foreach (ILibrary library in _libraries.Values)
         {
             if (library.TypeLibrary == null)
                 continue;

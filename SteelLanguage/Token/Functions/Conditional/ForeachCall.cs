@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
@@ -104,6 +105,8 @@ public class ForeachFunc : BaseExecutable
                     }
                 }
             }
+
+            GC.Collect();
         }
         
         enumerator.Reset();

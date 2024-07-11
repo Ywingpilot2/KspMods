@@ -12,6 +12,8 @@ using SteelLanguage.Token.KeyWords;
 using SteelLanguage.Token.KeyWords.Container;
 using SteelLanguage.Token.Terms;
 using SteelLanguage.Token.Terms.Complex;
+using SteelLanguage.Token.Terms.Complex.Enumerators;
+using SteelLanguage.Token.Terms.Literal;
 
 namespace ActionTest
 {
@@ -35,7 +37,7 @@ namespace ActionTest
 
         public IEnumerable<GlobalTerm> GlobalTerms => new[]
         {
-            new GlobalTerm("program", "program")
+            new GlobalTerm("program", "program_t")
         };
         
         public IEnumerable<IKeyword> Keywords { get; }
@@ -59,7 +61,7 @@ namespace ActionTest
         
         public class ProgramTerm : BaseTerm
         {
-            public override string ValueType => "program";
+            public override string ValueType => "program_t";
             private string _value;
             
             public override bool SetValue(object value)
@@ -71,6 +73,30 @@ namespace ActionTest
             public override IEnumerable<TermField> GetFields()
             {
                 yield return new TermField("value", "string", _value, true);
+            }
+
+            public override IEnumerable<IFunction> GetFunctions()
+            {
+                foreach (IFunction function in base.GetFunctions())
+                {
+                    yield return function;
+                }
+
+                yield return new Function("enumerate_test", "enumerable", _ =>
+                {
+                    TermArray array = new TermArray("int", 4);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        TermI iTerm = new TermI()
+                        {
+                            TypeLibrary = TypeLibrary
+                        };
+                        iTerm.SetValue(i + 1);
+                        array.SetValue(iTerm, i);
+                    }
+
+                    return new ReturnValue(array, "array<int>");
+                });
             }
 
             public override bool SetField(string name, object value)
