@@ -101,27 +101,21 @@ public abstract class BaseComputer : PartModule
                 }
                 else
                 {
-                    string error = "Big problem, multiple errors have occured! The errors:\n";
-                    
-                    foreach (Exception innerException in e.InnerExceptions)
+                    foreach (Exception ie in e.InnerExceptions)
                     {
-                        error += innerException.Message;
+                        ThrowException(ie.Message);
                     }
-                    
-                    ThrowException(error);
                 }
 
                 foreach (Exception ie in e.InnerExceptions)
                 {
-                    TimeSpan time = DateTime.Now.TimeOfDay;
-                    Debug.Log($"[{time.Hours}:{time.Minutes}:{time.TotalSeconds}] Exception caught during action script execution occured! Data: {ie.Message}\n{ie.StackTrace}");
+                    Debug.Log($"[{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}] Exception caught during execution! Data: {ie.Message}\n{ie.StackTrace}");
                 }
             }
             catch (Exception e)
             {
                 ThrowException(e.Message);
-                TimeSpan time = DateTime.Now.TimeOfDay;
-                Debug.Log($"[{time.Hours}:{time.Minutes}:{time.TotalSeconds}] Exception caught during action script execution occured! Data: {e.Message}\n{e.StackTrace}");
+                Debug.Log($"[{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}] Exception caught during execution! Data: {e.Message}\n{e.StackTrace}");
             }
         }
     }
@@ -135,16 +129,17 @@ public abstract class BaseComputer : PartModule
 
         _count++;
         _previous = log;
-        TimeSpan time;
+        string time;
         if (HighLogic.LoadedSceneIsFlight)
         {
-            time = TimeSpan.FromSeconds(vessel.missionTime);
+            TimeSpan timeSpan = TimeSpan.FromSeconds(vessel.missionTime);
+            time = $"[{timeSpan.Hours}:{timeSpan.Minutes}:{timeSpan.Seconds}]";
         }
         else
         {
-            time = TimeSpan.FromSeconds(Time.fixedTime);
+            time = $"[{KSPUtil.dateTimeFormatter.Year}:{KSPUtil.dateTimeFormatter.Day}:{KSPUtil.dateTimeFormatter.Hour}.{KSPUtil.dateTimeFormatter.Minute / 60}";
         }
-        _logControl.Log($"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}");
+        _logControl.Log($"{time} {log}");
     }
 
     #endregion
@@ -266,10 +261,28 @@ public abstract class BaseComputer : PartModule
             tokenContainer.shouldCompile = true;
             ResetStatus();
         }
+        catch (AggregateException e)
+        {
+            if (e.InnerExceptions.Count == 1 && e.InnerException != null)
+            {
+                ThrowException(e.InnerException.Message);
+            }
+            else
+            {
+                foreach (Exception innerException in e.InnerExceptions)
+                {
+                    ThrowException(innerException.Message);
+                }
+            }
+
+            foreach (Exception ie in e.InnerExceptions)
+            {
+                Debug.Log($"[{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}] Exception caught during compilation! Data: {ie.Message}\n{ie.StackTrace}");
+            }
+        }
         catch (Exception e)
         {
-            TimeSpan time = DateTime.Now.TimeOfDay;
-            Debug.Log($"[{time.Hours}:{time.Minutes}:{time.TotalSeconds}] Exception caught during action script execution occured! Data: {e.Message}\n{e.StackTrace}");
+            Debug.Log($"[{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}] Exception caught during compilation! Data: {e.Message}\n{e.StackTrace}");
             ThrowException(e.Message);
         }
         finally
