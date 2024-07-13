@@ -95,7 +95,11 @@
         <Compile Include="Scripting\Library\KerbalLibrary.cs" />
         <Compile Include="Scripting\Library\VesselLibrary.cs" />
         <Compile Include="Scripting\Terms\BaseVesselTerm.cs" />
-        <Compile Include="Scripting\Terms\Graphmatics\PiecewiseCurve.cs" />
+        <Compile Include="Scripting\Terms\Graphmatics\Curves\IPiecewise.cs" />
+        <Compile Include="Scripting\Terms\Graphmatics\Curves\PiecewiseCTerm.cs" />
+        <Compile Include="Scripting\Terms\Graphmatics\Curves\PiecewiseCurve.cs" />
+        <Compile Include="Scripting\Terms\Graphmatics\Curves\PiecewiseLinear.cs" />
+        <Compile Include="Scripting\Terms\IStashableTerm.cs" />
         <Compile Include="Scripting\Terms\KerbNet\KerbNetTerm.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec2Term.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec3Term.cs" />
@@ -104,6 +108,8 @@
         <Compile Include="Scripting\Terms\Vessel\StagingManager.cs" />
         <Compile Include="Scripting\Terms\Vessel\StagingTerm.cs" />
         <Compile Include="Scripting\Terms\Vessel\VesselTerm.cs" />
+        <Compile Include="Scripting\ValueStasher\ProtoStash.cs" />
+        <Compile Include="Scripting\ValueStasher\ValueStasher.cs" />
         <Compile Include="SuperComputer.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

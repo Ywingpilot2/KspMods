@@ -11,21 +11,13 @@ using Random = System.Random;
 
 namespace ProgrammableMod.Controls;
 
-public sealed class CodeEditorControl : Control
+public sealed class CodeEditorControl : DragWindow
 {
     public string Text => _textControl.Text;
     private Action<CodeEditorControl> _onSave;
     private Action<CodeEditorControl> _onClose;
     private TextAreaControl _textControl;
-    
-    public override void Draw()
-    {
-        foreach (Control control in this)
-        {
-            control.Draw();
-        }
-    }
-    
+
     public static void Show(string content, string header, Action<CodeEditorControl> onSave, Action<CodeEditorControl> onClose)
     {
         Random rng = new Random();
@@ -45,27 +37,21 @@ public sealed class CodeEditorControl : Control
         Hide();
     }
 
-    public CodeEditorControl(int id, string code, string content, Action<CodeEditorControl> onSave, Action<CodeEditorControl> onClose) : base(id)
+    public CodeEditorControl(int id, [NotNull] string content, string header, Action<CodeEditorControl> onSave, Action<CodeEditorControl> onClose) : base(id, header, new(Screen.width / 2, Screen.height / 2, 600, 450))
     {
         Random rng = new Random();
-        _textControl = new TextAreaControl(rng.Next(), code)
+        _textControl = new TextAreaControl(rng.Next(), content)
         {
             LayoutOptions = new []{GUILayout.ExpandWidth(true),GUILayout.ExpandHeight(true)}
         };
-
-        WindowControl control = new WindowControl(rng.Next(), new GUIContent(content),
-            new(Screen.width / 2, Screen.height / 2, 600, 450),
-            new ScrollViewControl(rng.Next(), _textControl))
-            {
-                FontSize = 18,
-            };
+        
+        Add(new ScrollViewControl(rng.Next(), _textControl));
 
         ColumnControl columnControl = new ColumnControl(rng.Next(),
             new ButtonControl(rng.Next(), "Cancel", (_,_) => Hide()),
             new ButtonControl(rng.Next(), "Save", (_,_) => Save()));
-        control.Add(columnControl);
+        Add(columnControl);
         
-        Add(control);
         _onSave = onSave;
         _onClose = onClose;
     }

@@ -2,6 +2,7 @@
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Terms.KerbNet;
+using SteelLanguage;
 using SteelLanguage.Library;
 using SteelLanguage.Reflection;
 using SteelLanguage.Token.Functions;
@@ -24,21 +25,23 @@ public class KerbalLibrary : ILibrary
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 
-    public KerbalLibrary(BaseComputer computer, SteelLibrary library)
+    public KerbalLibrary(BaseComputer computer) : this()
     {
-        TypeLibrary = new TypeLibrary();
-        KerbNetTerm kerb = new KerbNetTerm
-        {
-            Kind = TermKind.Class, 
-            Computer = computer,
-            Name = "KERBNET",
-            
-        };
-        TypeLibrary.AddTermType(new TermType(kerb, library.TypeLibrary.GetTermType("term", 0)));
-        
         GlobalTerms = new[]
         {
-            new GlobalTerm(kerb)
+            new GlobalTerm(new KerbNetTerm
+            {
+                Kind = TermKind.Class, 
+                Computer = computer,
+                Name = "KERBNET",
+            
+            })
         };
+    }
+
+    public KerbalLibrary()
+    {
+        TypeLibrary = new TypeLibrary();
+        TypeLibrary.AddTermType(new TermType(new KerbNetTerm(), SteelCompiler.Library.TypeLibrary.GetTermType("term", 0)));
     }
 }

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Terms.Graphmatics;
+using ProgrammableMod.Scripting.Terms.Graphmatics.Curves;
 using ProgrammableMod.Scripting.Terms.Vectors;
+using SteelLanguage;
 using SteelLanguage.Library;
 using SteelLanguage.Reflection;
 using SteelLanguage.Token.Functions;
@@ -42,12 +44,16 @@ public class ComputerLibrary : ILibrary
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 
-    public ComputerLibrary(SteelLibrary baseLibrary, BaseComputer computer)
+    public ComputerLibrary(BaseComputer computer) : this()
     {
         _computer = computer;
+    }
+
+    public ComputerLibrary()
+    {
         TypeLibrary = new TypeLibrary();
         
-        TermType baseType = baseLibrary.TypeLibrary.GetTermType("term", 0);
+        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term", 0);
         TypeLibrary.AddTermType(new TermType(new PiecewiseCTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new Vec2Term(), baseType));
         TypeLibrary.AddTermType(new TermType(new Vec3Term(), baseType));

@@ -32,7 +32,7 @@ public class GuiTestModule : PartModule
             LayoutOptions = new []{GUILayout.ExpandWidth(true),GUILayout.ExpandHeight(true)}
         };
 
-        WindowControl control = new WindowControl(_winId, new GUIContent("I am gonna touch you"),
+        HeaderWindow control = new HeaderWindow(_winId, new GUIContent("I am gonna touch you"),
             new(Screen.width / 2, Screen.height / 2, 600, 450),
             new ScrollViewControl(random.Next(), _textControl))
             {

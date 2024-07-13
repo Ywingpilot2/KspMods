@@ -28,3 +28,25 @@ public class TooSlowException : ExecutionException
     {
     }
 }
+
+public class TypeNotStashableException : ExecutionException
+{
+    private string _type;
+    public override string Message => $"The the type {_type} at line {LineNumber} does not support being stashed onto the kerbnet";
+
+    public TypeNotStashableException(int lineNumber, string type) : base(lineNumber)
+    {
+        _type = type;
+    }
+}
+
+public class StashableNotFoundException : ExecutionException
+{
+    private string _name;
+    public override string Message => $"Call at {LineNumber} cannot be made as stashable of name {_name} does not exist";
+
+    public StashableNotFoundException(int lineNumber, string name) : base(lineNumber)
+    {
+        _name = name;
+    }
+}

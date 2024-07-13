@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CommNet;
 using ProgrammableMod.Scripting.Exceptions;
 using SteelLanguage.Exceptions;
@@ -32,7 +33,8 @@ public class SASTypeTerm : EnumTerm
 public class SASTerm : BaseVesselTerm
 {
     public override string ValueType => "autopilot";
-
+    
+    [SuppressMessage("ReSharper", "HeapView.BoxingAllocation")]
     public override IEnumerable<IFunction> GetFunctions()
     {
         foreach (IFunction function in base.GetFunctions())
@@ -54,17 +56,21 @@ public class SASTerm : BaseVesselTerm
 
             return new ReturnValue();
         });
-        yield return new Function("can_sas", "bool", terms => new ReturnValue(
-            Computer.vessel.Autopilot.CanSetMode(
-                (VesselAutopilot.AutopilotMode)Enum.Parse(typeof(VesselAutopilot.AutopilotMode),
-                    terms[0].CastToStr(), true)), "bool"), "string");
+        yield return new Function("can_sas", "bool", terms =>
+        {
+            VesselAutopilot.AutopilotMode mode =
+                (VesselAutopilot.AutopilotMode)KerbinSuperComputer.EnumFromInt(terms[0].CastToInt(),
+                    typeof(VesselAutopilot.AutopilotMode));
+
+            return new ReturnValue(Computer.vessel.Autopilot.CanSetMode(mode), "bool");
+        }, "sas_mode");
         yield return new Function("set_sas", "void", terms =>
         {
             string sasType = terms[0].CastToStr();
 
-            // TODO: switch instead of parsing it as a string
             VesselAutopilot.AutopilotMode mode =
-                (VesselAutopilot.AutopilotMode)Enum.Parse(typeof(VesselAutopilot.AutopilotMode), sasType, true);
+                (VesselAutopilot.AutopilotMode)KerbinSuperComputer.EnumFromInt(terms[0].CastToInt(),
+                    typeof(VesselAutopilot.AutopilotMode));
             if (!Computer.vessel.Autopilot.CanSetMode(mode))
                 throw new InvalidActionException(0, $"Cannot set autopilot mode to {sasType} currently");
 

@@ -13,6 +13,7 @@ using SteelLanguage.Library;
 using UniLinq;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Debug = UnityEngine.Debug;
 using Random = System.Random;
 
 namespace ProgrammableMod.Modules.Computers;
@@ -109,10 +110,18 @@ public abstract class BaseComputer : PartModule
                     
                     ThrowException(error);
                 }
+
+                foreach (Exception ie in e.InnerExceptions)
+                {
+                    TimeSpan time = DateTime.Now.TimeOfDay;
+                    Debug.Log($"[{time.Hours}:{time.Minutes}:{time.TotalSeconds}] Exception caught during action script execution occured! Data: {ie.Message}\n{ie.StackTrace}");
+                }
             }
             catch (Exception e)
             {
                 ThrowException(e.Message);
+                TimeSpan time = DateTime.Now.TimeOfDay;
+                Debug.Log($"[{time.Hours}:{time.Minutes}:{time.TotalSeconds}] Exception caught during action script execution occured! Data: {e.Message}\n{e.StackTrace}");
             }
         }
     }
@@ -126,7 +135,15 @@ public abstract class BaseComputer : PartModule
 
         _count++;
         _previous = log;
-        TimeSpan time = TimeSpan.FromSeconds(vessel.missionTime);
+        TimeSpan time;
+        if (HighLogic.LoadedSceneIsFlight)
+        {
+            time = TimeSpan.FromSeconds(vessel.missionTime);
+        }
+        else
+        {
+            time = TimeSpan.FromSeconds(Time.fixedTime);
+        }
         _logControl.Log($"[{time.Hours}:{time.Minutes}:{time.Seconds}] {log}");
     }
 
@@ -145,9 +162,9 @@ public abstract class BaseComputer : PartModule
     {
         Libraries = new ILibrary[]
         {
-            new KerbalLibrary(this, SteelCompiler.Library),
+            new KerbalLibrary(this),
             new VesselLibrary(this),
-            new ComputerLibrary(SteelCompiler.Library, this)
+            new ComputerLibrary(this)
         };
 
         _compiler = new SteelCompiler(Libraries);
@@ -251,6 +268,8 @@ public abstract class BaseComputer : PartModule
         }
         catch (Exception e)
         {
+            TimeSpan time = DateTime.Now.TimeOfDay;
+            Debug.Log($"[{time.Hours}:{time.Minutes}:{time.TotalSeconds}] Exception caught during action script execution occured! Data: {e.Message}\n{e.StackTrace}");
             ThrowException(e.Message);
         }
         finally
@@ -483,8 +502,48 @@ public class TokenContainer : IConfigNode
             node.AddValue("script-startup", "");
         }
     }
+    
+    private readonly struct Replacer
+    {
+        public string A { get; }
+        public string B { get; }
 
-    private string Clean(string dirty) => dirty.Trim().SanitizedReplace("{", "|{|").SanitizedReplace("}", "|}|").SanitizedReplace("\t", "|t|");
+        public Replacer(string a, string b)
+        {
+            A = a;
+            B = b;
+        }
+    }
 
-    private string Dirty(string clean) => clean.SanitizedReplace("|[|", "{").SanitizedReplace("|]|", "}").SanitizedReplace("|t|", "\t");
+    private static Replacer[] _replacers = 
+    {
+        new Replacer("{", "|{|"),
+        new Replacer("}", "|}|"),
+        new Replacer("\t", "|t|"),
+        new Replacer("[", "|[|"),
+        new Replacer("]", "|]|"),
+        new Replacer("//", "|/|")
+    };
+
+    private string Clean(string dirty)
+    {
+        dirty = dirty.Trim();
+
+        foreach (Replacer replacer in _replacers)
+        {
+            dirty = dirty.Replace(replacer.A, replacer.B);
+        }
+
+        return dirty;
+    }
+
+    private string Dirty(string clean)
+    {
+        foreach (Replacer replacer in _replacers)
+        {
+            clean = clean.Replace(replacer.B, replacer.A);
+        }
+
+        return clean;
+    }
 }

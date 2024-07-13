@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Terms.Vectors;
 
-public class Vec3Term : BaseTerm
+public class Vec3Term : BaseTerm, IStashableTerm
 {
     public override string ValueType => "vec3";
     
@@ -62,5 +62,20 @@ public class Vec3Term : BaseTerm
     public override object GetValue()
     {
         return _value;
+    }
+
+    public bool Save(ConfigNode node)
+    {
+        node.AddValue("value", ConfigNode.WriteVector(_value));
+        return true;
+    }
+
+    public bool Load(ConfigNode node)
+    {
+        if (node.HasValue("value"))
+            return false;
+
+        _value = ConfigNode.ParseVector3(node.GetValue("value"));
+        return true;
     }
 }

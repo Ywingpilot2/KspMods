@@ -76,7 +76,6 @@ public abstract class Control : ICollection<Control>
     public GUILayoutOption[] LayoutOptions { get; set; }
     public Control? ParentControl { get; set; }
     private Dictionary<int, Control> ChildControls { get; }
-    public Rect Size { get; protected set; }
     public GUIContent Content { get; set; }
 
     public abstract void Draw();

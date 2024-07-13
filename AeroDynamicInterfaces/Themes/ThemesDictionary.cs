@@ -6,6 +6,7 @@ namespace AeroDynamicKerbalInterfaces.Themes;
 public static class ThemesDictionary
 {
     private static readonly Dictionary<string, GUIStyle> Styles;
+    public static readonly GUISkin Skin;
 
     #region Getting Styles
 
@@ -44,11 +45,6 @@ public static class ThemesDictionary
     }
 
     #endregion
-
-    public static Color ColorFromTexture(Texture2D texture, int sourceX = 0, int sourceY = 0)
-    {
-        return texture.GetPixel(sourceX, sourceY);
-    }
 
     public static Texture2D TextureFromColor(Color color, int width, int height)
     {
@@ -129,6 +125,37 @@ public static class ThemesDictionary
 
         #endregion
 
+        #region Custom Style
+
+        foreach (GUIStyle customStyle in HighLogic.Skin.customStyles)
+        {
+            AddStyle(customStyle.name.Replace(" ", ""), customStyle);
+        }
+
         #endregion
+
+        #endregion
+
+        Skin = ScriptableObject.CreateInstance<GUISkin>();
+        Skin.box = HighLogic.Skin.box;
+        Skin.button = HighLogic.Skin.button;
+        Skin.label = HighLogic.Skin.label;
+        Skin.textField = HighLogic.Skin.textField;
+        Skin.toggle = HighLogic.Skin.toggle;
+        
+        Skin.scrollView = HighLogic.Skin.scrollView;
+        Skin.textArea = HighLogic.Skin.textArea;
+        Skin.window = HighLogic.Skin.window;
+
+        Skin.horizontalScrollbar = HighLogic.Skin.horizontalScrollbar;
+        Skin.horizontalScrollbarThumb = HighLogic.Skin.horizontalScrollbarThumb;
+        Skin.horizontalScrollbarLeftButton = HighLogic.Skin.horizontalScrollbarLeftButton;
+        Skin.horizontalScrollbarRightButton = HighLogic.Skin.horizontalScrollbarRightButton;
+
+        Skin.verticalScrollbar = HighLogic.Skin.verticalScrollbar;
+        Skin.verticalScrollbarDownButton = HighLogic.Skin.verticalScrollbarDownButton;
+        Skin.verticalScrollbarThumb = HighLogic.Skin.verticalScrollbarThumb;
+        Skin.verticalScrollbarUpButton = HighLogic.Skin.verticalScrollbarDownButton;
+        Skin.font = HighLogic.UISkin.font;
     }
 }

@@ -12,7 +12,7 @@ using Random = System.Random;
 
 namespace ProgrammableMod.Controls;
 
-public sealed class LogControl : Control
+public sealed class LogControl : DragWindow
 {
     public List<string> LogText { get; }
     private readonly TextAreaControl _textControl;
@@ -21,10 +21,7 @@ public sealed class LogControl : Control
     public override void Draw()
     {
         UpdateControl();
-        foreach (Control control in this)
-        {
-            control.Draw();
-        }
+        base.Draw();
     }
 
     public void ClearLog()
@@ -52,19 +49,15 @@ public sealed class LogControl : Control
         _textControl.Content.text = string.Join("\n", LogText);
     }
 
-    public LogControl(int id, Action<LogControl> onClose) : base(id)
+    public LogControl(int id, Action<LogControl> onClose) : base(id, new(Screen.width / 2, Screen.height / 2, 600, 450))
     {
         LogText = new List<string>();
         _onClose = onClose;
 
         Random rng = new Random(GetHashCode());
-        WindowControl windowControl = new WindowControl(rng.Next(), new(Screen.width / 2, Screen.height / 2, 600, 450));
 
         RowControl rows = new RowControl(rng.Next());
-        ScrollViewControl scroll = new ScrollViewControl(rng.Next())
-        {
-            AutoScrollBottom = true
-        };
+        ScrollViewControl scroll = new ScrollViewControl(rng.Next());
         _textControl = new TextAreaControl(rng.Next(), "");
         _textControl.LayoutOptions = new[] { GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true) };
 
@@ -76,7 +69,6 @@ public sealed class LogControl : Control
         columns.Add(new ButtonControl(rng.Next(), "Close", (_,_) => Close()));
         
         rows.Add(columns);
-        windowControl.Add(rows);
-        Add(windowControl);
+        Add(rows);
     }
 }

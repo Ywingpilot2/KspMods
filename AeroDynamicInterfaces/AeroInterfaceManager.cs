@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using AeroDynamicKerbalInterfaces.Controls;
+using AeroDynamicKerbalInterfaces.Themes;
+using KSP.UI;
+using KSP.UI.Screens;
 using UnityEngine;
 
 namespace AeroDynamicKerbalInterfaces;
@@ -12,12 +15,15 @@ public class AeroInterfaceManager : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.skin = HighLogic.Skin;
-        foreach (Control control in EnumerateControls())
+        if (!UIMasterController.Instance.IsUIShowing)
+            return;
+
+        GUI.skin = ThemesDictionary.Skin;
+        foreach (Control control in Controls.Values)
         {
             control.Draw();
         }
-
+        
         GUI.skin = null;
     }
 
@@ -30,7 +36,7 @@ public class AeroInterfaceManager : MonoBehaviour
     /// <returns>Null if the control was not found, otherwise the control with the specified ID</returns>
     public static Control? FetchControl(int id)
     {
-        foreach (Control control in EnumerateControls())
+        foreach (Control control in Controls.Values)
         {
             if (control.Id == id)
                 return control;

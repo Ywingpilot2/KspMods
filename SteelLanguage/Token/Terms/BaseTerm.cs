@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Library;
 using SteelLanguage.Reflection;
@@ -109,6 +110,7 @@ public abstract class BaseTerm : IToken
     /// It is suggested to iterate over the base.GetFunctions as well, that way functions such as Equals are included in the enumeration
     /// </summary>
     /// <returns>An enumerable which provides the terms functions</returns>
+    [SuppressMessage("ReSharper", "HeapView.BoxingAllocation")]
     public virtual IEnumerable<IFunction> GetFunctions()
     {
         yield return new Function("equals", "bool", inputTypes: new[] { "term" }, action: terms =>

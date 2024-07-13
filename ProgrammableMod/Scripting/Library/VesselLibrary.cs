@@ -18,8 +18,6 @@ namespace ProgrammableMod.Scripting.Library;
 
 public class VesselLibrary : ILibrary
 {
-    private BaseComputer _computer;
-
     public string Name => "vessel";
     
     public IEnumerable<IFunction> GlobalFunctions { get; }
@@ -28,9 +26,16 @@ public class VesselLibrary : ILibrary
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 
-    public VesselLibrary(BaseComputer computer)
+    public VesselLibrary(BaseComputer computer) : this()
     {
-        _computer = computer;
+        GlobalTerms = new[]
+        {
+            new GlobalTerm(new VesselTerm { Name = "VESSEL", Computer = computer, Kind = TermKind.Class })
+        };
+    }
+
+    public VesselLibrary()
+    {
         TypeLibrary = new TypeLibrary();
 
         TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term", 0);
@@ -42,10 +47,5 @@ public class VesselLibrary : ILibrary
         TypeLibrary.AddTermType(new TermType(new SASTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new SASTypeTerm(), enumType));
         TypeLibrary.AddTermType(new TermType(new ActionGroupTerm(), enumType));
-
-        GlobalTerms = new[]
-        {
-            new GlobalTerm(new VesselTerm { Name = "VESSEL", Computer = computer, Kind = TermKind.Class })
-        };
     }
 }

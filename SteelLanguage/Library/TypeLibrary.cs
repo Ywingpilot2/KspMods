@@ -110,4 +110,9 @@ public class TypeLibrary
             AddTermType(type);
         }
     }
+
+    public TypeLibrary()
+    {
+        Types = new Dictionary<string, TermType>();
+    }
 }

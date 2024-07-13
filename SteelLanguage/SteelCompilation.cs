@@ -138,6 +138,7 @@ public sealed class SteelCompiler
         string[] values = CompileUtils.GetTermValues(token);
 
         LibraryManager manager = _currentScript.GetLibraryManager();
+        _currentScript.TermTokens++;
         switch (kind)
         {
             case AssignmentKind.Constant:
@@ -146,8 +147,7 @@ public sealed class SteelCompiler
                 BaseTerm term = type.Construct(values[1], CurrentLine, manager);
                 if (!term.Parse(values[2]))
                     throw new InvalidAssignmentException(CurrentLine, term);
-
-                _currentScript.TermTokens++;
+                
                 holder.AddTerm(term);
             } break;
             case AssignmentKind.Term:
@@ -182,7 +182,7 @@ public sealed class SteelCompiler
                 AssignmentCall call = new AssignmentCall(term, input, holder, CurrentLine);
                 holder.AddTerm(term);
                 holder.AddCall(call);
-                _currentScript.TermTokens++;
+                _currentScript.CallTokens++;
             } break;
             case AssignmentKind.Assignment:
             {

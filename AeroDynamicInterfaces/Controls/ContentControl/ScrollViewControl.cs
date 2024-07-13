@@ -48,6 +48,7 @@ public class ScrollViewControl : Control
     public ScrollViewControl(int id, params Control[] children) : base(id)
     {
         ScrollPosition = Vector2.zero;
+        AutoScrollBottom = true;
         AddRange(children);
     }
 }
