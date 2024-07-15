@@ -15,11 +15,16 @@ public abstract class BaseVesselTerm : BaseTerm
         throw new TypeNotConstructableException(0, ValueType);
     }
 
+    protected virtual void ExtraBuilding()
+    {
+    }
+
     public override bool CopyFrom(BaseTerm term)
     {
         if (term is BaseVesselTerm vesselTerm)
         {
             Computer = vesselTerm.Computer;
+            ExtraBuilding();
             return true;
         }
         
@@ -31,6 +36,7 @@ public abstract class BaseVesselTerm : BaseTerm
         if (value is BaseComputer computer)
         {
             Computer = computer;
+            ExtraBuilding();
             return true;
         }
 

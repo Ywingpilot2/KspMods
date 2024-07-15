@@ -101,6 +101,7 @@
         <Compile Include="Scripting\Terms\Graphmatics\Curves\PiecewiseLinear.cs" />
         <Compile Include="Scripting\Terms\IStashableTerm.cs" />
         <Compile Include="Scripting\Terms\KerbNet\KerbNetTerm.cs" />
+        <Compile Include="Scripting\Terms\KerbNet\SuperComputerTerm.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec2Term.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec3Term.cs" />
         <Compile Include="Scripting\Terms\Vessel\ActionGroupTerm.cs" />

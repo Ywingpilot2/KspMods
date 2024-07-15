@@ -1,4 +1,5 @@
-﻿using SteelLanguage.Exceptions;
+﻿using ProgrammableMod.Scripting.ValueStasher;
+using SteelLanguage.Exceptions;
 
 namespace ProgrammableMod.Scripting.Exceptions;
 
@@ -48,5 +49,16 @@ public class StashableNotFoundException : ExecutionException
     public StashableNotFoundException(int lineNumber, string name) : base(lineNumber)
     {
         _name = name;
+    }
+}
+
+public class StashableInvalidException : ExecutionException
+{
+    private ProtoStash _stash;
+
+    public override string Message => $"Stashable {_stash.Name} of type {_stash.ValueType} requested at line {LineNumber} was invalid";
+
+    public StashableInvalidException(int lineNumber, ProtoStash stash) : base(lineNumber)
+    {
     }
 }

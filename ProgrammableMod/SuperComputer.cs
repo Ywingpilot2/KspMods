@@ -35,6 +35,10 @@ public class KerbinSuperComputer : MonoBehaviour
         };
         
         _stasher = new ValueStasher();
+    }
+
+    private void Start()
+    {
         CurrentStasher = _stasher;
     }
 
@@ -49,5 +53,49 @@ public class KerbinSuperComputer : MonoBehaviour
         Array values = enumType.GetEnumValues();
         object value = values.GetValue(idx);
         return (Enum)Enum.ToObject(enumType, value);
+    }
+    
+    private readonly struct Replacer
+    {
+        public string A { get; }
+        public string B { get; }
+
+        public Replacer(string a, string b)
+        {
+            A = a;
+            B = b;
+        }
+    }
+
+    private static Replacer[] _replacers = 
+    {
+        new Replacer("{", "|{|"),
+        new Replacer("}", "|}|"),
+        new Replacer("\t", "|t|"),
+        new Replacer("[", "|[|"),
+        new Replacer("]", "|]|"),
+        new Replacer("//", "|/|")
+    };
+
+    public static string Clean(string dirty)
+    {
+        dirty = dirty.Trim();
+
+        foreach (Replacer replacer in _replacers)
+        {
+            dirty = dirty.Replace(replacer.A, replacer.B);
+        }
+
+        return dirty;
+    }
+
+    public static string Dirty(string clean)
+    {
+        foreach (Replacer replacer in _replacers)
+        {
+            clean = clean.Replace(replacer.B, replacer.A);
+        }
+
+        return clean;
     }
 }

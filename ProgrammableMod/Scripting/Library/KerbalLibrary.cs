@@ -42,6 +42,9 @@ public class KerbalLibrary : ILibrary
     public KerbalLibrary()
     {
         TypeLibrary = new TypeLibrary();
-        TypeLibrary.AddTermType(new TermType(new KerbNetTerm(), SteelCompiler.Library.TypeLibrary.GetTermType("term", 0)));
+        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term", 0);
+        
+        TypeLibrary.AddTermType(new TermType(new KerbNetTerm(), baseType));
+        TypeLibrary.AddTermType(new TermType(new SuperComputerTerm(), baseType));
     }
 }

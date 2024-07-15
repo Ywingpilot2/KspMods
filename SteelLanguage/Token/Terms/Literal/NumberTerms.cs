@@ -311,7 +311,7 @@ public class TermF : NumberTerm
     {
         value = value.StartsWith("0x") ? value.Replace("0x", "") : value;
 
-        if (float.TryParse(value, NumberStyles.Float, new NumberFormatInfo(), out float i))
+        if (float.TryParse(value, NumberStyles.Float, Info, out float i))
         {
             Number = i;
             Kind = TermKind.Basic;
@@ -327,7 +327,7 @@ public class TermF : NumberTerm
     {
         if (value is IConvertible convertible)
         {
-            Number = convertible.ToSingle(new NumberFormatInfo());
+            Number = convertible.ToSingle(Info);
             Kind = TermKind.Basic;
             return true;
         }
@@ -423,7 +423,7 @@ public class TermU : NumberTerm
     {
         value = value.StartsWith("0x") ? value.Replace("0x", "") : value;
 
-        if (uint.TryParse(value, NumberStyles.Integer & NumberStyles.HexNumber, new NumberFormatInfo(), out uint i))
+        if (uint.TryParse(value, NumberStyles.Integer & NumberStyles.HexNumber, Info, out uint i))
         {
             Number = i;
             Kind = TermKind.Basic;
@@ -537,7 +537,7 @@ public class TermD : NumberTerm
     {
         value = value.StartsWith("0x") ? value.Replace("0x", "") : value;
 
-        if (double.TryParse(value, NumberStyles.Float, new NumberFormatInfo(), out double i))
+        if (double.TryParse(value, NumberStyles.Float, Info, out double i))
         {
             Number = i;
             Kind = TermKind.Basic;

@@ -480,7 +480,7 @@ public class TokenContainer : IConfigNode
             {
                 if (node.HasValue($"script-line{i}"))
                 {
-                    tokens += $"{Dirty(node.GetValue($"script-line{i}"))}\n";
+                    tokens += $"{KerbinSuperComputer.Dirty(node.GetValue($"script-line{i}"))}\n";
                 }
             }
         }
@@ -502,7 +502,7 @@ public class TokenContainer : IConfigNode
         node.AddValue("script-length", lines.Length);
         for (int i = 0; i < lines.Length; i++)
         {
-            node.AddValue($"script-line{i}", Clean(lines[i]));
+            node.AddValue($"script-line{i}", KerbinSuperComputer.Clean(lines[i]));
         }
 
         if (shouldCompile)
@@ -514,49 +514,5 @@ public class TokenContainer : IConfigNode
         {
             node.AddValue("script-startup", "");
         }
-    }
-    
-    private readonly struct Replacer
-    {
-        public string A { get; }
-        public string B { get; }
-
-        public Replacer(string a, string b)
-        {
-            A = a;
-            B = b;
-        }
-    }
-
-    private static Replacer[] _replacers = 
-    {
-        new Replacer("{", "|{|"),
-        new Replacer("}", "|}|"),
-        new Replacer("\t", "|t|"),
-        new Replacer("[", "|[|"),
-        new Replacer("]", "|]|"),
-        new Replacer("//", "|/|")
-    };
-
-    private string Clean(string dirty)
-    {
-        dirty = dirty.Trim();
-
-        foreach (Replacer replacer in _replacers)
-        {
-            dirty = dirty.Replace(replacer.A, replacer.B);
-        }
-
-        return dirty;
-    }
-
-    private string Dirty(string clean)
-    {
-        foreach (Replacer replacer in _replacers)
-        {
-            clean = clean.Replace(replacer.B, replacer.A);
-        }
-
-        return clean;
     }
 }

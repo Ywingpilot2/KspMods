@@ -23,6 +23,7 @@ public class ValueStasher : IConfigNode
         if (term is IStashableTerm configTerm)
         {
             ConfigNode cfg = new ConfigNode(name);
+            cfg.AddValue("basic_type", false);
             configTerm.Save(cfg);
             _stashedValues.Add(name, new ProtoStash(name, term.ValueType, cfg));
         }
@@ -37,7 +38,8 @@ public class ValueStasher : IConfigNode
             case bool:
             {
                 ConfigNode cfg = new ConfigNode(name);
-                cfg.AddValue("value", value);
+                cfg.AddValue("value", KerbinSuperComputer.Clean(value.ToString()));
+                cfg.AddValue("basic_type", true);
                 _stashedValues.Add(name, new ProtoStash(name, term.ValueType, cfg));
             } break;
         }
