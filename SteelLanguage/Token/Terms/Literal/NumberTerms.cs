@@ -208,17 +208,13 @@ public class TermI : NumberTerm
             yield return function;
         }
 
-        yield return new Function("increment", "void", _ =>
+        yield return new Function("increment", () =>
         {
             SetValue(CastToInt() + 1);
-
-            return new ReturnValue();
         });
-        yield return new Function("decrement", "void", _ =>
+        yield return new Function("decrement", () =>
         {
             SetValue(CastToInt() - 1);
-
-            return new ReturnValue();
         });
     }
     

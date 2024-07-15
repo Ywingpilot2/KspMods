@@ -12,6 +12,7 @@ namespace SteelLanguage.Token.Functions;
 public interface IExecutable
 {
     public ReturnValue Execute(params BaseTerm[] terms);
+    public ReturnValue Execute();
 
     public void PreExecution();
     public void PostExecution();
@@ -27,18 +28,77 @@ public interface IFunction : IExecutable
     // TODO: this is a cool idea, why aren't we using it?
     // public bool InputIsValid(string type, int idx, ITokenHolder holder);
 }
-    
+
 public struct Function : IFunction
 {
+    private enum FunctionKind
+    {
+        InReturn,
+        Return,
+        In,
+        None
+    }
+    
     public string Name { get; }
     public string ReturnType { get; }
     public string[] InputTypes { get; }
-    private Func<BaseTerm[], ReturnValue> Action { get; }
+    private Func<BaseTerm[], ReturnValue> InReturn { get; }
+    private Func<ReturnValue> Return { get; }
+    private Action<BaseTerm[]> In { get; }
+    private Action None { get; }
+    private FunctionKind _kind;
+    private static readonly BaseTerm[] _empty = new BaseTerm[0]; // array declaration is expensive!
 
     public ReturnValue Execute(params BaseTerm[] terms)
     {
-        return Action.Invoke(terms);
+        switch (_kind)
+        {
+            case FunctionKind.InReturn:
+            {
+                return InReturn.Invoke(terms);
+            }
+            case FunctionKind.Return:
+            {
+                return Return.Invoke();
+            }
+            case FunctionKind.In:
+            {
+                In.Invoke(terms);
+            } break;
+            case FunctionKind.None:
+            {
+                None.Invoke();
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return new ReturnValue();
     }
+
+    public ReturnValue Execute()
+    {
+        switch (_kind)
+        {
+            case FunctionKind.InReturn:
+            {
+                return InReturn.Invoke(_empty);
+            }
+            case FunctionKind.Return:
+            {
+                return Return.Invoke();
+            }
+            case FunctionKind.In:
+            {
+                In.Invoke(_empty);
+            } break;
+        }
+
+        return new ReturnValue();
+    }
+
+    #region Events
 
     public void PreExecution()
     {
@@ -52,13 +112,61 @@ public struct Function : IFunction
     {
     }
 
-    public Function(string name, string returnType, Func<BaseTerm[], ReturnValue> action, params string[] inputTypes)
+    #endregion
+
+    #region Construction
+
+    private Function(string name, string returnType, string[] inputs)
     {
         Name = name;
         ReturnType = returnType;
-        InputTypes = inputTypes;
-        Action = action;
+        InputTypes = inputs;
     }
+
+    /// <summary>
+    /// Creates a function with inputs and a return value
+    /// </summary>
+    /// <param name="name">The name of the function</param>
+    /// <param name="returnType">The name of the TermType the returned type belongs to</param>
+    /// <param name="action">The action to execute</param>
+    /// <param name="inputTypes">The TermType names of the inputted types</param>
+    public Function(string name, string returnType, Func<BaseTerm[], ReturnValue> action, params string[] inputTypes) : this(name, returnType, inputTypes)
+    {
+        InReturn = action;
+        _kind = FunctionKind.InReturn;
+    }
+
+    /// <summary>
+    /// Creates a function with inputs, but no return value
+    /// </summary>
+    /// <param name="name">The name of the function</param>
+    /// <param name="action">The action to execute</param>
+    /// <param name="inputTypes">The TermType names of the inputted types</param>
+    public Function(string name, Action<BaseTerm[]> action, params string[] inputTypes) : this(name, "void", inputTypes)
+    {
+        In = action;
+        _kind = FunctionKind.In;
+    }
+    
+    /// <summary>
+    /// Creates a function with no inputs but a return value
+    /// </summary>
+    /// <param name="name">The name of the function</param>
+    /// <param name="returnType">The name of the TermType the returned type belongs to</param>
+    /// <param name="action">The action to execute</param>
+    public Function(string name, string returnType, Func<ReturnValue> action) : this(name, returnType, new string[0])
+    {
+        Return = action;
+        _kind = FunctionKind.Return;
+    }
+
+    public Function(string name, Action action) : this(name, "void", new string[0])
+    {
+        None = action;
+        _kind = FunctionKind.None;
+    }
+
+    #endregion
 }
     
 public class UserFunction : BaseExecutable, IFunction
@@ -77,6 +185,11 @@ public class UserFunction : BaseExecutable, IFunction
             term.CopyFrom(terms[i]);
         }
 
+        return Execute();
+    }
+
+    public override ReturnValue Execute()
+    {
         foreach (TokenCall call in Calls)
         {
             if (call is ReturnCall)

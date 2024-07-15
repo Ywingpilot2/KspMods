@@ -42,19 +42,15 @@ public class SASTerm : BaseVesselTerm
             yield return function;
         }
         
-        yield return new Function("enable_sas", "void", _ =>
+        yield return new Function("enable_sas", _ =>
         {
             if (!Computer.vessel.Autopilot.Enabled)
                 Computer.vessel.ActionGroups.SetGroup(KSPActionGroup.SAS, true);
-
-            return new ReturnValue();
         });
-        yield return new Function("disable_sas", "void", _ =>
+        yield return new Function("disable_sas" ,_ =>
         {
             if (Computer.vessel.Autopilot.Enabled)
                 Computer.vessel.ActionGroups.SetGroup(KSPActionGroup.SAS, false);
-
-            return new ReturnValue();
         });
         yield return new Function("can_sas", "bool", terms =>
         {
@@ -64,7 +60,7 @@ public class SASTerm : BaseVesselTerm
 
             return new ReturnValue(Computer.vessel.Autopilot.CanSetMode(mode), "bool");
         }, "sas_mode");
-        yield return new Function("set_sas", "void", terms =>
+        yield return new Function("set_sas", terms =>
         {
             string sasType = terms[0].CastToStr();
 
@@ -78,8 +74,6 @@ public class SASTerm : BaseVesselTerm
             // so to prevent this from happening, we just don't set it if its the same
             if (mode != Computer.vessel.Autopilot.Mode)
                 Computer.vessel.Autopilot.SetMode(mode);
-            
-            return new ReturnValue();
         }, "sas_mode");
     }
 }

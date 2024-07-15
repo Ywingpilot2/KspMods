@@ -23,13 +23,12 @@ public class EnumeratorTerm : BaseTerm
             yield return function;
         }
 
-        yield return new Function("next", "bool", _ => new ReturnValue(Value.GetEnumerator().MoveNext(), "bool"));
-        yield return new Function("reset", "void", _ =>
+        yield return new Function("next", "bool", () => new ReturnValue(Value.GetEnumerator().MoveNext(), "bool"));
+        yield return new Function("reset", () =>
         {
             Value.GetEnumerator().Reset();
-            return new ReturnValue();
         });
-        yield return new Function("get_current", "term", terms => new ReturnValue(Value.GetEnumerator().Current, ContainedType));
+        yield return new Function("get_current", "term", () => new ReturnValue(Value.GetEnumerator().Current, ContainedType));
     }
 
     #endregion

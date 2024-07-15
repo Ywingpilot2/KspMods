@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Library;
 using SteelLanguage.Token.Interaction;
@@ -79,8 +80,16 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
 
     #endregion
 
-    public abstract ReturnValue Execute(params BaseTerm[] terms);
+    public virtual ReturnValue Execute(params BaseTerm[] terms)
+    {
+        throw new NotImplementedException();
+    }
 
+    public virtual ReturnValue Execute()
+    {
+        throw new NotImplementedException();
+    }
+    
     #region Pre/Post events
 
     public virtual void PreExecution()

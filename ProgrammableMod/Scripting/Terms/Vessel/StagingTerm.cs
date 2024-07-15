@@ -19,19 +19,19 @@ public class StagingTerm : BaseTerm
         }
 
         yield return new Function("get_burntime", "double",
-            _ => new ReturnValue(_manager.GetCurrentBurnTime(), "double"));
+            () => new ReturnValue(_manager.GetCurrentBurnTime(), "double"));
         yield return new Function("get_deltav", "float",
-            _ => new ReturnValue(_manager.GetCurrentDeltaV(), "float"));
+            () => new ReturnValue(_manager.GetCurrentDeltaV(), "float"));
         yield return new Function("get_current_mass", "double",
-            _ => new ReturnValue(_manager.CurrentStageMass(), "double"));
+            () => new ReturnValue(_manager.CurrentStageMass(), "double"));
         yield return new Function("get_dry_mass", "double",
-            _ => new ReturnValue(_manager.CurrentDryMass(), "double"));
+            () => new ReturnValue(_manager.CurrentDryMass(), "double"));
         yield return new Function("get_stage", "stage", terms =>
         {
             int stage = terms[0].CastToInt();
             return new ReturnValue(_manager.GetStage(stage), "stage");
         }, "int");
-        yield return new Function("next_stage", "stage", _ => new ReturnValue(_manager.NextStage(), "stage"));
+        yield return new Function("next_stage", "stage", () => new ReturnValue(_manager.NextStage(), "stage"));
     }
 
     public override bool SetValue(object value)

@@ -40,10 +40,9 @@ public class SuperComputerTerm : BaseTerm
         yield return new Function("can_stash", "bool",
             terms => new ReturnValue(KerbinSuperComputer.CurrentStasher.CanStashType(terms[0]), "bool"), "term");
 
-        yield return new Function("stash_value", "void", terms =>
+        yield return new Function("stash_value", terms =>
         {
             KerbinSuperComputer.CurrentStasher.StashValue(terms[0].CastToStr(), terms[1]);
-            return new ReturnValue();
         }, "string" ,"term");
     }
 

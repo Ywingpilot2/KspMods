@@ -101,22 +101,18 @@ public class VesselTerm : BaseVesselTerm
             yield return function;
         }
         
-        yield return new Function("toggle_action", "void", terms =>
+        yield return new Function("toggle_action", terms =>
         {
             int idx = terms[0].CastToInt();
             KSPActionGroup group = (KSPActionGroup)KerbinSuperComputer.EnumFromInt(idx + 3, typeof(KSPActionGroup));
             Computer.vessel.ActionGroups.ToggleGroup(group);
-
-            return new ReturnValue();
         }, "action");
-        yield return new Function("set_action", "void", terms =>
+        yield return new Function("set_action",terms =>
         {
             int idx = terms[0].CastToInt();
             bool value = terms[1].CastToBool();
             KSPActionGroup group = (KSPActionGroup)KerbinSuperComputer.EnumFromInt(idx + 3, typeof(KSPActionGroup));
             Computer.vessel.ActionGroups.SetGroup(group, value);
-
-            return new ReturnValue();
         }, "action", "bool");
         yield return new Function("action_state", "bool", terms =>
         {

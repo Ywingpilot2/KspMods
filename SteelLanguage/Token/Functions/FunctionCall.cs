@@ -32,18 +32,25 @@ public abstract class TokenCall : BaseToken
     
 public class FunctionCall : TokenCall
 {
-    private Input[] Inputs;
+    // NOTICE: this isn't a real cache.
+    // Dynamic and static inputs are mixed together in a muddy way, and the compiler is not setup to recognize the difference
+    // this is instead meant to prevent us from creating lots and lots of arrays in memory, since we only need 1 array of a fixed length
+    private readonly BaseTerm[] _cache;
+    private readonly Input[] _inputs;
+
     private IFunction Function { get; }
 
     public override ReturnValue Call()
     {
-        BaseTerm[] terms = new BaseTerm[Inputs.Length];
-        for (var i = 0; i < Inputs.Length; i++)
+        if (_inputs.Length == 0)
+            return Function.Execute();
+        
+        for (var i = 0; i < _inputs.Length; i++)
         {
-            terms.SetValue(Inputs[i].GetValue(), i);
+            _cache.SetValue(_inputs[i].GetValue(), i);
         }
 
-        return Function.Execute(terms);
+        return Function.Execute(_cache);
     }
         
     #region Pre/Post events
@@ -61,7 +68,7 @@ public class FunctionCall : TokenCall
     public override void PostCompilation()
     {
         Function.PostCompilation();
-        foreach (Input input in Inputs)
+        foreach (Input input in _inputs)
         {
             input.PostCompilation();
         }
@@ -72,12 +79,14 @@ public class FunctionCall : TokenCall
     public FunctionCall(ITokenHolder container, IFunction function, IEnumerable<Input> inputs, int line) : base(container, line)
     {
         Function = function;
-        Inputs = inputs.ToArray();
+        _inputs = inputs.ToArray();
+        _cache = new BaseTerm[_inputs.Length];
     }
 
     public FunctionCall(ITokenHolder container, IFunction function, int line, params Input[] inputs) : base(container, line)
     {
         Function = function;
-        Inputs = inputs;
+        _inputs = inputs;
+        _cache = new BaseTerm[_inputs.Length];
     }
 }

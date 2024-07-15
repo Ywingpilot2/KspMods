@@ -13,16 +13,22 @@ public struct TermConstructor : IFunction
     public string[] InputTypes { get; }
     public ConstructorKind Kind { get; }
     
-    private Func<BaseTerm[], ReturnValue> _action;
+    private Func<BaseTerm[], ReturnValue> _filled;
+    private Func<ReturnValue> _partial;
 
     public ReturnValue Execute(params BaseTerm[] terms)
     {
-        return _action.Invoke(terms);
+        return _filled.Invoke(terms);
+    }
+
+    public ReturnValue Execute()
+    {
+        return _partial.Invoke();
     }
 
     public string GetSig()
     {
-        if (Kind == ConstructorKind.Empty)
+        if (Kind is ConstructorKind.Empty or ConstructorKind.Partial)
         {
             return "";
         }
@@ -35,11 +41,18 @@ public struct TermConstructor : IFunction
         InputTypes = new string[0];
     }
 
-    public TermConstructor(Func<BaseTerm[], ReturnValue> action, params string[] inputTypes)
+    public TermConstructor(Func<BaseTerm[], ReturnValue> filled, params string[] inputTypes)
     {
-        _action = action;
+        _filled = filled;
         InputTypes = inputTypes;
+        
         Kind = ConstructorKind.Filled;
+    }
+
+    public TermConstructor(Func<ReturnValue> partial)
+    {
+        _partial = partial;
+        Kind = ConstructorKind.Partial;
     }
 
     public void PreExecution()

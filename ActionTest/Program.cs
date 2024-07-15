@@ -23,10 +23,9 @@ namespace ActionTest
 
         public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
         {
-            new Function("print", "void", inputTypes:"string", action: terms =>
+            new Function("print", inputTypes:"string", action: terms =>
             {
                 Console.WriteLine(terms[0].CastToStr());
-                return new ReturnValue();
             }),
             new Function("read", "string", terms =>
             {
@@ -82,7 +81,7 @@ namespace ActionTest
                     yield return function;
                 }
 
-                yield return new Function("enumerate_test", "enumerable", _ =>
+                yield return new Function("enumerate_test", "enumerable", () =>
                 {
                     TermArray array = new TermArray("int", 4);
                     for (int i = 0; i < 4; i++)

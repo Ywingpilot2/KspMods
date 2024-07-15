@@ -43,7 +43,7 @@ public class ForeachFunc : BaseExecutable
     private Input _enumerator;
     private string _term;
 
-    public override ReturnValue Execute(params BaseTerm[] terms)
+    public override ReturnValue Execute()
     {
         bool shouldBreak = false;
         bool shouldContinue = false;

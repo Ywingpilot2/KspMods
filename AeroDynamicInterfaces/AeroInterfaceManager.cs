@@ -12,10 +12,13 @@ namespace AeroDynamicKerbalInterfaces;
 public class AeroInterfaceManager : MonoBehaviour
 {
     private static readonly Dictionary<int, Control> Controls;
+    private static bool _hide;
+
+    #region GUI
 
     private void OnGUI()
     {
-        if (!UIMasterController.Instance.IsUIShowing)
+        if (_hide)
             return;
 
         GUI.skin = ThemesDictionary.Skin;
@@ -26,6 +29,20 @@ public class AeroInterfaceManager : MonoBehaviour
         
         GUI.skin = null;
     }
+
+    public static void Hide()
+    {
+        _hide = true;
+    }
+
+    public static void Show()
+    {
+        _hide = false;
+    }
+
+    #endregion
+
+    #region Control Management
 
     public static bool HasControl(int id) => Controls.ContainsKey(id);
 
@@ -105,17 +122,34 @@ public class AeroInterfaceManager : MonoBehaviour
         }
     }
 
+
+
     public static void Clear() => Controls.Clear();
+    
+    #endregion
+
+    #region Events
+
+    private void GameLoading(ConfigNode data)
+    {
+        Hide();
+    }
 
     private void Start()
     {
         Debug.Log("Aero Dynamic UI loaded!");
+        GameEvents.onHideUI.Add(() => Hide());
+        GameEvents.onShowUI.Add(() => Show());
+        GameEvents.onGameStateLoad.Add(GameLoading);
     }
 
     private void OnDestroy()
     {
         Clear();
+        GameEvents.onGameStateLoad.Remove(GameLoading);
     }
+
+    #endregion
 
     static AeroInterfaceManager()
     {

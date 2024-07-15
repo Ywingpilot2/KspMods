@@ -33,8 +33,8 @@ public sealed class StringTerm : BaseTerm
     {
         foreach (IFunction function in base.GetFunctions()) yield return function;
 
-        yield return new Function("upper", "string", _ => new ReturnValue(_value.ToUpper(), "string"));
-        yield return new Function("lower", "string", terms => new ReturnValue(_value.ToLower(), "string"));
+        yield return new Function("upper", "string", () => new ReturnValue(_value.ToUpper(), "string"));
+        yield return new Function("lower", "string", () => new ReturnValue(_value.ToLower(), "string"));
         yield return new Function("remove", "string", inputTypes: "string", action: terms =>
         {
             BaseTerm remove = terms[0];

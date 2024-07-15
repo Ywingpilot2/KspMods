@@ -6,6 +6,10 @@ public struct ReturnValue
     public string Type { get; }
     public object Value { get; }
 
+    public ReturnValue()
+    {
+    }
+
     public ReturnValue(object value, string type)
     {
         Value = value;

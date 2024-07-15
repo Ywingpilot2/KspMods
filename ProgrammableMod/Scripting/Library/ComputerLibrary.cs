@@ -27,18 +27,16 @@ public class ComputerLibrary : ILibrary
             "float", "float", "float"),
         new Function("abs", "float", terms => new ReturnValue(Mathf.Abs(terms[0].CastToFloat()),"float"), 
             "float"),
-        new Function("log", "void", terms =>
+        new Function("log", terms =>
         {
             _computer.Log(terms[0].CastToStr());
-            return new ReturnValue();
         }, "string"),
-        new Function("display", "void", terms =>
+        new Function("display",terms =>
         {
             ScreenMessages.PostScreenMessage(terms[0].CastToStr(), 0.5f,
                 ScreenMessageStyle.UPPER_LEFT);
-            return new ReturnValue();
         }, "string"),
-        new Function("get_start", "float", _ => new ReturnValue(_computer.runTime, "float")),
+        new Function("get_start", "float", () => new ReturnValue(_computer.runTime, "float")),
     };
     public IEnumerable<GlobalTerm> GlobalTerms { get; }
     public IEnumerable<IKeyword> Keywords { get; }

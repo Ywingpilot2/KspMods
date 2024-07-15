@@ -72,7 +72,7 @@ public class SteelLibrary : ILibrary
             double b = terms[1].CastToDouble();
             return new ReturnValue(a <= b, "bool");
         }, "number_term","number_term"),
-        new Function("random", "int", _ => new ReturnValue(Rng.Next(), "int")),
+        new Function("random", "int", () => new ReturnValue(Rng.Next(), "int")),
         new Function("random_max", "int",inputTypes:new []{"int"}, action:terms => new ReturnValue(Rng.Next(terms[0].CastToInt()), "int")),
         new Function("random_interval", "int", inputTypes:new []{"int","int"}, action:terms => new ReturnValue(Rng.Next(terms[0].CastToInt(), terms[1].CastToInt()), "int")),
         new Function("not", "bool", inputTypes:new []{"bool"}, action: terms => new ReturnValue(!terms[0].CastToBool(), "bool")),

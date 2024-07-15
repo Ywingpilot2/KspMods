@@ -17,21 +17,15 @@ public class CollectionTerm : EnumeratorTerm
             yield return function;
         }
 
-        yield return new Function("add", "void", terms =>
+        yield return new Function("add", terms =>
         {
             Add(terms[0]);
-            return new ReturnValue();
         }, ContainedType);
-        yield return new Function("remove", "void", terms =>
+        yield return new Function("remove", terms =>
         {
             Remove(terms[0]);
-            return new ReturnValue();
         }, ContainedType);
-        yield return new Function("add", "void", _ =>
-        {
-            Clear();
-            return new ReturnValue();
-        });
+        yield return new Function("add", Clear);
         yield return new Function("contains", "bool", terms => new ReturnValue(Contains(terms[0]), "bool"),
             ContainedType);
     }

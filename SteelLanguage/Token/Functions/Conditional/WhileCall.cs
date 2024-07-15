@@ -40,7 +40,7 @@ public class WhileFunction : BaseExecutable
 {
     private Input _condition;
 
-    public override ReturnValue Execute(params BaseTerm[] terms)
+    public override ReturnValue Execute()
     {
         bool shouldBreak = false;
         bool shouldContinue = false;

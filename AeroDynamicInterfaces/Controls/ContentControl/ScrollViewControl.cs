@@ -13,7 +13,8 @@ public class ScrollViewControl : Control
 
     public Vector2 ScrollPosition { get; set; }
     public bool AutoScrollBottom { get; set; }
-    
+
+    private float _height;
     public override void Draw()
     {
         ScrollPosition = GUILayout.BeginScrollView(ScrollPosition, false, false,
@@ -22,11 +23,15 @@ public class ScrollViewControl : Control
             ThemesDictionary.GetStyle(Style),
             LayoutOptions);
 
-        float height = 0;
+        if (Event.current.type == EventType.Repaint)
+            _height = 0;
+        
         foreach (Control childControl in this)
         {
             childControl.Draw();
-            height += GUILayoutUtility.GetLastRect().height;
+            
+            if (Event.current.type == EventType.Repaint)
+                _height += GUILayoutUtility.GetLastRect().height;
         }
         
         GUILayout.EndScrollView();
@@ -34,7 +39,7 @@ public class ScrollViewControl : Control
         if (AutoScrollBottom)
         {
             // TODO: Implement a system for measuring control height in our own classes
-            float scrollBottom = (height - GUILayoutUtility.GetLastRect().height) + (height / Count);
+            float scrollBottom = _height - GUILayoutUtility.GetLastRect().height;
             
             // check if we should scroll to the bottom
             // this check works by seeing if we are close to the bottom, if we are close to the bottom it will automatically scroll us all the way down 

@@ -88,13 +88,12 @@ public class ArrayTerm : EnumeratorTerm
             BaseTerm term = array.GetValue(terms[0].CastToInt());
             return new ReturnValue(term.GetValue(), array.ValueType);
         }, "int");
-        yield return new Function("set", "void", terms =>
+        yield return new Function("set", terms =>
         {
             TermArray array = (TermArray)Value;
             BaseTerm term = terms[0];
             BaseTerm i = terms[1];
             array.SetValue(term, i.CastToInt());
-            return new ReturnValue();
         }, "term", "int");
     }
 

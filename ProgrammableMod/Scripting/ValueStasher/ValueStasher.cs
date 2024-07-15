@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Terms;
+using SteelLanguage.Extensions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
+using UnityEngine;
 
 namespace ProgrammableMod.Scripting.ValueStasher;
 
+[Serializable]
 public class ValueStasher : IConfigNode
 {
     private readonly Dictionary<string, ProtoStash> _stashedValues;
@@ -37,7 +41,7 @@ public class ValueStasher : IConfigNode
             case string:
             case bool:
             {
-                ConfigNode cfg = new ConfigNode(name);
+                ConfigNode cfg = new ConfigNode($"{term.ValueType}-{name}");
                 cfg.AddValue("value", KerbinSuperComputer.Clean(value.ToString()));
                 cfg.AddValue("basic_type", true);
                 _stashedValues.Add(name, new ProtoStash(name, term.ValueType, cfg));
@@ -62,7 +66,7 @@ public class ValueStasher : IConfigNode
     {
         foreach (ConfigNode configNode in node.GetNodes())
         {
-            string[] split = configNode.name.Split(' ');
+            string[] split = configNode.name.SanitizedSplit('-', 2);
             string typeName = split[0].Trim();
             string name = split[1].Trim();
             
@@ -76,7 +80,7 @@ public class ValueStasher : IConfigNode
         {
             string name = valuePair.Key;
             ProtoStash stash = valuePair.Value;
-            node.AddNode($"{stash.ValueType} {name}", stash.Node);
+            node.AddNode($"{stash.ValueType}-{name}", stash.Node);
         }
     }
 

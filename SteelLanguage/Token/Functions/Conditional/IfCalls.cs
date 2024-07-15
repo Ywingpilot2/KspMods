@@ -111,7 +111,7 @@ public class SingleExecutableFunc : BaseExecutable
     {
     }
 
-    public override ReturnValue Execute(params BaseTerm[] terms)
+    public override ReturnValue Execute()
     {
         foreach (TokenCall call in Calls)
         {

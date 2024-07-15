@@ -10,17 +10,17 @@ using SteelLanguage.Reflection;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ProgrammableMod;
 
 /// <summary>
 /// Behold! The kerbin super computer!
 /// </summary>
-[KSPAddon(KSPAddon.Startup.Flight, true)]
+[KSPAddon(KSPAddon.Startup.Flight, false)]
 public class KerbinSuperComputer : MonoBehaviour
 {
-    [KSPField]
-    private ValueStasher _stasher;
+    public ValueStasher stasher;
 
     public static ValueStasher CurrentStasher { get; private set; }
     internal static ILibrary[] Libraries { get; private set; }
@@ -34,12 +34,32 @@ public class KerbinSuperComputer : MonoBehaviour
             new ComputerLibrary()
         };
         
-        _stasher = new ValueStasher();
+        stasher = new ValueStasher();
+        GameEvents.onGameStateLoad.Add(Load);
+        GameEvents.onGameStateSave.Add(Save);
     }
 
     private void Start()
     {
-        CurrentStasher = _stasher;
+        CurrentStasher = stasher;
+    }
+    
+    private void Load(ConfigNode data)
+    {
+        if (!data.HasNode("kerfers_stash"))
+            return;
+        
+        stasher.Load(data.GetNode("kerfers_stash"));
+    }
+
+    private void Save(ConfigNode data)
+    {
+        if (data.HasNode("kerfers_stash"))
+            data.RemoveNode("kerfers_stash");
+        
+        ConfigNode configNode = new("kerfers_stash");
+        stasher.Save(configNode);
+        data.AddNode(configNode);
     }
 
     /// <summary>

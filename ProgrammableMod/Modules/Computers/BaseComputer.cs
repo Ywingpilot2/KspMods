@@ -120,15 +120,8 @@ public abstract class BaseComputer : PartModule
         }
     }
 
-    private string _previous;
-    private int _count;
     public virtual void Log(string log)
     {
-        if (_previous == log)
-            return;
-
-        _count++;
-        _previous = log;
         string time;
         if (HighLogic.LoadedSceneIsFlight)
         {
@@ -225,8 +218,11 @@ public abstract class BaseComputer : PartModule
 
     private void OnBlownUp(Part data)
     {
+        if (!HighLogic.LoadedSceneIsFlight)
+            return;
+        
         // not our crash, or bob is trying to break in again...
-        if (data.vessel.id != part.vessel.id || data.isVesselEVA)
+        if (data.vessel == null || data.isVesselEVA || data.vessel.id != part.vessel.id)
             return;
         
         Random rng = new();

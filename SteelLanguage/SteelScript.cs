@@ -147,6 +147,7 @@ public sealed class SteelScript : ITokenHolder
             }
 #endif
         }
+        PostExecution();
     }
 
     internal void PreExecution()
@@ -155,6 +156,11 @@ public sealed class SteelScript : ITokenHolder
         {
             term.SetValue(_compiledValues[term.Name]);
         }
+    }
+
+    internal void PostExecution()
+    {
+        GC.Collect();
     }
 
     internal void PostCompilation()
