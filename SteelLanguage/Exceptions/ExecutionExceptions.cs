@@ -14,7 +14,7 @@ public class ExecutionException : SteelException
 
 public class InvalidActionException : ExecutionException
 {
-    private string _message;
+    private readonly string _message;
     public override string Message => $"Invalid action conducted at {LineNumber}, {_message}";
 
     public InvalidActionException(int lineNumber, string message) : base(lineNumber)
@@ -25,8 +25,8 @@ public class InvalidActionException : ExecutionException
 
 public class InvalidAssignmentException : ExecutionException
 {
-    private string _name;
-    private string _type;
+    private readonly string _name;
+    private readonly string _type;
     public override string Message
     {
         get
@@ -58,7 +58,7 @@ public class InvalidAssignmentException : ExecutionException
 
 public class FunctionLacksReturnException : ExecutionException
 {
-    private IFunction _function;
+    private readonly IFunction _function;
 
     public override string Message
     {
@@ -83,7 +83,7 @@ public class FunctionLacksReturnException : ExecutionException
 
 public class UserException : ExecutionException
 {
-    private string _message;
+    private readonly string _message;
     public override string Message => _message;
 
     public UserException(int lineNumber, string message) : base(lineNumber)

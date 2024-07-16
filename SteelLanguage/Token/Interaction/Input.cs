@@ -1,9 +1,9 @@
 ﻿using System;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Reflection;
+using SteelLanguage.Library.System.Terms.Literal;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Terms;
-using SteelLanguage.Token.Terms.Literal;
 
 namespace SteelLanguage.Token.Interaction;
 
@@ -19,8 +19,8 @@ public struct Input
 {
     public InputType Type { get; }
     private TokenCall Call { get; }
-    private BaseTerm _term;
-    private ITokenHolder _script;
+    private readonly BaseTerm _term;
+    private readonly ITokenHolder _container;
 
     public BaseTerm GetValue()
     {
@@ -41,11 +41,11 @@ public struct Input
                     return new NullTerm();
                     
                 //return new BaseTerm(Guid.NewGuid().ToString(), value.Value.ToString(), Call.Function.ValueType);
-                if (!_script.GetLibraryManager().HasTermType(value.Type))
+                if (!_container.GetLibraryManager().HasTermType(value.Type))
                     throw new TypeNotExistException(Call.Line, value.Type);
 
-                TermType type = _script.GetLibraryManager().GetTermType(value.Type);
-                BaseTerm term = type.Construct(null, Call.Line, _script.GetLibraryManager());
+                TermType type = _container.GetLibraryManager().GetTermType(value.Type);
+                BaseTerm term = type.Construct(null, Call.Line, _container.GetLibraryManager());
                 if (term.SetValue(value.Value) && term.Kind == TermKind.Null)
                 {
                     term.Kind = TermKind.Basic;
@@ -68,12 +68,12 @@ public struct Input
         }
     }
 
-    public Input(ITokenHolder script, TokenCall call)
+    public Input(ITokenHolder container, TokenCall call)
     {
         Type = InputType.Call;
         Call = call;
         _term = null;
-        _script = script;
+        _container = container;
     }
 
     public Input(BaseTerm term)

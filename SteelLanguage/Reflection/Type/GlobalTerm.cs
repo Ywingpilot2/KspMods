@@ -1,6 +1,6 @@
 ﻿using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Library;
+namespace SteelLanguage.Reflection.Type;
 
 public struct GlobalTerm
 {

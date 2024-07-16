@@ -12,7 +12,7 @@ public class CompilationException : SteelException
 
 public class InvalidCompilationException : CompilationException
 {
-    private string _message;
+    private readonly string _message;
 
     public override string Message => $"A Compiler error has occured at line {LineNumber}: {_message}";
 
@@ -38,8 +38,8 @@ public class InvalidTermCastException : CompilationException
             }
         }
     }
-    private string _from;
-    private string _to;
+    private readonly string _from;
+    private readonly string _to;
 
     public InvalidTermCastException(int lineNumber) : base(lineNumber)
     {
@@ -54,7 +54,7 @@ public class InvalidTermCastException : CompilationException
 
 public class InvalidParametersException : CompilationException
 {
-    private string[] _strings;
+    private readonly string[] _strings;
 
     public override string Message
     {
@@ -96,7 +96,7 @@ public class InvalidParametersException : CompilationException
 
 public class TypeNotExistException : CompilationException
 {
-    private string _typeName;
+    private readonly string _typeName;
 
     public override string Message
     {
@@ -121,7 +121,7 @@ public class TypeNotExistException : CompilationException
 
 public class TypeNotConstructableException : CompilationException
 {
-    private string _type;
+    private readonly string _type;
 
     public override string Message
     {
@@ -156,7 +156,7 @@ public class FunctionNotExistException : CompilationException
             }
         }
     }
-    private string _name;
+    private readonly string _name;
     
     public FunctionNotExistException(int lineNumber, string name) : base(lineNumber)
     {
@@ -204,7 +204,7 @@ public class TermNotExistException : CompilationException
             }
         }
     }
-    private string _name;
+    private readonly string _name;
     
     public TermNotExistException(int lineNumber, string name) : base(lineNumber)
     {
@@ -214,7 +214,7 @@ public class TermNotExistException : CompilationException
 
 public class FunctionReturnsVoidException : CompilationException
 {
-    private string _function;
+    private readonly string _function;
 
     public override string Message
     {
@@ -239,8 +239,8 @@ public class FunctionReturnsVoidException : CompilationException
 
 public class FunctionParamsInvalidException : CompilationException
 {
-    private string _token;
-    private string _reason;
+    private readonly string _token;
+    private readonly string _reason;
 
     public override string Message
     {
@@ -266,7 +266,7 @@ public class FunctionParamsInvalidException : CompilationException
 
 public class FunctionLacksEndException : CompilationException
 {
-    private string _token;
+    private readonly string _token;
 
     public override string Message
     {
@@ -291,7 +291,7 @@ public class FunctionLacksEndException : CompilationException
 
 public class FunctionExistsException : CompilationException
 {
-    private string _name;
+    private readonly string _name;
 
     public override string Message => $"Function {_name} has already been declared";
 
@@ -321,7 +321,7 @@ public class AlreadyHasElseBranchException : CompilationException
 
 public class FieldNotExistException : CompilationException
 {
-    private string _name;
+    private readonly string _name;
 
     public override string Message
     {
@@ -346,7 +346,7 @@ public class FieldNotExistException : CompilationException
 
 public class ConstructorNotFoundException : CompilationException
 {
-    private string _sig;
+    private readonly string _sig;
     public override string Message => $"Could not find constructor with signature \"{_sig}\" at line {LineNumber}"; // TODO: Check for null
 
     public ConstructorNotFoundException(int lineNumber, string sig) : base(lineNumber)
@@ -357,7 +357,7 @@ public class ConstructorNotFoundException : CompilationException
 
 public class FieldReadOnlyException : CompilationException
 {
-    private string _name;
+    private readonly string _name;
 
     public override string Message
     {
@@ -382,7 +382,7 @@ public class FieldReadOnlyException : CompilationException
 
 public class TokenMustBeConstantException : CompilationException
 {
-    private string _token;
+    private readonly string _token;
     public override string Message
     {
         get

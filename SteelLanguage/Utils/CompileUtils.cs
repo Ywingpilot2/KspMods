@@ -4,7 +4,8 @@ using System.Linq;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Extensions;
 using SteelLanguage.Library;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Library;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Functions.Modifier;
@@ -15,51 +16,12 @@ using SteelLanguage.Token.Terms;
 
 namespace SteelLanguage.Utils;
 
-public enum BoolOperatorKind
-{
-    And = 0,
-    Or = 1
-}
-
-public enum ComparisonOperatorKind
-{
-    Equal = 0,
-    NotEqual = 1,
-    Greater = 2,
-    GreaterEqual = 3,
-    Lesser = 4,
-    LesserEqual = 5
-}
-
-public enum MathOperatorKind
-{
-    And = 0,
-    Or = 1,
-    Add = 2,
-    Subtract = 3,
-    Multiply = 4,
-    Divide = 5,
-    Power = 6,
-    Remaining = 7
-}
-
-public enum AssignmentKind
-{
-    Constant = 0,
-    Term = 1,
-    Assignment = 2,
-    Function = 3,
-    Field = 4
-}
-
 public static class CompileUtils
 {
     #region operator stuff
 
     private static readonly string[] InvalidNames = 
     {
-        "|",
-        "&",
         "!",
         "=",
         "!=",
@@ -70,7 +32,15 @@ public static class CompileUtils
         "<=",
         ">=",
         "&&",
-        "||"
+        "||",
+        "|",
+        "&",
+        "+",
+        "-",
+        "/",
+        "*",
+        "^",
+        "%"
     };
 
     private static readonly string[] Comparisons =

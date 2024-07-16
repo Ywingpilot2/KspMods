@@ -10,6 +10,7 @@ using ProgrammableMod.Scripting.Library;
 using SteelLanguage;
 using SteelLanguage.Extensions;
 using SteelLanguage.Library;
+using SteelLanguage.Reflection.Library;
 using UniLinq;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -479,6 +480,8 @@ public class TokenContainer : IConfigNode
                     tokens += $"{KerbinSuperComputer.Dirty(node.GetValue($"script-line{i}"))}\n";
                 }
             }
+
+            tokens = tokens.TrimEnd();
         }
 
         if (node.HasValue("compile-startup"))
@@ -494,7 +497,7 @@ public class TokenContainer : IConfigNode
 
     public void Save(ConfigNode node)
     {
-        string[] lines = tokens.Split('\n');
+        string[] lines = tokens.TrimEnd().Split('\n');
         node.AddValue("script-length", lines.Length);
         for (int i = 0; i < lines.Length; i++)
         {

@@ -8,11 +8,14 @@ namespace SteelLanguage.Token.Functions;
 public class LocalCall : TokenCall
 {
     private Input _input;
-    private string _funcName;
-    private Input[] _inputs;
+    private readonly string _funcName;
+    private readonly Input[] _inputs;
     
     public override ReturnValue Call()
     {
+        if (_inputs.Length == 0)
+            return _input.GetValue().GetFunction(_funcName).Execute();
+        
         BaseTerm[] terms = new BaseTerm[_inputs.Length];
         for (int i = 0; i < _inputs.Length; i++)
         {

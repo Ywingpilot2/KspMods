@@ -1,22 +1,21 @@
 ﻿using System.Collections.Generic;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions;
-using SteelLanguage.Token.KeyWords;
 using SteelLanguage.Token.KeyWords.Container;
 using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Library;
+namespace SteelLanguage.Reflection.Library;
 
 /// <summary>
 /// Centralized class for handling <see cref="ILibrary"/>s
 /// </summary>
 public class LibraryManager
 {
-    private Dictionary<string, ILibrary> _libraries;
-    private Dictionary<string, IKeyword> _keywords;
-    private Dictionary<string, IFunction> _functions;
-    private Dictionary<string, BaseTerm> _globals;
+    private readonly Dictionary<string, ILibrary> _libraries;
+    private readonly Dictionary<string, IKeyword> _keywords;
+    private readonly Dictionary<string, IFunction> _functions;
+    private readonly Dictionary<string, BaseTerm> _globals;
     
     public bool HasGlobalTerm(string name) => _globals.ContainsKey(name);
 

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions;
-using SteelLanguage.Token.KeyWords;
 using SteelLanguage.Token.KeyWords.Container;
 
-namespace SteelLanguage.Library;
+namespace SteelLanguage.Reflection.Library;
 
 public interface ILibrary
 {

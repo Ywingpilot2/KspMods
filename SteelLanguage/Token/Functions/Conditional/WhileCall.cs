@@ -7,7 +7,7 @@ namespace SteelLanguage.Token.Functions.Conditional;
 
 public class WhileCall : TokenCall
 {
-    private WhileFunction _while;
+    private readonly WhileFunction _while;
     
     public WhileCall(ITokenHolder container, int line, WhileFunction function) : base(container, line)
     {

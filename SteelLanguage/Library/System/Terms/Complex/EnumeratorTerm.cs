@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using SteelLanguage.Reflection;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
+using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Token.Terms.Complex;
+namespace SteelLanguage.Library.System.Terms.Complex;
 
 public class EnumeratorTerm : BaseTerm
 {
@@ -51,11 +51,4 @@ public class EnumeratorTerm : BaseTerm
     }
 
     #endregion
-
-    public override TermType GetTermType()
-    {
-        TermType type = base.GetTermType();
-        type.ContainedType = ContainedType;
-        return type;
-    }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using SteelLanguage.Extensions;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions.Conditional;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;

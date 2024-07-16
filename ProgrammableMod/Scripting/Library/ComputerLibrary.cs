@@ -6,7 +6,8 @@ using ProgrammableMod.Scripting.Terms.Graphmatics.Curves;
 using ProgrammableMod.Scripting.Terms.Vectors;
 using SteelLanguage;
 using SteelLanguage.Library;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Library;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.KeyWords;
@@ -25,8 +26,6 @@ public class ComputerLibrary : ILibrary
         new Function("lerp", "float", 
             terms => new ReturnValue(Mathf.Lerp(terms[0].CastToFloat(), terms[1].CastToFloat(), terms[2].CastToFloat()), "float"), 
             "float", "float", "float"),
-        new Function("abs", "float", terms => new ReturnValue(Mathf.Abs(terms[0].CastToFloat()),"float"), 
-            "float"),
         new Function("log", terms =>
         {
             _computer.Log(terms[0].CastToStr());

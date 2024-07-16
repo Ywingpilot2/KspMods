@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.ValueStasher;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;

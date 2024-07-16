@@ -1,4 +1,5 @@
-﻿using SteelLanguage.Token.Interaction;
+﻿using SteelLanguage.Token.Functions.Modifier;
+using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 using SteelLanguage.Utils;
 

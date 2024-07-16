@@ -1,7 +1,8 @@
 ﻿using SteelLanguage.Exceptions;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Type;
+using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Token.Terms.Literal;
+namespace SteelLanguage.Library.System.Terms.Literal;
 
 public class NullTerm : BaseTerm
 {

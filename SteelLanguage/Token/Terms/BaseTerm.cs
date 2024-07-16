@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Library;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Library;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
+using SteelLanguage.Token.Functions.Modifier;
+using SteelLanguage.Token.Functions.Operator;
+using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Utils;
 
@@ -335,11 +339,17 @@ public abstract class BaseTerm : IToken
             if (subject.GetValue() == null && GetValue() == null)
                 return true;
 
+            if (GetValue() == null)
+                return subject.GetValue() == null;
+
             return GetValue().Equals(subject.GetValue());
         }
 
         if (subject.GetValue() == null && GetValue() == null)
             return false;
+
+        if (GetValue() == null)
+            return subject.GetValue() != null;
 
         return GetValue().Equals(subject.GetValue());
     }
@@ -362,7 +372,7 @@ public abstract class BaseTerm : IToken
     #region Value manipulation
 
     /// <summary>
-    /// Parse the term from a string value
+    /// Parse the term from a string value. This method is hard coded to basic types. 
     /// </summary>
     /// <param name="value">The pure value from the token</param>
     /// <returns>A bool indicating whether the operation was a success. If false a <see cref="CompilationException"/> will be thrown</returns>
@@ -371,13 +381,18 @@ public abstract class BaseTerm : IToken
         throw new InvalidActionException(0, $"{ValueType} can't parse {value} as a literal");
     }
 
+    /// <summary>
+    /// Set this terms raw value
+    /// </summary>
+    /// <param name="value">The value to set</param>
+    /// <returns>A bool indicating whether the operation was a success. If false a <see cref="CompilationException"/> will be thrown</returns>
     public abstract bool SetValue(object value);
     
     /// <summary>
-    /// Copy another terms 
+    /// Copy another term's value
     /// </summary>
-    /// <param name="term"></param>
-    /// <returns></returns>
+    /// <param name="term">The term to copy the value from</param>
+    /// <returns>A bool indicating whether the operation was a success. If false a <see cref="CompilationException"/> will be thrown</returns>
     public abstract bool CopyFrom(BaseTerm term);
 
     /// <summary>
@@ -392,9 +407,13 @@ public abstract class BaseTerm : IToken
     /// Gets the <see cref="TermType"/> representing this term
     /// </summary>
     /// <returns>A copy of the <see cref="TermType"/> gotten from <see cref="LibraryManager"/> used to construct this <see cref="BaseTerm"/></returns>
-    public virtual TermType GetTermType()
+    public TermType GetTermType()
     {
         TermType example = TypeLibrary.GetTermType(ValueType);
-        return new TermType(this, example.BaseClass, example.IsAbstract);
+        TermType type = new TermType(this, example.BaseClass, example.IsAbstract, example.IsNullable);
+        if (ContainsType)
+            type.ContainedType = ContainedType;
+        
+        return type;
     }
 }

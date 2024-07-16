@@ -1,4 +1,4 @@
-﻿namespace SteelLanguage.Reflection;
+﻿namespace SteelLanguage.Reflection.Type;
 
 public enum ConstructorKind
 {

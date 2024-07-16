@@ -7,7 +7,7 @@ namespace SteelLanguage.Token.Functions.Modifier;
 public class CastCall : TokenCall
 {
     private Input _from;
-    private string _type;
+    private readonly string _type;
     
     public CastCall(ITokenHolder container, int line, Input from, string type) : base(container, line)
     {

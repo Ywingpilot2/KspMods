@@ -4,11 +4,11 @@ namespace SteelLanguage.Token.Functions.Modifier;
 
 public class FieldCall : TokenCall
 {
-    private bool _static;
-    private string _field;
+    private readonly bool _static;
+    private readonly string _field;
     
     private Input _input;
-    private string _type;
+    private readonly string _type;
     
     public FieldCall(ITokenHolder container, int line, Input input, string field) : base(container, line)
     {

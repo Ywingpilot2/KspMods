@@ -1,5 +1,5 @@
-﻿using SteelLanguage.Token.Interaction;
-using SteelLanguage.Token.Terms.Complex.Enumerators;
+﻿using SteelLanguage.Library.System.Terms.Complex.Enumerators;
+using SteelLanguage.Token.Interaction;
 
 namespace SteelLanguage.Token.Functions.Modifier;
 
@@ -8,8 +8,8 @@ namespace SteelLanguage.Token.Functions.Modifier;
 /// </summary>
 public class ParamsCall : TokenCall
 {
-    private string _type;
-    private Input[] _inputs;
+    private readonly string _type;
+    private readonly Input[] _inputs;
     
     public ParamsCall(ITokenHolder container, int line, string type, Input[] inputs) : base(container, line)
     {

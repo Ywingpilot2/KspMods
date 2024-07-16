@@ -1,39 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using SteelLanguage.Reflection;
+using SteelLanguage.Library.System.Terms.Complex;
+using SteelLanguage.Library.System.Terms.Complex.Enumerators;
+using SteelLanguage.Library.System.Terms.Literal;
+using SteelLanguage.Reflection.Library;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
-using SteelLanguage.Token.KeyWords;
 using SteelLanguage.Token.KeyWords.Container;
 using SteelLanguage.Token.KeyWords.Single;
 using SteelLanguage.Token.Terms;
-using SteelLanguage.Token.Terms.Complex;
-using SteelLanguage.Token.Terms.Complex.Enumerators;
-using SteelLanguage.Token.Terms.Literal;
 using SteelLanguage.Token.Terms.Technical;
 
-namespace SteelLanguage.Library;
+namespace SteelLanguage.Library.System;
 
-public class SteelLibrary : ILibrary
+public class SystemLibrary : ILibrary
 {
     public string Name => "system";
-    private static readonly Random Rng = new();
 
     public IEnumerable<IFunction> GlobalFunctions { get; } = new IFunction[]
     {
-        new Function("to_string", "string", inputTypes: "term", action: terms => new ReturnValue(TermToString(terms[0]), "string")),
-        new Function("equal", "bool", inputTypes:new []{"term", "term"}, action: terms =>
+        new Function("equal", "bool", inputTypes: new[] { "term", "term" }, action: terms =>
         {
             object a = terms[0].GetValue();
             object b = terms[1].GetValue();
-                
+
             if (a == null && b == null) // both values are null therefore technically equal
             {
                 return new ReturnValue(true, "bool");
             }
+
             return new ReturnValue(Equals(a, b), "bool");
         }),
-        new Function("not_equal", "bool", inputTypes:new []{"term","term"}, action: terms =>
+        new Function("not_equal", "bool", inputTypes: new[] { "term", "term" }, action: terms =>
         {
             object a = terms[0].GetValue();
             object b = terms[1].GetValue();
@@ -42,39 +41,10 @@ public class SteelLibrary : ILibrary
             {
                 return new ReturnValue(false, "bool");
             }
+
             return new ReturnValue(!Equals(a, b), "bool");
         }),
-        new Function("greater", "bool", terms =>
-        {
-            // We use doubles since those are most likely to give us accurate results(everything can cast to them without losing data)
-            double a = terms[0].CastToDouble();
-            double b = terms[1].CastToDouble();
-            return new ReturnValue(a > b, "bool");
-        }, "number_term","number_term"),
-        new Function("greater_equal", "bool", terms =>
-        {
-            // We use doubles since those are most likely to give us accurate results(everything can cast to them without losing data)
-            double a = terms[0].CastToDouble();
-            double b = terms[1].CastToDouble();
-            return new ReturnValue(a >= b, "bool");
-        }, "number_term","number_term"),
-        new Function("lesser", "bool", terms =>
-        {
-            // We use doubles since those are most likely to give us accurate results(everything can cast to them without losing data)
-            double a = terms[0].CastToDouble();
-            double b = terms[1].CastToDouble();
-            return new ReturnValue(a < b, "bool");
-        }, "number_term","number_term"),
-        new Function("lesser_equal", "bool", terms =>
-        {
-            // We use doubles since those are most likely to give us accurate results(everything can cast to them without losing data)
-            double a = terms[0].CastToDouble();
-            double b = terms[1].CastToDouble();
-            return new ReturnValue(a <= b, "bool");
-        }, "number_term","number_term"),
-        new Function("random", "int", () => new ReturnValue(Rng.Next(), "int")),
-        new Function("random_max", "int",inputTypes:new []{"int"}, action:terms => new ReturnValue(Rng.Next(terms[0].CastToInt()), "int")),
-        new Function("random_interval", "int", inputTypes:new []{"int","int"}, action:terms => new ReturnValue(Rng.Next(terms[0].CastToInt(), terms[1].CastToInt()), "int")),
+        new Function("to_string", "string", inputTypes: "term", action: terms => new ReturnValue(TermToString(terms[0]), "string")),
         new Function("not", "bool", inputTypes:new []{"bool"}, action: terms => new ReturnValue(!terms[0].CastToBool(), "bool")),
         new Function("and", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() && terms[1].CastToBool(), "bool")),
         new Function("or", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() || terms[1].CastToBool(), "bool")),
@@ -143,7 +113,7 @@ public class SteelLibrary : ILibrary
     };
     public TypeLibrary TypeLibrary { get; }
     
-    public SteelLibrary()
+    public SystemLibrary()
     {
         TypeLibrary = new TypeLibrary();
 

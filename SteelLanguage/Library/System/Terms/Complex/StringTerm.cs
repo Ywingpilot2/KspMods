@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using SteelLanguage.Exceptions;
+using SteelLanguage.Library.System.Terms.Literal;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
-using SteelLanguage.Token.Terms.Literal;
+using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Token.Terms.Complex;
+namespace SteelLanguage.Library.System.Terms.Complex;
 
 public sealed class StringTerm : BaseTerm
 {

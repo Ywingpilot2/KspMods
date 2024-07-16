@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Library;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Library;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
@@ -46,7 +47,7 @@ public struct Function : IFunction
     private Func<ReturnValue> Return { get; }
     private Action<BaseTerm[]> In { get; }
     private Action None { get; }
-    private FunctionKind _kind;
+    private readonly FunctionKind _kind;
     private static readonly BaseTerm[] _empty = new BaseTerm[0]; // array declaration is expensive!
 
     public ReturnValue Execute(params BaseTerm[] terms)

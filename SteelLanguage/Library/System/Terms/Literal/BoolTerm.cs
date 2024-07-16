@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using SteelLanguage.Reflection;
+using SteelLanguage.Token.Functions.Operator;
+using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
+using SteelLanguage.Token.Terms;
 using SteelLanguage.Utils;
 
-namespace SteelLanguage.Token.Terms.Literal;
+namespace SteelLanguage.Library.System.Terms.Literal;
 
 public sealed class BoolTerm : BaseTerm
 {

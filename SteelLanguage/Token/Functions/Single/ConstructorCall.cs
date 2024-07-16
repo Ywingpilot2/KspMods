@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 
@@ -8,9 +8,9 @@ namespace SteelLanguage.Token.Functions.Single;
 
 public class ConstructorCall : TokenCall
 {
-    private Input[] _inputs;
-    private TermType _type;
-    private string _sig;
+    private readonly Input[] _inputs;
+    private readonly TermType _type;
+    private readonly string _sig;
     
     public ConstructorCall(ITokenHolder container, int line, string sig, TermType type, IEnumerable<Input> inputs) : base(container, line)
     {

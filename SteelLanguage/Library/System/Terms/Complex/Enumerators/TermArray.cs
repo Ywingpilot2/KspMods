@@ -1,19 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Reflection;
+using SteelLanguage.Library.System.Terms.Literal;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
+using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
-using SteelLanguage.Token.Terms.Literal;
+using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Token.Terms.Complex.Enumerators;
+namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
 
 public class TermArray : IEnumerable
 {
     public string ValueType { get; }
     public int Length { get; }
-    private BaseTerm[] _terms;
+    private readonly BaseTerm[] _terms;
 
     public void SetValue(BaseTerm value, int idx)
     {

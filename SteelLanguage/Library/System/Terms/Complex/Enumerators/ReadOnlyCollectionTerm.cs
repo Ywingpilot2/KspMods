@@ -2,8 +2,9 @@
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
+using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Token.Terms.Complex.Enumerators;
+namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
 
 public class ReadOnlyCollectionTerm : EnumeratorTerm
 {

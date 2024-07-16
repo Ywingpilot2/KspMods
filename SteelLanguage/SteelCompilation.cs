@@ -5,11 +5,15 @@ using System.Linq;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Extensions;
 using SteelLanguage.Library;
-using SteelLanguage.Reflection;
+using SteelLanguage.Library.Numerics;
+using SteelLanguage.Library.System;
+using SteelLanguage.Reflection.Library;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Functions.Modifier;
+using SteelLanguage.Token.Functions.Operator;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.KeyWords;
 using SteelLanguage.Token.KeyWords.Container;
@@ -20,10 +24,16 @@ namespace SteelLanguage;
 
 public sealed class SteelCompiler
 {
-    private ILibrary[] _libraries;
+    private readonly ILibrary[] _libraries;
     private SteelScript _currentScript;
 
-    public static readonly SteelLibrary Library = new();
+    public static SystemLibrary Library => SysLibraries[0] as SystemLibrary;
+
+    public static readonly ILibrary[] SysLibraries = new ILibrary[]
+    {
+        new SystemLibrary(),
+        new NumericsLibrary()
+    };
 
     public SteelScript Compile(string tokens)
     {
@@ -462,11 +472,12 @@ public sealed class SteelCompiler
     public SteelCompiler(params ILibrary[] libraries)
     {
         // needs to be longer by one to account for the system library(always imported)
-        _libraries = new ILibrary[libraries.Length + 1];
-        _libraries.SetValue(new SteelLibrary(), 0);
-        for (int i = 0; i < libraries.Length; i++)
+        _libraries = new ILibrary[libraries.Length + SysLibraries.Length];
+        for (int i = 0; i < SysLibraries.Length; i++)
         {
-            _libraries.SetValue(libraries[i], i + 1);
+            _libraries.SetValue(SysLibraries[i], i);
         }
+        
+        libraries.CopyTo(_libraries, SysLibraries.Length);
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
-using SteelLanguage.Token.Functions;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Reflection;
+namespace SteelLanguage.Token.Functions.Single;
 
 public struct TermConstructor : IFunction
 {
@@ -13,8 +13,8 @@ public struct TermConstructor : IFunction
     public string[] InputTypes { get; }
     public ConstructorKind Kind { get; }
     
-    private Func<BaseTerm[], ReturnValue> _filled;
-    private Func<ReturnValue> _partial;
+    private readonly Func<BaseTerm[], ReturnValue> _filled;
+    private readonly Func<ReturnValue> _partial;
 
     public ReturnValue Execute(params BaseTerm[] terms)
     {

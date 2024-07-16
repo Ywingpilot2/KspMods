@@ -1,11 +1,10 @@
 ﻿using System.Globalization;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Token.Terms;
-using SteelLanguage.Token.Terms.Complex;
 
 namespace ProgrammableMod.Scripting.ValueStasher;
 
-public struct ProtoStash
+public readonly struct ProtoStash
 {
     public string Name { get; }
     public string ValueType { get; }
@@ -20,7 +19,7 @@ public struct ProtoStash
 
     public bool IsBasic => bool.Parse(Node.GetValue("basic_type"));
 
-    private NumberFormatInfo _info = new();
+    private readonly NumberFormatInfo _info = new();
 
     public object GetBasicValue()
     {

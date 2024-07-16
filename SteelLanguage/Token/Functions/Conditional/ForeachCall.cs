@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections;
+using SteelLanguage.Library.System.Terms.Complex;
 using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
-using SteelLanguage.Token.Terms.Complex;
 
 namespace SteelLanguage.Token.Functions.Conditional;
 
 public class ForeachCall : TokenCall
 {
-    private ForeachFunc _foreach;
+    private readonly ForeachFunc _foreach;
     
     public ForeachCall(ITokenHolder container, int line, ForeachFunc function) : base(container, line)
     {
@@ -41,7 +41,7 @@ public class ForeachCall : TokenCall
 public class ForeachFunc : BaseExecutable
 {
     private Input _enumerator;
-    private string _term;
+    private readonly string _term;
 
     public override ReturnValue Execute()
     {

@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Globalization;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Reflection;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
+using SteelLanguage.Token.Functions.Modifier;
+using SteelLanguage.Token.Functions.Operator;
+using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
+using SteelLanguage.Token.Terms;
 using SteelLanguage.Utils;
 
-namespace SteelLanguage.Token.Terms.Literal;
+namespace SteelLanguage.Library.System.Terms.Literal;
 
 public static class NumberConversion
 {
@@ -23,7 +26,7 @@ public static class NumberConversion
 
 public class NumberTerm : BaseTerm
 {
-    public override string ValueType => "number-term";
+    public override string ValueType => "number";
 
     public override bool Parse(string value)
     {
@@ -36,8 +39,8 @@ public class NumberTerm : BaseTerm
     }
 
     protected ValueType Number;
-    protected virtual Type NumberType { get; }
-    protected static NumberFormatInfo Info = new NumberFormatInfo();
+    protected virtual global::System.Type NumberType { get; }
+    protected static readonly NumberFormatInfo Info = new NumberFormatInfo();
 
     protected static string[] NumberTypes = new[]
     {
@@ -172,7 +175,7 @@ public class NumberTerm : BaseTerm
 public class TermI : NumberTerm
 {
     public override string ValueType => "int";
-    protected override Type NumberType => typeof(int);
+    protected override global::System.Type NumberType => typeof(int);
 
     public override bool CanImplicitCastToBool => true;
 
@@ -301,7 +304,7 @@ public class TermI : NumberTerm
 public class TermF : NumberTerm
 {
     public override string ValueType => "float";
-    protected override Type NumberType => typeof(float);
+    protected override global::System.Type NumberType => typeof(float);
     
     public override bool Parse(string value)
     {
@@ -411,7 +414,7 @@ public class TermF : NumberTerm
 public class TermU : NumberTerm
 {
     public override string ValueType => "uint";
-    protected override Type NumberType => typeof(uint);
+    protected override global::System.Type NumberType => typeof(uint);
 
     public override bool CanImplicitCastToBool => true;
 
@@ -512,7 +515,7 @@ public class TermU : NumberTerm
 public class TermD : NumberTerm
 {
     public override string ValueType => "double";
-    protected override Type NumberType => typeof(double);
+    protected override global::System.Type NumberType => typeof(double);
 
     public override IEnumerable<TermField> GetStaticFields()
     {

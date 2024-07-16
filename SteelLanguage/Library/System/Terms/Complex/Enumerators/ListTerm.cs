@@ -1,19 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Reflection;
+using SteelLanguage.Library.System.Terms.Literal;
+using SteelLanguage.Token.Functions.Modifier;
+using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
-using SteelLanguage.Token.Terms.Literal;
+using SteelLanguage.Token.Terms;
 using SteelLanguage.Utils;
 
-namespace SteelLanguage.Token.Terms.Complex.Enumerators;
+namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
 
 public class TermList : ICollection<BaseTerm>
 {
     public int Count => _baseTerms.Count;
     public string ValueType { get; }
     public bool IsReadOnly => false;
-    private List<BaseTerm> _baseTerms;
+    private readonly List<BaseTerm> _baseTerms;
 
     public IEnumerator<BaseTerm> GetEnumerator()
     {
@@ -57,7 +59,7 @@ public class TermList : ICollection<BaseTerm>
 
     public void CopyTo(BaseTerm[] array, int arrayIndex)
     {
-        throw new System.NotImplementedException();
+        throw new global::System.NotImplementedException();
     }
 
     public bool Remove(BaseTerm item)

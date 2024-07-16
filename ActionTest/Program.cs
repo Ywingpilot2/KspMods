@@ -4,16 +4,18 @@ using System.Diagnostics;
 using System.IO;
 using SteelLanguage;
 using SteelLanguage.Library;
-using SteelLanguage.Reflection;
+using SteelLanguage.Library.System;
+using SteelLanguage.Library.System.Terms.Complex;
+using SteelLanguage.Library.System.Terms.Complex.Enumerators;
+using SteelLanguage.Library.System.Terms.Literal;
+using SteelLanguage.Reflection.Library;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.KeyWords;
 using SteelLanguage.Token.KeyWords.Container;
 using SteelLanguage.Token.Terms;
-using SteelLanguage.Token.Terms.Complex;
-using SteelLanguage.Token.Terms.Complex.Enumerators;
-using SteelLanguage.Token.Terms.Literal;
 
 namespace ActionTest
 {
@@ -42,7 +44,7 @@ namespace ActionTest
         public IEnumerable<IKeyword> Keywords { get; }
         public TypeLibrary TypeLibrary { get; }
 
-        public ProgramLibrary(SteelLibrary baseLibrary)
+        public ProgramLibrary(SystemLibrary baseLibrary)
         {
             TypeLibrary = new TypeLibrary();
             TermType type = baseLibrary.TypeLibrary.GetTermType("term", 0);
@@ -55,8 +57,8 @@ namespace ActionTest
     
     internal static class Program
     {
-        private static Dictionary<string, SteelScript> _compiled = new Dictionary<string, SteelScript>();
-        private static SteelCompiler _compiler = new SteelCompiler(new ProgramLibrary(SteelCompiler.Library));
+        private static readonly Dictionary<string, SteelScript> _compiled = new Dictionary<string, SteelScript>();
+        private static readonly SteelCompiler _compiler = new SteelCompiler(new ProgramLibrary(SteelCompiler.Library));
         
         public class ProgramTerm : BaseTerm
         {

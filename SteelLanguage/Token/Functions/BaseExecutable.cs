@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Library;
+using SteelLanguage.Reflection.Library;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 
@@ -11,9 +12,9 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
 {
     public ITokenHolder Container { get; }
 
-    protected Dictionary<string, BaseTerm> BaseTerms;
-    private Dictionary<string, object> _compiledValues;
-    protected List<TokenCall> Calls;
+    protected readonly Dictionary<string, BaseTerm> BaseTerms;
+    private readonly Dictionary<string, object> _compiledValues;
+    protected readonly List<TokenCall> Calls;
 
     #region Token Holder
     

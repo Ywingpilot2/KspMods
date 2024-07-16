@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Library;
-using SteelLanguage.Reflection;
+using SteelLanguage.Reflection.Library;
+using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Functions.Single;
@@ -19,7 +20,7 @@ public sealed class SteelScript : ITokenHolder
 
     private Dictionary<string, IFunction> Functions { get; }
     private Dictionary<string, BaseTerm> Terms { get; }
-    private Dictionary<string, object> _compiledValues;
+    private readonly Dictionary<string, object> _compiledValues;
     private LibraryManager LibraryManager { get; }
     private List<TokenCall> TokenCalls { get; }
 

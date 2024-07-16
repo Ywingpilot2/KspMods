@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Library;
+using SteelLanguage.Reflection.Library;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
+using SteelLanguage.Token.Functions.Modifier;
+using SteelLanguage.Token.Functions.Operator;
+using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 using SteelLanguage.Utils;
 
-namespace SteelLanguage.Reflection;
+namespace SteelLanguage.Reflection.Type;
 
 public sealed class TermType
 {
@@ -65,6 +68,9 @@ public sealed class TermType
 
     public ReturnValue Construct(string sig, params BaseTerm[] inputs)
     {
+        if (inputs.Length == 0)
+            return Term.GetConstructor("").Execute();
+        
         return Term.GetConstructor(sig).Execute(inputs);
     }
     
