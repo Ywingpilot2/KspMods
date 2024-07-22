@@ -14,8 +14,8 @@ public enum InputType
     Term,
     Call
 }
-    
-public struct Input
+
+public readonly record struct Input
 {
     public InputType Type { get; }
     private TokenCall Call { get; }

@@ -14,6 +14,10 @@ using SteelLanguage.Token.Terms;
 
 namespace SteelLanguage;
 
+/// <summary>
+/// Represents a fully compiled and executable script
+/// </summary>
+/// <seealso cref="SteelCompiler"/>
 public sealed class SteelScript : ITokenHolder
 {
     public ITokenHolder Container { get; }
@@ -151,7 +155,7 @@ public sealed class SteelScript : ITokenHolder
         PostExecution();
     }
 
-    internal void PreExecution()
+    private void PreExecution()
     {
         foreach (BaseTerm term in EnumerateTerms())
         {
@@ -159,7 +163,7 @@ public sealed class SteelScript : ITokenHolder
         }
     }
 
-    internal void PostExecution()
+    private void PostExecution()
     {
         GC.Collect();
     }
@@ -171,7 +175,7 @@ public sealed class SteelScript : ITokenHolder
             call.PostCompilation();
         }
 
-        foreach (BaseTerm term in EnumerateTerms())
+        foreach (BaseTerm term in Terms.Values)
         {
             _compiledValues.Add(term.Name, term.GetValue());
         }

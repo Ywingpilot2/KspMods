@@ -8,7 +8,10 @@ using SteelLanguage.Token.Terms;
 
 namespace SteelLanguage.Token.Functions;
 
-public abstract class BaseExecutable : ITokenHolder, IExecutable
+/// <summary>
+/// Base class for an <see cref="T:SteelLanguage.Token.Functions.IExecutable" /> <see cref="T:SteelLanguage.Token.ITokenHolder" />. 
+/// </summary>
+public abstract record BaseExecutable : ITokenHolder, IExecutable
 {
     public ITokenHolder Container { get; }
 
@@ -128,7 +131,7 @@ public abstract class BaseExecutable : ITokenHolder, IExecutable
 
     #endregion
 
-    public BaseExecutable(ITokenHolder holder)
+    protected BaseExecutable(ITokenHolder holder)
     {
         BaseTerms = new Dictionary<string, BaseTerm>();
         _compiledValues = new Dictionary<string, object>();

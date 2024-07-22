@@ -18,6 +18,8 @@ public abstract class BaseVesselTerm : BaseTerm
     protected virtual void ExtraBuilding()
     {
     }
+    
+    
 
     public override bool CopyFrom(BaseTerm term)
     {

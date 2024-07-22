@@ -71,7 +71,8 @@ public class SystemLibrary : ILibrary
 
     public static string TermToString(BaseTerm term)
     {
-        if (term.CanImplicitCastToStr)
+        TermType strType = SteelCompiler.Library.TypeLibrary.GetTermType("string");
+        if (term.CanImplicitCastToType(strType))
         {
             return term.CastToStr();
         }

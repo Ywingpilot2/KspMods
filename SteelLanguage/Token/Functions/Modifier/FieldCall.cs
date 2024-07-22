@@ -7,7 +7,7 @@ public class FieldCall : TokenCall
     private readonly bool _static;
     private readonly string _field;
     
-    private Input _input;
+    private readonly Input _input;
     private readonly string _type;
     
     public FieldCall(ITokenHolder container, int line, Input input, string field) : base(container, line)

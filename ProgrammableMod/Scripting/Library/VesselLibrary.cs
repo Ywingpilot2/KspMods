@@ -39,8 +39,8 @@ public class VesselLibrary : ILibrary
     {
         TypeLibrary = new TypeLibrary();
 
-        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term", 0);
-        TermType enumType = SteelCompiler.Library.TypeLibrary.GetTermType("enum", 0);
+        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term");
+        TermType enumType = SteelCompiler.Library.TypeLibrary.GetTermType("enum");
         
         TypeLibrary.AddTermType(new TermType(new VesselTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new StagingTerm(), baseType));

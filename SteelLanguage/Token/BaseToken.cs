@@ -12,7 +12,7 @@ public abstract class BaseToken : IToken
 
     public IFunction GetFunc(string name) => Container.GetFunction(name);
 
-    public BaseToken(ITokenHolder container, int line)
+    protected BaseToken(ITokenHolder container, int line)
     {
         Container = container;
         Line = line;

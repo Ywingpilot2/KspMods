@@ -35,7 +35,6 @@ public class KerbalLibrary : ILibrary
                 Kind = TermKind.Class, 
                 Computer = computer,
                 Name = "KERBNET",
-            
             })
         };
     }
@@ -43,7 +42,7 @@ public class KerbalLibrary : ILibrary
     public KerbalLibrary()
     {
         TypeLibrary = new TypeLibrary();
-        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term", 0);
+        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term");
         
         TypeLibrary.AddTermType(new TermType(new KerbNetTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new SuperComputerTerm(), baseType));

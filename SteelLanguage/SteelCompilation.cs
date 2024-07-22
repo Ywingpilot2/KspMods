@@ -22,6 +22,9 @@ using SteelLanguage.Utils;
 
 namespace SteelLanguage;
 
+/// <summary>
+/// This class can be used to compile a <see cref="SteelScript"/>
+/// </summary>
 public sealed class SteelCompiler
 {
     private readonly ILibrary[] _libraries;
@@ -35,6 +38,11 @@ public sealed class SteelCompiler
         new NumericsLibrary()
     };
 
+    /// <summary>
+    /// Compiles a <see cref="SteelScript"/> from a string
+    /// </summary>
+    /// <param name="tokens">The string to compile from</param>
+    /// <returns>A compiled <see cref="SteelScript"/> ready for execution</returns>
     public SteelScript Compile(string tokens)
     {
         return Compile(new StringReader(tokens));
@@ -42,10 +50,10 @@ public sealed class SteelCompiler
 
     /// <summary>
     /// Compiles a <see cref="SteelScript"/>
-    /// NOTICE: This does not work in multi threaded or async situations. 
     /// </summary>
-    /// <param name="reader"></param>
+    /// <param name="reader">The <see cref="TextReader"/> to use for reading the script</param>
     /// <returns>A compiled <see cref="SteelScript"/> ready for execution</returns>
+    /// <remarks>This does not work in multi threaded or async situations.</remarks>
     public SteelScript Compile(TextReader reader)
     {
         _reader = reader;

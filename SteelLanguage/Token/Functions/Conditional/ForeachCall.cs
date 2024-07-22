@@ -38,7 +38,7 @@ public class ForeachCall : TokenCall
     }
 }
 
-public class ForeachFunc : BaseExecutable
+public record ForeachFunc : BaseExecutable
 {
     private Input _enumerator;
     private readonly string _term;

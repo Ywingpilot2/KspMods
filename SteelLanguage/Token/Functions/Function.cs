@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Library;
 using SteelLanguage.Reflection.Library;
 using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions.Single;
@@ -10,27 +9,66 @@ using SteelLanguage.Token.Terms;
 
 namespace SteelLanguage.Token.Functions;
 
+/// <summary>
+/// Base implementation of a token capable of executing instructions
+/// </summary>
 public interface IExecutable
 {
+    /// <summary>
+    /// Begin execution
+    /// </summary>
+    /// <param name="terms">Input terms given to this by a <see cref="TokenCall"/></param>
+    /// <returns>A <see cref="ReturnValue"/>, <c>return new ReturnValue()</c> if void</returns>
     public ReturnValue Execute(params BaseTerm[] terms);
+    /// <summary>
+    /// Begin execution without any arguments
+    /// </summary>
+    /// <returns>A <see cref="ReturnValue"/>, <c>return new ReturnValue()</c> if void</returns>
     public ReturnValue Execute();
 
+    /// <summary>
+    /// Occurs just before <see cref="Execute(SteelLanguage.Token.Terms.BaseTerm[])"/> is called
+    /// </summary>
     public void PreExecution();
+    /// <summary>
+    /// Occurs just after <see cref="Execute(SteelLanguage.Token.Terms.BaseTerm[])"/> is called
+    /// </summary>
     public void PostExecution();
+    /// <summary>
+    /// Occurs when the <see cref="SteelCompiler"/> has finished compiling the <see cref="SteelScript"/>
+    /// </summary>
     public void PostCompilation();
 }
 
+/// <summary>
+/// Base implementation of a function which can be directly called through user code through a <see cref="FunctionCall"/>
+/// </summary>
 public interface IFunction : IExecutable
 {
+    /// <summary>
+    /// The name of the function
+    /// </summary>
     public string Name { get; }
+    /// <summary>
+    /// The return type of the function
+    /// </summary>
     public string ReturnType { get; }
+    /// <summary>
+    /// The types of this functions inputs
+    /// </summary>
     public string[] InputTypes { get; }
 
     // TODO: this is a cool idea, why aren't we using it?
     // public bool InputIsValid(string type, int idx, ITokenHolder holder);
 }
 
-public struct Function : IFunction
+/// <inheritdoc />
+/// <summary>
+/// A function natively handled in C# which can be called by Steel code through a <see cref="T:SteelLanguage.Token.Functions.FunctionCall" />
+/// </summary>
+///
+/// <seealso cref="UserFunction"/>
+public record Function : IFunction
 {
     private enum FunctionKind
     {
@@ -48,7 +86,7 @@ public struct Function : IFunction
     private Action<BaseTerm[]> In { get; }
     private Action None { get; }
     private readonly FunctionKind _kind;
-    private static readonly BaseTerm[] _empty = new BaseTerm[0]; // array declaration is expensive!
+    private static readonly BaseTerm[] Empty = new BaseTerm[0]; // array declaration is expensive!
 
     public ReturnValue Execute(params BaseTerm[] terms)
     {
@@ -84,7 +122,7 @@ public struct Function : IFunction
         {
             case FunctionKind.InReturn:
             {
-                return InReturn.Invoke(_empty);
+                return InReturn.Invoke(Empty);
             }
             case FunctionKind.Return:
             {
@@ -92,7 +130,7 @@ public struct Function : IFunction
             }
             case FunctionKind.In:
             {
-                In.Invoke(_empty);
+                In.Invoke(Empty);
             } break;
         }
 
@@ -169,8 +207,12 @@ public struct Function : IFunction
 
     #endregion
 }
-    
-public class UserFunction : BaseExecutable, IFunction
+
+/// <summary>
+/// Represents a function written in Steel
+/// </summary>
+/// <seealso cref="Function"/>
+public record UserFunction : BaseExecutable, IFunction
 {
     public string Name { get; }
     public string ReturnType { get; }

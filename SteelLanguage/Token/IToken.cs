@@ -1,5 +1,8 @@
 ﻿namespace SteelLanguage.Token;
 
+/// <summary>
+/// Base implementation of a compiler token
+/// </summary>
 public interface IToken
 {
     /// <summary>

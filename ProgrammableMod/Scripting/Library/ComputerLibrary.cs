@@ -50,7 +50,7 @@ public class ComputerLibrary : ILibrary
     {
         TypeLibrary = new TypeLibrary();
         
-        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term", 0);
+        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term");
         TypeLibrary.AddTermType(new TermType(new PiecewiseCTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new Vec2Term(), baseType));
         TypeLibrary.AddTermType(new TermType(new Vec3Term(), baseType));

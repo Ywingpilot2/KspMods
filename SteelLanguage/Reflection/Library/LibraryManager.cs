@@ -85,7 +85,7 @@ public class LibraryManager
                 continue;
             
             if (library.TypeLibrary.HasTermType(name))
-                return library.TypeLibrary.GetTermType(name, 0);
+                return library.TypeLibrary.GetTermType(name);
         }
         
         throw new TypeNotExistException(0, name);

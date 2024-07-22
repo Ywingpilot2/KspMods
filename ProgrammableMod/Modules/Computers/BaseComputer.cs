@@ -33,7 +33,7 @@ public abstract class BaseComputer : PartModule
     [KSPField(isPersistant = false, guiActive = true, guiName = "Program Status", guiActiveEditor = true)] [UsedImplicitly]
     public string status = "Operating";
     
-    [KSPField(isPersistant = false, guiActive = false, guiName = "Error")]
+    [KSPField(isPersistant = false, guiActive = false, guiName = "Error")] [UsedImplicitly]
     public string exception;
 
     [KSPField(isPersistant = true)]
@@ -171,6 +171,14 @@ public abstract class BaseComputer : PartModule
         }
         
         UpdateButton();
+    }
+    
+    public override void OnCopy(PartModule fromModule)
+    {
+        BaseComputer computer = (BaseComputer)fromModule;
+        tokenContainer.tokens = computer.tokenContainer.tokens;
+        tokenContainer.shouldRun = computer.tokenContainer.shouldRun;
+        tokenContainer.shouldCompile = computer.tokenContainer.shouldRun;
     }
 
     #endregion

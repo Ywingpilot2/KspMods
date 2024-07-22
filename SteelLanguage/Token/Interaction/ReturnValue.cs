@@ -1,6 +1,6 @@
 ﻿namespace SteelLanguage.Token.Interaction;
 
-public struct ReturnValue
+public readonly record struct ReturnValue
 {
     public bool HasValue => Value != null;
     public string Type { get; }

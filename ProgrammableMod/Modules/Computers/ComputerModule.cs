@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using JetBrains.Annotations;
+using ProgrammableMod.Scripting.Exceptions;
 using SteelLanguage;
 
 namespace ProgrammableMod.Modules.Computers;
@@ -52,6 +53,12 @@ public class ComputerModule : BaseComputer, IResourceConsumer
         if (!resHandler.UpdateModuleResourceInputs(ref error, rate, 0.9, true) && ShouldRun)
         {
             ThrowException("Computer has ran out of power! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on");
+        }
+
+        if (vessel.Connection.GetControlLevel() == Vessel.ControlLevel.NONE ||
+            vessel.Connection.GetControlLevel() == Vessel.ControlLevel.PARTIAL_UNMANNED)
+        {
+            throw new ControlLostException(0);
         }
     }
 

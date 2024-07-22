@@ -155,6 +155,43 @@ public sealed class StringTerm : BaseTerm
             
         return false;
     }
+    
+    public override object CastToType(string name)
+    {
+        switch (name)
+        {
+            case "bool":
+            {
+                return CastToBool();
+            }
+            case "double":
+            {
+                return CastToDouble();
+            }
+            case "float":
+            {
+                return CastToFloat();
+            }
+            case "int":
+            {
+                return CastToInt();
+            }
+            case "uint":
+            {
+                return CastToUint();
+            }
+            case "guid":
+            {
+                return CastToGuid();
+            }
+            case "string":
+            {
+                return CastToStr();
+            }
+        }
+
+        return null;
+    }
 
     #endregion
 

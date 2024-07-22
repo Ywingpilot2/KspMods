@@ -105,7 +105,7 @@ public class ElseCall : TokenCall, IConditionalCall
     }
 }
 
-public class SingleExecutableFunc : BaseExecutable
+public record SingleExecutableFunc : BaseExecutable
 {
     public SingleExecutableFunc(ITokenHolder holder) : base(holder)
     {

@@ -25,7 +25,7 @@ public class TypeLibrary
         return Types.ContainsKey(name);
     }
 
-    public TermType GetTermType(string name, int line)
+    public TermType GetTermType(string name)
     {
         if (name.EndsWith(">"))
         {
@@ -35,7 +35,7 @@ public class TypeLibrary
             string currentType = split[0].Trim();
             
             if (!Types.ContainsKey(currentType))
-                throw new TypeNotExistException(line, currentType);
+                throw new TypeNotExistException(0, currentType);
 
             TermType example = Types[currentType];
             
@@ -52,7 +52,7 @@ public class TypeLibrary
         }
         
         if (!Types.ContainsKey(name))
-            throw new TypeNotExistException(line, name);
+            throw new TypeNotExistException(0, name);
 
         return Types[name];
     }

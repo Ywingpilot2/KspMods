@@ -3,7 +3,7 @@ using SteelLanguage.Token.KeyWords.Container;
 
 namespace SteelLanguage.Token.KeyWords.Single;
 
-public struct ContinueKeyword : IKeyword
+internal record ContinueKeyword : IKeyword
 {
     public string Name => "continue";
     public void CompileKeyword(string token, SteelCompiler compiler, SteelScript script, ITokenHolder tokenHolder)

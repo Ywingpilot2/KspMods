@@ -6,7 +6,7 @@ using SteelLanguage.Utils;
 
 namespace SteelLanguage.Token.KeyWords.Single;
 
-public struct ThrowKeyword : IKeyword
+internal record ThrowKeyword : IKeyword
 {
     public string Name => "throw";
     public void CompileKeyword(string token, SteelCompiler compiler, SteelScript script, ITokenHolder tokenHolder)

@@ -47,8 +47,8 @@ namespace ActionTest
         public ProgramLibrary(SystemLibrary baseLibrary)
         {
             TypeLibrary = new TypeLibrary();
-            TermType type = baseLibrary.TypeLibrary.GetTermType("term", 0);
-            TermType enumType = baseLibrary.TypeLibrary.GetTermType("enum", 0);
+            TermType type = baseLibrary.TypeLibrary.GetTermType("term");
+            TermType enumType = baseLibrary.TypeLibrary.GetTermType("enum");
             
             TypeLibrary.AddTermType(new TermType(new Program.ProgramTerm(), type));
             TypeLibrary.AddTermType(new TermType(new Program.YuriEnum(), enumType));

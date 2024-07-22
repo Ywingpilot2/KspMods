@@ -8,7 +8,7 @@ using SteelLanguage.Utils;
 
 namespace SteelLanguage.Token.KeyWords.Single;
 
-public struct ReturnKeyword : IKeyword
+internal record ReturnKeyword : IKeyword
 {
     public string Name => "return";
 

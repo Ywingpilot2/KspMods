@@ -36,7 +36,7 @@ public class WhileCall : TokenCall
     }
 }
 
-public class WhileFunction : BaseExecutable
+public record WhileFunction : BaseExecutable
 {
     private Input _condition;
 
