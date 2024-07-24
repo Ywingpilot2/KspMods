@@ -34,6 +34,10 @@ public abstract class Control : ICollection<Control>
     
     public float FixedHeight { get; set; }
     public float FixedWidth { get; set; }
+    
+    public bool ExpandHeight { get; set; }
+    public bool ExpandWidth { get; set; }
+    
     public Vector2 Offset { get; set; }
 
     #endregion
@@ -64,7 +68,9 @@ public abstract class Control : ICollection<Control>
             font = Font,
             fixedHeight = FixedHeight,
             fixedWidth = FixedWidth,
-            contentOffset = Offset
+            contentOffset = Offset,
+            stretchHeight = ExpandHeight,
+            stretchWidth = ExpandWidth, 
         };
         return style;
     }
@@ -79,6 +85,11 @@ public abstract class Control : ICollection<Control>
     public GUIContent Content { get; set; }
 
     public abstract void Draw();
+
+    public Vector2 GetSize()
+    {
+        return GetStyle().CalcSize(Content);
+    }
 
     #endregion
 
@@ -115,6 +126,8 @@ public abstract class Control : ICollection<Control>
         Font = baseStyle.font;
         FixedHeight = baseStyle.fixedHeight;
         FixedWidth = baseStyle.fixedWidth;
+        ExpandHeight = baseStyle.stretchHeight;
+        ExpandWidth = baseStyle.stretchWidth;
     }
 
     public Control(int id) : this(id, GUIContent.none)

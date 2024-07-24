@@ -152,6 +152,11 @@ public static class ThemesDictionary
         Skin.horizontalScrollbarLeftButton = HighLogic.Skin.horizontalScrollbarLeftButton;
         Skin.horizontalScrollbarRightButton = HighLogic.Skin.horizontalScrollbarRightButton;
 
+        Skin.horizontalSlider = HighLogic.Skin.horizontalSlider;
+        Skin.horizontalSliderThumb = HighLogic.Skin.horizontalSliderThumb;
+        Skin.verticalSlider = HighLogic.Skin.verticalSlider;
+        Skin.verticalSliderThumb = HighLogic.Skin.verticalSliderThumb;
+
         Skin.verticalScrollbar = HighLogic.Skin.verticalScrollbar;
         Skin.verticalScrollbarDownButton = HighLogic.Skin.verticalScrollbarDownButton;
         Skin.verticalScrollbarThumb = HighLogic.Skin.verticalScrollbarThumb;

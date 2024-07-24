@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using AeroDynamicKerbalInterfaces.Themes;
 using UnityEngine;
 
-namespace AeroDynamicKerbalInterfaces.Controls.ContentControl;
+namespace AeroDynamicKerbalInterfaces.Controls.ContentControl.Flow;
 
 public class ScrollViewControl : Control
 {
     public override string Style { get; set; } = "ScrollViewBase";
-    public string VerticalStyle { get; set; } = "VerticalScrollbar";
-    public string HorizontalStyle { get; set; } = "HorizontalScrollbar";
 
     public Vector2 ScrollPosition { get; set; }
     public bool AutoScrollBottom { get; set; }
@@ -17,11 +13,7 @@ public class ScrollViewControl : Control
     private float _height;
     public override void Draw()
     {
-        ScrollPosition = GUILayout.BeginScrollView(ScrollPosition, false, false,
-            ThemesDictionary.GetStyle(HorizontalStyle), 
-            ThemesDictionary.GetStyle(VerticalStyle),  
-            ThemesDictionary.GetStyle(Style),
-            LayoutOptions);
+        ScrollPosition = GUILayout.BeginScrollView(ScrollPosition, GetStyle(), LayoutOptions);
 
         if (Event.current.type == EventType.Repaint)
             _height = 0;

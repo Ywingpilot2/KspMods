@@ -4,7 +4,9 @@ using AeroDynamicKerbalInterfaces;
 using AeroDynamicKerbalInterfaces.Controls;
 using AeroDynamicKerbalInterfaces.Controls.Buttons;
 using AeroDynamicKerbalInterfaces.Controls.ContentControl;
+using AeroDynamicKerbalInterfaces.Controls.ContentControl.Flow;
 using AeroDynamicKerbalInterfaces.Controls.ContentControl.Organization;
+using AeroDynamicKerbalInterfaces.Controls.ContentControl.Windows;
 using AeroDynamicKerbalInterfaces.Controls.Fields;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -16,7 +18,6 @@ public sealed class LogControl : DragWindow
 {
     public List<string> LogText { get; }
     private readonly TextAreaControl _textControl;
-    private Action<LogControl> _onClose;
 
     public override void Draw()
     {
@@ -40,7 +41,6 @@ public sealed class LogControl : DragWindow
 
     public void Close()
     {
-        _onClose.Invoke(this);
         AeroInterfaceManager.RemoveControl(Id);
     }
 
@@ -49,10 +49,9 @@ public sealed class LogControl : DragWindow
         _textControl.Content.text = string.Join("\n", LogText);
     }
 
-    public LogControl(int id, Action<LogControl> onClose) : base(id, new(Screen.width / 2, Screen.height / 2, 600, 450))
+    public LogControl(int id) : base(id, new(Screen.width / 2, Screen.height / 2, 600, 450))
     {
         LogText = new List<string>();
-        _onClose = onClose;
 
         Random rng = new Random(GetHashCode());
 
@@ -60,6 +59,7 @@ public sealed class LogControl : DragWindow
         ScrollViewControl scroll = new ScrollViewControl(rng.Next());
         _textControl = new TextAreaControl(rng.Next(), "");
         _textControl.LayoutOptions = new[] { GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true) };
+        _textControl.RichText = true;
 
         scroll.Add(_textControl);
         rows.Add(scroll);

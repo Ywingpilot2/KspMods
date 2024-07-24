@@ -8,13 +8,13 @@ public class ButtonControl : Control
 {
     public override string Style { get; set; } = "ButtonBase";
     public event EventHandler? OnPressed;
+    protected void Pressed() => OnPressed?.Invoke(this, EventArgs.Empty);
 
     public override void Draw()
     {
         if (GUILayout.Button(Content, GetStyle(), LayoutOptions))
         {
             OnPressed?.Invoke(this, EventArgs.Empty);
-            
         }
     }
 

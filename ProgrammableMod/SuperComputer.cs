@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using KSP.UI.Screens;
+using ProgrammableMod.Extensions;
+using ProgrammableMod.Scripting.Config.ScriptLibrary;
+using ProgrammableMod.Scripting.Config.ValueStasher;
 using ProgrammableMod.Scripting.Library;
 using ProgrammableMod.Scripting.Terms;
-using ProgrammableMod.Scripting.ValueStasher;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Library;
 using SteelLanguage.Reflection.Library;
@@ -21,9 +23,11 @@ namespace ProgrammableMod;
 public class KerbinSuperComputer : MonoBehaviour
 {
     public ValueStasher stasher;
+    public static readonly ScriptLibrary Library = new();
 
-    public static ValueStasher CurrentStasher { get; private set; }
-    internal static ILibrary[] Libraries { get; private set; }
+    public static ValueStasher CurrentStasher => Instance.stasher;
+    public static KerbinSuperComputer Instance { get; private set; }
+    private static ILibrary[] Libraries { get; set; }
 
     private void Awake()
     {
@@ -35,13 +39,14 @@ public class KerbinSuperComputer : MonoBehaviour
         };
         
         stasher = new ValueStasher();
+        
         GameEvents.onGameStateLoad.Add(Load);
         GameEvents.onGameStateSave.Add(Save);
     }
 
     private void Start()
     {
-        CurrentStasher = stasher;
+        Instance = this;
     }
     
     private void Load(ConfigNode data)
@@ -62,6 +67,8 @@ public class KerbinSuperComputer : MonoBehaviour
         data.AddNode(configNode);
     }
 
+    #region Utility
+
     /// <summary>
     /// Gets an enum value at the specified index of the enum
     /// </summary>
@@ -74,48 +81,6 @@ public class KerbinSuperComputer : MonoBehaviour
         object value = values.GetValue(idx);
         return (Enum)Enum.ToObject(enumType, value);
     }
-    
-    private readonly struct Replacer
-    {
-        public string A { get; }
-        public string B { get; }
 
-        public Replacer(string a, string b)
-        {
-            A = a;
-            B = b;
-        }
-    }
-
-    private static Replacer[] _replacers = 
-    {
-        new Replacer("{", "|{|"),
-        new Replacer("}", "|}|"),
-        new Replacer("\t", "|t|"),
-        new Replacer("[", "|[|"),
-        new Replacer("]", "|]|"),
-        new Replacer("//", "|/|")
-    };
-
-    public static string Clean(string dirty)
-    {
-        dirty = dirty.Trim();
-
-        foreach (Replacer replacer in _replacers)
-        {
-            dirty = dirty.Replace(replacer.A, replacer.B);
-        }
-
-        return dirty;
-    }
-
-    public static string Dirty(string clean)
-    {
-        foreach (Replacer replacer in _replacers)
-        {
-            clean = clean.Replace(replacer.B, replacer.A);
-        }
-
-        return clean;
-    }
+    #endregion
 }

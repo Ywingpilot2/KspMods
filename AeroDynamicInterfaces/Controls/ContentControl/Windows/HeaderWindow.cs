@@ -1,9 +1,7 @@
-﻿using System;
-using AeroDynamicKerbalInterfaces.Controls.Fields;
-using AeroDynamicKerbalInterfaces.Themes;
+﻿using AeroDynamicKerbalInterfaces.Themes;
 using UnityEngine;
 
-namespace AeroDynamicKerbalInterfaces.Controls.ContentControl;
+namespace AeroDynamicKerbalInterfaces.Controls.ContentControl.Windows;
 
 public class HeaderWindow : WindowControl
 {

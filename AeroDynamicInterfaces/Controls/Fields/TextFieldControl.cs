@@ -10,7 +10,7 @@ public class TextFieldControl : Control
         get => Content.text;
         set => Content.text = value;
     }
-    private readonly EventHandler? _onUpdated;
+    public event EventHandler? OnUpdated;
 
     public TextFieldControl(int id) : base(id)
     {
@@ -18,14 +18,16 @@ public class TextFieldControl : Control
 
     public TextFieldControl(int id, string content, EventHandler? onUpdated = null) : base(id, content)
     {
-        _onUpdated = onUpdated;
+        OnUpdated = onUpdated;
     }
+
+    protected void Updated() => OnUpdated?.Invoke(this, EventArgs.Empty);
 
     public override void Draw()
     {
-        string upd = GUILayout.TextArea(Content.text, GetStyle(), LayoutOptions);
+        string upd = GUILayout.TextField(Content.text, GetStyle(), LayoutOptions);
         if (upd != Content.text)
-            _onUpdated?.Invoke(this, EventArgs.Empty);
+            OnUpdated?.Invoke(this, EventArgs.Empty);
 
         Content.text = upd;
     }

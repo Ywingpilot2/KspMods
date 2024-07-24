@@ -1,8 +1,7 @@
 ﻿using System;
-using AeroDynamicKerbalInterfaces.Themes;
 using UnityEngine;
 
-namespace AeroDynamicKerbalInterfaces.Controls.ContentControl;
+namespace AeroDynamicKerbalInterfaces.Controls.ContentControl.Windows;
 
 public class WindowControl : Control
 {

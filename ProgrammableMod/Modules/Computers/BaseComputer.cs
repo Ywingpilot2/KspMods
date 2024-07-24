@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using AeroDynamicKerbalInterfaces;
 using JetBrains.Annotations;
 using ProgrammableMod.Controls;
+using ProgrammableMod.Extensions;
+using ProgrammableMod.Scripting.Config.ScriptLibrary;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Library;
 using SteelLanguage;
@@ -121,21 +123,6 @@ public abstract class BaseComputer : PartModule
         }
     }
 
-    public virtual void Log(string log)
-    {
-        string time;
-        if (HighLogic.LoadedSceneIsFlight)
-        {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(vessel.missionTime);
-            time = $"[{timeSpan.Hours}:{timeSpan.Minutes}:{timeSpan.Seconds}]";
-        }
-        else
-        {
-            time = $"[{KSPUtil.dateTimeFormatter.Year}:{KSPUtil.dateTimeFormatter.Day}:{KSPUtil.dateTimeFormatter.Hour}.{KSPUtil.dateTimeFormatter.Minute / 60}";
-        }
-        _logControl.Log($"{time} {log}");
-    }
-
     #endregion
 
     #region Logic
@@ -157,7 +144,8 @@ public abstract class BaseComputer : PartModule
         };
 
         _compiler = new SteelCompiler(Libraries);
-        _logControl = new LogControl(new Random(GetHashCode()).Next(), _ => _logOpen = false);
+        _logControl = new LogControl(new Random(GetHashCode()).Next());
+        _codeEditor = new CodeEditorControl(tokenContainer.craft, "code editor", _compiler, craft => tokenContainer.craft = craft);
         
         ResetStatus();
         if (tokenContainer.shouldCompile || ShouldRun)
@@ -176,7 +164,8 @@ public abstract class BaseComputer : PartModule
     public override void OnCopy(PartModule fromModule)
     {
         BaseComputer computer = (BaseComputer)fromModule;
-        tokenContainer.tokens = computer.tokenContainer.tokens;
+        tokenContainer.craft = new ScriptCraft(computer.tokenContainer.craft.Name, computer.tokenContainer.craft.Script,
+            computer.tokenContainer.craft.Directory);
         tokenContainer.shouldRun = computer.tokenContainer.shouldRun;
         tokenContainer.shouldCompile = computer.tokenContainer.shouldRun;
     }
@@ -256,7 +245,7 @@ public abstract class BaseComputer : PartModule
         compiling = true;
         try
         {
-            SteelScript script = _compiler.Compile(tokenContainer.tokens);
+            SteelScript script = _compiler.Compile(tokenContainer.Tokens);
             if (!ValidateScript(script, out string reason))
             {
                 ThrowException(reason);
@@ -302,20 +291,14 @@ public abstract class BaseComputer : PartModule
 
     #region UI Buttons
 
-    private bool _editorOpen;
+    private CodeEditorControl _codeEditor;
     [KSPEvent(active = true, guiActive = true, guiName = "Open Code Editor", guiActiveEditor = true)]
     public void OpenEditor()
     {
-        if (_editorOpen)
-            return;
-        
-        _editorOpen = true;
-        CodeEditorControl.Show(tokenContainer.tokens, "Code Editor",
-            control => tokenContainer.tokens = control.Text, _ => _editorOpen = false);
+        AeroInterfaceManager.AddControl(_codeEditor);
     }
 
     private LogControl _logControl;
-    private bool _logOpen;
     [KSPEvent(active = true, guiActive = true, guiName = "Open Log", guiActiveEditor = true)]
     public void OpenLog()
     {
@@ -396,6 +379,37 @@ public abstract class BaseComputer : PartModule
     #endregion
 
     #region Status
+    
+    public void Log(string log, StatusKind kind = StatusKind.Exceptional)
+    {
+        string time;
+        if (HighLogic.LoadedSceneIsFlight)
+        {
+            TimeSpan timeSpan = TimeSpan.FromSeconds(vessel.missionTime);
+            time = $"[{timeSpan.Hours}:{timeSpan.Minutes}:{timeSpan.Seconds}]";
+        }
+        else
+        {
+            time = $"[{KSPUtil.dateTimeFormatter.PrintDateCompact(HighLogic.CurrentGame.UniversalTime, true, true)}]";
+        }
+
+        switch (kind)
+        {
+            default:
+            case StatusKind.Exceptional:
+            {
+                _logControl.Log($"{time} {log}");
+            } break;
+            case StatusKind.NotGreat:
+            {
+                _logControl.Log($"<color=orange>{time}</color> {log}");
+            } break;
+            case StatusKind.Uhoh:
+            {
+                _logControl.Log($"<color=red>{time}</color> {log}");
+            } break;
+        }
+    }
 
     public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
     {
@@ -432,7 +446,7 @@ public abstract class BaseComputer : PartModule
 
         if (!string.IsNullOrEmpty(newStatus))
         {
-            Log($"Status update: {newStatus}");
+            Log($"Status update: {newStatus}", kind);
         }
     }
 
@@ -468,28 +482,34 @@ public abstract class BaseComputer : PartModule
 [Serializable]
 public class TokenContainer : IConfigNode
 {
+    public ScriptCraft craft = new ScriptCraft("untitled script", "", KerbinSuperComputer.Library.GetCurrentScriptsPath());
+    
     [SerializeField]
-    public string tokens = "";
+    [Obsolete]
+    public string tokens = ""; // TODO: kill this thing
+
+    public string Tokens => craft.Script;
 
     [SerializeField]
     public bool shouldRun;
     
     [SerializeField]
     public bool shouldCompile;
-    
+
+    #region Loading
+
     public void Load(ConfigNode node)
     {
         if (node.HasValue("script-length") && int.TryParse(node.GetValue("script-length"), out int length))
         {
-            for (int i = 0; i < length; i++)
-            {
-                if (node.HasValue($"script-line{i}"))
-                {
-                    tokens += $"{KerbinSuperComputer.Dirty(node.GetValue($"script-line{i}"))}\n";
-                }
-            }
+            tokens = TokensLoad(node, length);
+            craft = new ScriptCraft("untitled script", tokens, KerbinSuperComputer.Library.GetCurrentScriptsPath());
+        }
 
-            tokens = tokens.TrimEnd();
+        if (node.HasNode("script-craft"))
+        {
+            CraftLoad(node.GetNode("script-craft"));
+            tokens = craft.Script;
         }
 
         if (node.HasValue("compile-startup"))
@@ -503,14 +523,42 @@ public class TokenContainer : IConfigNode
         }
     }
 
+    private void CraftLoad(ConfigNode node)
+    {
+        string tokens = "";
+        string directory = node.GetValue("directory");
+        string name = node.GetValue("craft-name");
+        
+        if (int.TryParse(node.GetValue("script-length"), out int length))
+        {
+            tokens = TokensLoad(node.GetNode("script-lines"), length);
+        }
+
+        craft = new ScriptCraft(name, tokens, directory);
+    }
+
+    private string TokensLoad(ConfigNode node, int length)
+    {
+        string tokens = "";
+        for (int i = 0; i < length; i++)
+        {
+            if (node.HasValue($"script-line{i}"))
+            {
+                tokens += $"{node.GetValue($"script-line{i}").ConfigDirty()}\n";
+            }
+        }
+
+        tokens = tokens.TrimEnd();
+        return tokens;
+    }
+
+    #endregion
+
     public void Save(ConfigNode node)
     {
-        string[] lines = tokens.TrimEnd().Split('\n');
-        node.AddValue("script-length", lines.Length);
-        for (int i = 0; i < lines.Length; i++)
-        {
-            node.AddValue($"script-line{i}", KerbinSuperComputer.Clean(lines[i]));
-        }
+        ConfigNode craftNode = new ConfigNode("script-craft");
+        SaveCraft(craftNode);
+        node.AddNode(craftNode);
 
         if (shouldCompile)
         {
@@ -521,5 +569,22 @@ public class TokenContainer : IConfigNode
         {
             node.AddValue("script-startup", "");
         }
+    }
+
+    public void SaveCraft(ConfigNode node)
+    {
+        string[] lines = craft.Script.TrimEnd().Split('\n');
+        node.AddValue("script-length", lines.Length);
+
+        ConfigNode linesNode = new ConfigNode("script-lines");
+        for (int i = 0; i < lines.Length; i++)
+        {
+            linesNode.AddValue($"script-line{i}", lines[i].ConfigClean());
+        }
+
+        node.AddNode(linesNode);
+        
+        node.AddValue("directory", craft.Directory);
+        node.AddValue("craft-name", craft.Name);
     }
 }

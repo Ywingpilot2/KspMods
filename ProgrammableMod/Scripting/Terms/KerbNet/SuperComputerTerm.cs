@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using ProgrammableMod.Scripting.Config.ValueStasher;
 using ProgrammableMod.Scripting.Exceptions;
-using ProgrammableMod.Scripting.ValueStasher;
 using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;

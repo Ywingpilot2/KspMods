@@ -1,4 +1,4 @@
-﻿using ProgrammableMod.Scripting.ValueStasher;
+﻿using ProgrammableMod.Scripting.Config.ValueStasher;
 using SteelLanguage.Exceptions;
 
 namespace ProgrammableMod.Scripting.Exceptions;

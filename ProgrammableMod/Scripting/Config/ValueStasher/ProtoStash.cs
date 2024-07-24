@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
+using ProgrammableMod.Extensions;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Token.Terms;
 
-namespace ProgrammableMod.Scripting.ValueStasher;
+namespace ProgrammableMod.Scripting.Config.ValueStasher;
 
 public readonly struct ProtoStash
 {
@@ -31,7 +31,7 @@ public readonly struct ProtoStash
             case "double": return GetAsDouble();
             case "bool": return GetAsBool();
             // annoyding
-            case "string": return KerbinSuperComputer.Dirty(Node.GetValue("value"));
+            case "string": return Node.GetValue("value").ConfigDirty();
         }
         
         throw new InvalidActionException(0, $"Stashed value {Name} of type {ValueType} was not a basic type(int, string, uint)");

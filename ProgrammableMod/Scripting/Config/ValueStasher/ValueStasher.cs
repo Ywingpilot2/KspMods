@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using ProgrammableMod.Extensions;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Terms;
 using SteelLanguage.Extensions;
-using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
-using UnityEngine;
 
-namespace ProgrammableMod.Scripting.ValueStasher;
+namespace ProgrammableMod.Scripting.Config.ValueStasher;
 
 [Serializable]
 public class ValueStasher : IConfigNode
@@ -42,7 +41,7 @@ public class ValueStasher : IConfigNode
             case bool:
             {
                 ConfigNode cfg = new ConfigNode($"{term.ValueType}-{name}");
-                cfg.AddValue("value", KerbinSuperComputer.Clean(value.ToString()));
+                cfg.AddValue("value", value.ToString().ConfigClean());
                 cfg.AddValue("basic_type", true);
                 _stashedValues.Add(name, new ProtoStash(name, term.ValueType, cfg));
             } break;

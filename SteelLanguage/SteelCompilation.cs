@@ -475,6 +475,14 @@ public sealed class SteelCompiler
         return _libraries.First(l => name == l.Name);
     }
 
+    public IEnumerable<ILibrary> EnumerateLibraries()
+    {
+        foreach (ILibrary library in _libraries)
+        {
+            yield return library;
+        }
+    }
+
     #endregion
 
     public SteelCompiler(params ILibrary[] libraries)

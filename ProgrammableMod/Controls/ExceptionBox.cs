@@ -2,6 +2,8 @@
 using AeroDynamicKerbalInterfaces.Controls;
 using AeroDynamicKerbalInterfaces.Controls.Buttons;
 using AeroDynamicKerbalInterfaces.Controls.ContentControl;
+using AeroDynamicKerbalInterfaces.Controls.ContentControl.Flow;
+using AeroDynamicKerbalInterfaces.Controls.ContentControl.Windows;
 using AeroDynamicKerbalInterfaces.Controls.Fields;
 using AeroDynamicKerbalInterfaces.Controls.Space;
 using JetBrains.Annotations;

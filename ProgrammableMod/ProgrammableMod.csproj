@@ -84,12 +84,18 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Controls\CodeEditorControl.cs" />
+        <Compile Include="Controls\CodeHighlightAreaControl.cs" />
+        <Compile Include="Controls\CodeLibraryControl.cs" />
         <Compile Include="Controls\ExceptionBox.cs" />
         <Compile Include="Controls\LogControl.cs" />
+        <Compile Include="Extensions\StringExtension.cs" />
         <Compile Include="Modules\Computers\BaseComputer.cs" />
         <Compile Include="Modules\Computers\ComputerModule.cs" />
         <Compile Include="Modules\Test\GuiTestModule.cs" />
         <Compile Include="Modules\Test\ThrottleTest.cs" />
+        <Compile Include="Scripting\Config\ScriptLibrary\ScriptLibrary.cs" />
+        <Compile Include="Scripting\Config\ValueStasher\ProtoStash.cs" />
+        <Compile Include="Scripting\Config\ValueStasher\ValueStasher.cs" />
         <Compile Include="Scripting\Exceptions\ExecutionException.cs" />
         <Compile Include="Scripting\Library\ComputerLibrary.cs" />
         <Compile Include="Scripting\Library\KerbalLibrary.cs" />
@@ -109,8 +115,6 @@
         <Compile Include="Scripting\Terms\Vessel\StagingManager.cs" />
         <Compile Include="Scripting\Terms\Vessel\StagingTerm.cs" />
         <Compile Include="Scripting\Terms\Vessel\VesselTerm.cs" />
-        <Compile Include="Scripting\ValueStasher\ProtoStash.cs" />
-        <Compile Include="Scripting\ValueStasher\ValueStasher.cs" />
         <Compile Include="SuperComputer.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

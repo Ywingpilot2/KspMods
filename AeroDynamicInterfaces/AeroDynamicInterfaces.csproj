@@ -77,12 +77,13 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Controls\Buttons\ButtonControl.cs" />
-        <Compile Include="Controls\ContentControl\DragWindow.cs" />
+        <Compile Include="Controls\ContentControl\Flow\ScrollViewControl.cs" />
+        <Compile Include="Controls\ContentControl\Flow\SelectionGridControl.cs" />
         <Compile Include="Controls\ContentControl\Organization\ColumnControl.cs" />
         <Compile Include="Controls\ContentControl\Organization\RowControl.cs" />
-        <Compile Include="Controls\ContentControl\ScrollViewControl.cs" />
-        <Compile Include="Controls\ContentControl\Window.cs" />
-        <Compile Include="Controls\ContentControl\HeaderWindow.cs" />
+        <Compile Include="Controls\ContentControl\Windows\DragWindow.cs" />
+        <Compile Include="Controls\ContentControl\Windows\HeaderWindow.cs" />
+        <Compile Include="Controls\ContentControl\Windows\Window.cs" />
         <Compile Include="Controls\Control.cs" />
         <Compile Include="Controls\Fields\LabelControl.cs" />
         <Compile Include="Controls\Fields\TextAreaControl.cs" />

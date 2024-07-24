@@ -332,14 +332,7 @@ public static class StringExtension
             // needs special handling to avoid forever replacing
             if (with.SanitizedContains(replace))
             {
-                while (self.SanitizedContains(replace))
-                {
-                    string san = updated.SanitizeQuotes();
-                    int idx = san.IndexOf(replace, san.IndexOf(with, StringComparison.Ordinal) + with.Length, StringComparison.Ordinal);
-                    
-                    updated = updated.Remove(idx, replace.Length);
-                    updated = updated.Insert(idx, with);
-                }
+                // TODO: how do we do this lol
             }
             else
             {
