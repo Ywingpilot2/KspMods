@@ -31,11 +31,12 @@ public class ScrollViewControl : Control
         if (AutoScrollBottom)
         {
             // TODO: Implement a system for measuring control height in our own classes
+            GUILayoutUtility.GetLastRect(); // for some reason if we dont do this it breaks lol
             float scrollBottom = _height - GUILayoutUtility.GetLastRect().height;
             
             // check if we should scroll to the bottom
             // this check works by seeing if we are close to the bottom, if we are close to the bottom it will automatically scroll us all the way down 
-            if (Math.Abs(scrollBottom - ScrollPosition.y) < 100)
+            if (Math.Abs(scrollBottom - ScrollPosition.y) < 25)
             {
                 ScrollPosition = new Vector2(ScrollPosition.x, scrollBottom);
             }

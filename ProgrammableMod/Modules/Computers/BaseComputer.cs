@@ -30,13 +30,17 @@ public enum StatusKind
 
 public abstract class BaseComputer : PartModule
 {
-    protected ILibrary[] Libraries;
-    
+    #region Display
+
     [KSPField(isPersistant = false, guiActive = true, guiName = "Program Status", guiActiveEditor = true)] [UsedImplicitly]
     public string status = "Operating";
     
     [KSPField(isPersistant = false, guiActive = false, guiName = "Error")] [UsedImplicitly]
     public string exception;
+
+    #endregion
+
+    #region Persistent
 
     [KSPField(isPersistant = true)]
     public TokenContainer tokenContainer;
@@ -44,9 +48,11 @@ public abstract class BaseComputer : PartModule
     [KSPField(isPersistant = true)]
     public float runTime;
 
-    internal FlightCtrlState State;
-    private SteelCompiler _compiler;
+    #endregion
 
+    #region Important info
+
+    protected ILibrary[] Libraries;
     public bool ShouldRun
     {
         get => tokenContainer.shouldRun;
@@ -66,7 +72,11 @@ public abstract class BaseComputer : PartModule
         }
     }
 
+    internal FlightCtrlState State;
+    private SteelCompiler _compiler;
     protected SteelScript Script;
+
+    #endregion
 
     #region Execution
     
@@ -146,7 +156,7 @@ public abstract class BaseComputer : PartModule
         _compiler = new SteelCompiler(Libraries);
         _logControl = new LogControl(new Random(GetHashCode()).Next());
         _codeEditor = new CodeEditorControl(tokenContainer.craft, "code editor", _compiler, craft => tokenContainer.craft = craft);
-        
+
         ResetStatus();
         if (tokenContainer.shouldCompile || ShouldRun)
         {
@@ -160,7 +170,15 @@ public abstract class BaseComputer : PartModule
         
         UpdateButton();
     }
-    
+
+    private void OnDestroy()
+    {
+        if (HighLogic.LoadedSceneIsFlight)
+        {
+            RemoveGameEvents();
+        }
+    }
+
     public override void OnCopy(PartModule fromModule)
     {
         BaseComputer computer = (BaseComputer)fromModule;
@@ -233,6 +251,18 @@ public abstract class BaseComputer : PartModule
         {
             RemoveGameEvents();
         }
+    }
+
+    [KSPField]
+    public bool createsHeat = false;
+
+    /// <summary>
+    /// Calculates the heat this Computer produces while executing
+    /// </summary>
+    /// <returns>A double representing the temperature to add to the computer</returns>
+    public virtual double CalculateHeat()
+    {
+        return 0.0;
     }
 
     #endregion
@@ -428,7 +458,7 @@ public abstract class BaseComputer : PartModule
         {
             case StatusKind.NotGreat:
             {
-                status = $"Somethings off:\n{newStatus}";
+                status = $"We have a problem:\n{newStatus}";
                 UpdateException(kind);
             } break;
             case StatusKind.Uhoh:

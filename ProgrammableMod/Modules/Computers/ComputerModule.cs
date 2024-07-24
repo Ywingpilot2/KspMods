@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using JetBrains.Annotations;
 using ProgrammableMod.Scripting.Exceptions;
@@ -28,6 +29,9 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
     [KSPField]
     public string requiredConsumption;
+    
+    [KSPField]
+    public double maxHeat = 100;
 
     #endregion
 
@@ -44,23 +48,6 @@ public class ComputerModule : BaseComputer, IResourceConsumer
     #endregion
 
     #region Logic
-
-    protected override void PreExecute()
-    {
-        string error = "";
-        double rate = ShouldRun ? CalculateCost(Script) : 0.0;
-        
-        if (!resHandler.UpdateModuleResourceInputs(ref error, rate, 0.9, true) && ShouldRun)
-        {
-            ThrowException("Computer has ran out of power! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on");
-        }
-
-        if (vessel.Connection.GetControlLevel() == Vessel.ControlLevel.NONE ||
-            vessel.Connection.GetControlLevel() == Vessel.ControlLevel.PARTIAL_UNMANNED)
-        {
-            throw new ControlLostException(0);
-        }
-    }
 
     public override bool ValidateScript(SteelScript script, out string reason)
     {
@@ -85,6 +72,27 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
         return total;
     }
+    
+    public override double CalculateHeat()
+    {
+        float ratio = CalculateCost(Script) / tokenLimit;
+        if (ratio >= 0.75)
+        {
+            SetStatus("The temperature of the computer is high, stability issues probable", StatusKind.NotGreat);
+        }
+
+        return maxHeat * ratio;
+    }
+
+    protected override void PreExecute()
+    {
+        base.PreExecute();
+        if (vessel.Connection.GetControlLevel() == Vessel.ControlLevel.NONE ||
+            vessel.Connection.GetControlLevel() == Vessel.ControlLevel.PARTIAL_UNMANNED)
+        {
+            throw new ControlLostException(0);
+        }
+    }
 
     #endregion
 
@@ -92,7 +100,16 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
     public override string GetModuleDisplayName() => "Processing Chips";
 
-    public override string GetInfo() => $"Computer chips for processing tokens and instructions. These are not snacks.\n- Token limit of {tokenLimit}\n- Consumes {requiredConsumption} {requiredResource} per token";
+    public override string GetInfo()
+    {
+        string message = $"Computer chips for processing tokens and instructions. Warranty void if ingested.\n- Token limit of {tokenLimit}\n- Consumes {requiredConsumption} {requiredResource} per token";
+        if (createsHeat)
+        {
+            message += "\n- Overclocked, produces heat";
+        }
+
+        return message;
+    }
 
     #endregion
 
@@ -138,5 +155,19 @@ public class ComputerModule : BaseComputer, IResourceConsumer
         };
         
         resHandler.inputResources.Add(resource);
+    }
+
+    private void FixedUpdate()
+    {
+        if (HighLogic.LoadedSceneIsFlight)
+        {
+            string error = "";
+            double rate = ShouldRun ? CalculateCost(Script) : 0.0;
+        
+            if (!resHandler.UpdateModuleResourceInputs(ref error, rate, 0.9, true) && ShouldRun)
+            {
+                ThrowException("Computer has ran out of power! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on");
+            }
+        }
     }
 }

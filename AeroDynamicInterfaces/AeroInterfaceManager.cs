@@ -5,6 +5,7 @@ using AeroDynamicKerbalInterfaces.Themes;
 using KSP.UI;
 using KSP.UI.Screens;
 using UnityEngine;
+// ReSharper disable ConvertClosureToMethodGroup
 
 namespace AeroDynamicKerbalInterfaces;
 
@@ -138,7 +139,7 @@ public class AeroInterfaceManager : MonoBehaviour
     private void Start()
     {
         Debug.Log("Aero Dynamic UI loaded!");
-        GameEvents.onHideUI.Add(() => Hide());
+        GameEvents.onHideUI.Add(() => Hide()); // DON'T TURN THESE INTO METHOD GROUPS!
         GameEvents.onShowUI.Add(() => Show());
         GameEvents.onGameStateLoad.Add(GameLoading);
     }

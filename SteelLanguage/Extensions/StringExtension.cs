@@ -324,6 +324,10 @@ public static class StringExtension
         return santize.IndexOf(check, comparison);
     }
 
+    /// <summary>
+    /// TODO: figure out how to make this function properly
+    /// </summary>
+    [Obsolete]
     public static string SanitizedReplace(this string self, string replace, string with)
     {
         string updated = self;

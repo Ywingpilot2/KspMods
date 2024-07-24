@@ -1,11 +1,13 @@
-﻿namespace ProgrammableMod.Extensions;
+﻿using SteelLanguage.Extensions;
+
+namespace ProgrammableMod.Extensions;
 
 public static class StringExtension
 {
     private static readonly Replacer[] Replacers = 
     {
-        new("{", "|{|"),
-        new("}", "|}|"),
+        new("{", "|bra|"),
+        new("}", "|arb|"),
         new("\t", "|t|"),
         new("[", "|[|"),
         new("]", "|]|"),
@@ -20,7 +22,7 @@ public static class StringExtension
 
     public static string ConfigClean(this string dirty)
     {
-        dirty = dirty.Trim();
+        dirty = dirty.Trim('\r', '\n');
 
         foreach (Replacer replacer in Replacers)
         {
