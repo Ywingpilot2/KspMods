@@ -36,7 +36,7 @@ public class ScrollViewControl : Control
             
             // check if we should scroll to the bottom
             // this check works by seeing if we are close to the bottom, if we are close to the bottom it will automatically scroll us all the way down 
-            if (Math.Abs(scrollBottom - ScrollPosition.y) < 25)
+            if (Math.Abs(scrollBottom - ScrollPosition.y) < 45)
             {
                 ScrollPosition = new Vector2(ScrollPosition.x, scrollBottom);
             }

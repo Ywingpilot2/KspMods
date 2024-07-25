@@ -6,10 +6,12 @@ using AeroDynamicKerbalInterfaces;
 using JetBrains.Annotations;
 using ProgrammableMod.Controls;
 using ProgrammableMod.Extensions;
+using ProgrammableMod.Modules.ComputerTemp;
 using ProgrammableMod.Scripting.Config.ScriptLibrary;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Library;
 using SteelLanguage;
+using SteelLanguage.Exceptions;
 using SteelLanguage.Extensions;
 using SteelLanguage.Library;
 using SteelLanguage.Reflection.Library;
@@ -40,17 +42,23 @@ public abstract class BaseComputer : PartModule
 
     #endregion
 
-    #region Persistent
+    #region Fields
 
     [KSPField(isPersistant = true)]
     public TokenContainer tokenContainer;
 
     [KSPField(isPersistant = true)]
     public float runTime;
+    
+    [KSPField]
+    public bool createsHeat = false;
+
+    [KSPField]
+    public double inactiveHeatModifier = 0.25;
 
     #endregion
 
-    #region Important info
+    #region Misc properties
 
     protected ILibrary[] Libraries;
     public bool ShouldRun
@@ -68,6 +76,9 @@ public abstract class BaseComputer : PartModule
                 running = false;
             }
             tokenContainer.shouldRun = value;
+            if (tokenContainer.shouldRun)
+                tokenContainer.shouldCompile = true;
+            
             UpdateButton();
         }
     }
@@ -75,6 +86,7 @@ public abstract class BaseComputer : PartModule
     internal FlightCtrlState State;
     private SteelCompiler _compiler;
     protected SteelScript Script;
+    protected Random Rng;
 
     #endregion
 
@@ -87,6 +99,8 @@ public abstract class BaseComputer : PartModule
         if (tokenContainer.shouldRun && HighLogic.LoadedSceneIsFlight)
         {
             State = state;
+            if (ShouldSkipCycle())
+                return;
 
             try
             {
@@ -101,34 +115,9 @@ public abstract class BaseComputer : PartModule
 
                 PostExecute();
             }
-            catch (OperationCanceledException)
-            {
-                ThrowException(
-                    "Our engineers typically suggest writing scripts which don't loop forever, so they have shut down the script to prevent such a time paradox.");
-            }
-            catch (AggregateException e)
-            {
-                if (e.InnerExceptions.Count == 1 && e.InnerException != null)
-                {
-                    ThrowException(e.InnerException.Message);
-                }
-                else
-                {
-                    foreach (Exception ie in e.InnerExceptions)
-                    {
-                        ThrowException(ie.Message);
-                    }
-                }
-
-                foreach (Exception ie in e.InnerExceptions)
-                {
-                    Debug.Log($"[{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}] Exception caught during execution! Data: {ie.Message}\n{ie.StackTrace}");
-                }
-            }
             catch (Exception e)
             {
-                ThrowException(e.Message);
-                Debug.Log($"[{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}] Exception caught during execution! Data: {e.Message}\n{e.StackTrace}");
+                CatchException(e);
             }
         }
     }
@@ -152,9 +141,11 @@ public abstract class BaseComputer : PartModule
             new VesselLibrary(this),
             new ComputerLibrary(this)
         };
+        
+        Rng = new Random(GetHashCode());
 
         _compiler = new SteelCompiler(Libraries);
-        _logControl = new LogControl(new Random(GetHashCode()).Next());
+        _logControl = new LogControl(Rng.Next());
         _codeEditor = new CodeEditorControl(tokenContainer.craft, "code editor", _compiler, craft => tokenContainer.craft = craft);
 
         ResetStatus();
@@ -173,10 +164,7 @@ public abstract class BaseComputer : PartModule
 
     private void OnDestroy()
     {
-        if (HighLogic.LoadedSceneIsFlight)
-        {
-            RemoveGameEvents();
-        }
+        RemoveGameEvents();
     }
 
     public override void OnCopy(PartModule fromModule)
@@ -210,6 +198,11 @@ public abstract class BaseComputer : PartModule
     {
         running = true;
     }
+    
+    protected virtual bool ShouldSkipCycle()
+    {
+        return false;
+    }
 
     protected virtual void OnCompiled()
     {
@@ -223,13 +216,15 @@ public abstract class BaseComputer : PartModule
     private void AssignGameEvents()
     {
         vessel.OnFlyByWire += Execution;
-        GameEvents.onPartDestroyed.Add(OnBlownUp);
+        GameEvents.onPartWillDie.Add(OnBlownUp);
     }
 
     private void RemoveGameEvents()
     {
-        vessel.OnFlyByWire -= Execution;
-        GameEvents.onPartDestroyed.Remove(OnBlownUp);
+        if (vessel != null)
+            vessel.OnFlyByWire -= Execution;
+        
+        GameEvents.onPartWillDie.Remove(OnBlownUp);
     }
 
     private void OnBlownUp(Part data)
@@ -241,10 +236,9 @@ public abstract class BaseComputer : PartModule
         if (data.vessel == null || data.isVesselEVA || data.vessel.id != part.vessel.id)
             return;
         
-        Random rng = new();
-        if (rng.Next(0, 10) <= 5 || data.flightID == part.flightID)
+        if (Rng.Next(0, 10) <= 5 || data.flightID == part.flightID)
         {
-            ThrowException($"Oh no, an unknown error has occured! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {rng.Next(404)}");
+            ThrowException($"Oh no, an unknown error has occured! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {Rng.Next(404)}");
         }
 
         if (data.flightID == part.flightID)
@@ -253,9 +247,6 @@ public abstract class BaseComputer : PartModule
         }
     }
 
-    [KSPField]
-    public bool createsHeat = false;
-
     /// <summary>
     /// Calculates the heat this Computer produces while executing
     /// </summary>
@@ -263,6 +254,33 @@ public abstract class BaseComputer : PartModule
     public virtual double CalculateHeat()
     {
         return 0.0;
+    }
+
+    /// <summary>
+    /// Called when a <see cref="ModuleComputerHeat"/> has a low temperature(25% or lower)
+    /// </summary>
+    /// <param name="coreTemp">Core temperature</param>
+    /// <param name="shutdownTemp">Temperature at which this computer will shutdown</param>
+    public virtual void OnLowTemp(double coreTemp, double shutdownTemp)
+    {
+    }
+
+    /// <summary>
+    /// Called when a <see cref="ModuleComputerHeat"/> has a low temperature(50% to shutdown temp)
+    /// </summary>
+    /// <param name="coreTemp">Core temperature</param>
+    /// <param name="shutdownTemp">Temperature at which this computer will shutdown</param>
+    public virtual void OnMedTemp(double coreTemp, double shutdownTemp)
+    {
+    }
+
+    /// <summary>
+    /// Called when a <see cref="ModuleComputerHeat"/> has a high temperature(75% or higher to shutdown temp)
+    /// </summary>
+    /// <param name="coreTemp">Core temperature</param>
+    /// <param name="shutdownTemp">Temperature at which this computer will shutdown</param>
+    public virtual void OnHighTemp(double coreTemp, double shutdownTemp)
+    {
     }
 
     #endregion
@@ -285,29 +303,9 @@ public abstract class BaseComputer : PartModule
             tokenContainer.shouldCompile = true;
             ResetStatus();
         }
-        catch (AggregateException e)
-        {
-            if (e.InnerExceptions.Count == 1 && e.InnerException != null)
-            {
-                ThrowException(e.InnerException.Message);
-            }
-            else
-            {
-                foreach (Exception innerException in e.InnerExceptions)
-                {
-                    ThrowException(innerException.Message);
-                }
-            }
-
-            foreach (Exception ie in e.InnerExceptions)
-            {
-                Debug.Log($"[{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}] Exception caught during compilation! Data: {ie.Message}\n{ie.StackTrace}");
-            }
-        }
         catch (Exception e)
         {
-            Debug.Log($"[{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}] Exception caught during compilation! Data: {e.Message}\n{e.StackTrace}");
-            ThrowException(e.Message);
+            CatchException(e);
         }
         finally
         {
@@ -354,6 +352,11 @@ public abstract class BaseComputer : PartModule
     [KSPAction("Turn On")]
     public void Execute()
     {
+        if (Script == null)
+        {
+            ScreenMessages.PostScreenMessage("No script has been compiled yet", 4.5f);
+            return;
+        }
         ShouldRun = true;
     }
 
@@ -408,6 +411,47 @@ public abstract class BaseComputer : PartModule
 
     #endregion
 
+    #region Exception catching
+
+    public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
+    {
+        ExceptionBoxControl.Show(message);
+        SetStatus(message, kind);
+    }
+
+    protected void CatchException(Exception e)
+    {
+        switch (e)
+        {
+            case AggregateException ae:
+            {
+                if (ae.InnerExceptions.Count == 1 && ae.InnerException != null)
+                {
+                    CatchException(ae.InnerException);
+                }
+                else
+                {
+                    foreach (Exception ie in ae.InnerExceptions)
+                    {
+                        CatchException(ie);
+                    }
+                }
+            } break;
+            case OperationCanceledException:
+            {
+                ThrowException("Our engineers typically suggest writing scripts which don't loop forever, so they have shut down the script to prevent such a time paradox.");
+            } break;
+            default:
+            {
+                ThrowException(e.Message);
+            } break;
+        }
+        
+        Debug.Log($"[{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}] Exception caught during execution! Data: {e.Message}\n{e.StackTrace}");
+    }
+
+    #endregion
+
     #region Status
     
     public void Log(string log, StatusKind kind = StatusKind.Exceptional)
@@ -439,17 +483,6 @@ public abstract class BaseComputer : PartModule
                 _logControl.Log($"<color=red>{time}</color> {log}");
             } break;
         }
-    }
-
-    public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
-    {
-        ExceptionBoxControl.Show(message);
-        if (kind == StatusKind.Uhoh)
-        {
-            ShouldRun = false;
-            tokenContainer.shouldCompile = false;
-        }
-        SetStatus(message, kind);
     }
 
     public void SetStatus(string newStatus, StatusKind kind)
@@ -484,6 +517,9 @@ public abstract class BaseComputer : PartModule
     {
         if (kind == StatusKind.Uhoh)
         {
+            ShouldRun = false;
+            tokenContainer.shouldCompile = false;
+            
             Fields["exception"].guiActive = true;
             Fields["exception"].guiActiveEditor = true;
             Fields["exception"].guiActiveUnfocused = true;

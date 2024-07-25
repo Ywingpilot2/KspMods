@@ -7,7 +7,7 @@ namespace ProgrammableMod.Modules.ComputerTemp;
 public class ModuleComputerHeat : ModuleCoreHeat
 {
     private readonly Random _rng = new Random();
-    
+
     public override double CoreTemperature
     {
         get
@@ -16,10 +16,10 @@ public class ModuleComputerHeat : ModuleCoreHeat
             {
                 CheckStartingTemperature();
             }
-
-            double temp = CoreThermalEnergy * part.thermalMass;
+            
             if (!HighLogic.LoadedSceneIsFlight)
-                return temp;
+                return 0.0;
+            double temp = CoreThermalEnergy;
             
             BaseComputer computer = part.FindModuleImplementing<BaseComputer>();
             if (computer == null)
@@ -28,13 +28,16 @@ public class ModuleComputerHeat : ModuleCoreHeat
             if (!computer.createsHeat)
                 return 0.0;
 
-            double extraHeat = computer.CalculateHeat();
+            double extraHeat = 0.0;
+            if (computer.running)
+                extraHeat = computer.CalculateHeat();
+            
             extraHeat += vessel.externalTemperature * vessel.atmDensity;
-
+            temp = (temp + extraHeat) * part.thermalMass;
             if (!computer.running)
-                extraHeat /= part.thermalMass;
+                temp *= computer.inactiveHeatModifier;
 
-            return (temp + extraHeat) * part.thermalMass;
+            return temp;
         }
     }
 
@@ -62,19 +65,36 @@ public class ModuleComputerHeat : ModuleCoreHeat
     {
         if (!HighLogic.LoadedSceneIsFlight)
             return;
-        
-        if (CoreTemperature <= CoreShutdownTemp)
-            return;
-
+            
         BaseComputer computer = part.FindModuleImplementing<BaseComputer>();
         if (computer == null)
             return;
-        
+
+        if (CoreTemperature <= CoreShutdownTemp)
+        {
+            switch (CoreTemperature / CoreShutdownTemp)
+            {
+                case <= 0.35:
+                {
+                    computer.OnLowTemp(CoreTemperature, CoreShutdownTemp);
+                } break;
+                case >= 0.75:
+                {
+                    computer.OnHighTemp(CoreTemperature, CoreShutdownTemp);
+                } break;
+                default:
+                {
+                    computer.OnMedTemp(CoreTemperature, CoreShutdownTemp);
+                } break;
+            }
+            
+            return;
+        }
+
         if (!computer.running)
             return;
         
-        Random rng = new();
-        computer.ThrowException($"Computer CPU is overheating! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {rng.Next(405)}");
+        computer.ThrowException($"Computer CPU is overheating! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {_rng.Next(405)}");
     }
     
     protected override void ResolveConverterEnergy(double deltaTime)

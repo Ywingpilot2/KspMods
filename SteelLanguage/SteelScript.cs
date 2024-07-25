@@ -165,7 +165,7 @@ public sealed class SteelScript : ITokenHolder
 
     private void PostExecution()
     {
-        GC.Collect();
+        //GC.Collect();
     }
 
     internal void PostCompilation()

@@ -57,6 +57,7 @@ public class SASTerm : BaseVesselTerm
             VesselAutopilot.AutopilotMode mode =
                 (VesselAutopilot.AutopilotMode)KerbinSuperComputer.EnumFromInt(terms[0].CastToInt(),
                     typeof(VesselAutopilot.AutopilotMode));
+            mode = CorrectMode(mode);
 
             return new ReturnValue(Computer.vessel.Autopilot.CanSetMode(mode), "bool");
         }, "sas_mode");
@@ -67,6 +68,8 @@ public class SASTerm : BaseVesselTerm
             VesselAutopilot.AutopilotMode mode =
                 (VesselAutopilot.AutopilotMode)KerbinSuperComputer.EnumFromInt(terms[0].CastToInt(),
                     typeof(VesselAutopilot.AutopilotMode));
+            mode = CorrectMode(mode);
+
             if (!Computer.vessel.Autopilot.CanSetMode(mode))
                 throw new InvalidActionException(0, $"Cannot set autopilot mode to {sasType} currently");
 
@@ -75,5 +78,19 @@ public class SASTerm : BaseVesselTerm
             if (mode != Computer.vessel.Autopilot.Mode)
                 Computer.vessel.Autopilot.SetMode(mode);
         }, "sas_mode");
+    }
+
+    /// <summary>
+    /// This game is fucking stupid and has RadialIn and RadialOut flipped around
+    /// </summary>
+    private VesselAutopilot.AutopilotMode CorrectMode(VesselAutopilot.AutopilotMode mode)
+    {
+        if (mode == VesselAutopilot.AutopilotMode.RadialIn)
+            return VesselAutopilot.AutopilotMode.RadialOut;
+
+        if (mode == VesselAutopilot.AutopilotMode.RadialOut)
+            return VesselAutopilot.AutopilotMode.RadialIn;
+
+        return mode;
     }
 }

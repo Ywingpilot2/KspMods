@@ -3,41 +3,77 @@ using System.Collections.Generic;
 using System.Globalization;
 using JetBrains.Annotations;
 using ProgrammableMod.Scripting.Exceptions;
+using ProgrammableMod.Scripting.Terms.Vessel;
 using SteelLanguage;
+using UnityEngine;
 
 namespace ProgrammableMod.Modules.Computers;
 
 public class ComputerModule : BaseComputer, IResourceConsumer
 {
-    #region Display
-
-    [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Avaliable")] [UsedImplicitly]
-    public string tokenField;
-
-    [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Used")] [UsedImplicitly]
-    public string tokensUsed;
-
-    #endregion
-
     #region Module Fields
 
-    [KSPField]
+    [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Available")]
     public float tokenLimit;
 
     [KSPField]
     public string requiredResource;
 
     [KSPField]
-    public string requiredConsumption;
+    public double requiredConsumption = 1.0;
     
     [KSPField]
     public double maxHeat = 100;
 
+    [KSPField]
+    public bool canOverclock = false;
+
+    [KSPField(isPersistant = true)]
+    public bool isOverclocked = false;
+
+    [KSPField]
+    public float overclockPercent = 0.25f;
+
+    [KSPField]
+    public int mediumMalfunctionChance = 0;
+    
+    [KSPField]
+    public int highMalfunctionChance = 11;
+
+    #endregion
+
+    #region Module Events
+
+    private float _originalLimit;
+    [KSPEvent(active = false, guiActive = true, guiName = "CPU Over Clocking: false")]
+    public void ToggleOverclocking()
+    {
+        if (!HighLogic.LoadedSceneIsFlight)
+            return;
+
+        isOverclocked = !isOverclocked;
+        Events[nameof(ToggleOverclocking)].guiName = $"CPU Over Clocking: {isOverclocked}";
+        OverClockTokens();
+    }
+
+    private void OverClockTokens()
+    {
+        if (isOverclocked)
+        {
+            tokenLimit += _originalLimit * overclockPercent;
+        }
+        else
+        {
+            tokenLimit = _originalLimit;
+            Script = null;
+            CompileScript(); // recompile the script to ensure player isnt cheating
+        }
+    }
+
     #endregion
 
     #region Resource Handling
-
-    private double _consumptionAmount;
+    
     private List<PartResourceDefinition> _consumedResources; 
 
     public List<PartResourceDefinition> GetConsumedResources()
@@ -47,7 +83,175 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
     #endregion
 
-    #region Logic
+    #region Game Events
+
+    public override double CalculateHeat()
+    {
+        if (isOverclocked)
+        {
+            float ratio = CalculateCost(Script) / _originalLimit;
+
+            return maxHeat * ratio;
+        }
+        else
+        {
+            float ratio = CalculateCost(Script) / tokenLimit;
+
+            return maxHeat * ratio;
+        }
+    }
+    
+    private double _lastStatusUpdate = 0.0;
+    public override void OnMedTemp(double coreTemp, double shutdownTemp)
+    {
+        if (Rng.Next(1, mediumMalfunctionChance) != 5)
+            return;
+
+        int max = 7;
+        if (coreTemp / shutdownTemp < 0.45)
+            max = 3;
+        
+        if (Math.Abs(Time.fixedTime - _lastStatusUpdate) > 50)
+        {
+            SetStatus("Temperature anomaly, potential CPU skipping...", StatusKind.NotGreat);
+            _lastStatusUpdate = Time.fixedTime;
+        }
+        
+        MediumAnomaly(Rng.Next(0, max));
+    }
+    
+    public override void OnHighTemp(double coreTemp, double shutdownTemp)
+    {
+        if (Rng.Next(1, highMalfunctionChance) != 5)
+            return;
+        
+        if (Math.Abs(Time.fixedTime - _lastStatusUpdate) > 50)
+        {
+            SetStatus("Temperature anomaly, potential corruption...", StatusKind.NotGreat);
+            ScreenMessages.PostScreenMessage("Extreme temperatures detected, unexpected issues may occur");
+            _lastStatusUpdate = Time.fixedTime;
+        }
+        
+        MediumAnomaly(Rng.Next(0, 7));
+        HighAnomaly(Rng.Next(0, 7));
+    }
+
+    private double _lastHeatCycle = 0.0;
+    private void MediumAnomaly(int random)
+    {
+        switch (random)
+        {
+            case 0:
+            {
+                if (Math.Abs(Time.fixedTime - _lastHeatCycle) < 10)
+                    return;
+                
+                _heatCycle = true;
+                _skipUntil = Time.fixedTime + Rng.Next(1, 3);
+                _lastHeatCycle = Time.fixedTime;
+            } break;
+            case 1:
+            {
+                vessel.ActionGroups.ToggleGroup(KSPActionGroup.Light);
+            } break;
+            case 2:
+            {
+                vessel.ActionGroups.ToggleGroup(KSPActionGroup.Gear);
+            } break;
+            case 3:
+            {
+                vessel.ActionGroups.ToggleGroup(KSPActionGroup.Brakes);
+            } break;
+            case 4:
+            {
+                vessel.ActionGroups.ToggleGroup(KSPActionGroup.RCS);
+            } break;
+            case 5:
+            {
+                vessel.ActionGroups.ToggleGroup(KSPActionGroup.SAS);
+            } break;
+            case 6:
+            {
+                State.mainThrottle = Convert.ToSingle(Rng.NextDouble());
+            } break;
+        }
+    }
+    
+    private void HighAnomaly(int random)
+    {
+        switch (random)
+        {
+            case 3:
+            {
+                if (Math.Abs(Time.fixedTime - _lastHeatCycle) < 50)
+                    return;
+                
+                _heatCycle = true;
+                _skipUntil = Time.fixedTime + Rng.Next(1, 10);
+                _lastHeatCycle = Time.fixedTime;
+            } break;
+            case 4:
+            {
+                List<ModulePartFirework> fireworks = vessel.FindPartModulesImplementing<ModulePartFirework>();
+                foreach (ModulePartFirework firework in fireworks)
+                {
+                    if (Rng.Next(3) > 1)
+                        continue;
+                    
+                    firework.LaunchShell();
+                }
+            } break;
+            case 5:
+            {
+                switch (Rng.Next(0,4))
+                {
+                    case 0:
+                    {
+                        ShouldRun = false;
+                    } break;
+                    case 1:
+                    {
+                        ThrowException($"Oh no, an unknown error has occured! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {Rng.Next(404)}");
+                    } break;
+                    case 3:
+                    {
+                        _rateMultiplier = Rng.Next(1, 10);
+                        _resetRateAt = Time.fixedTime + Rng.Next(1, 10);
+                    } break;
+                }
+            } break;
+            case 6:
+            {
+                switch (Rng.Next(5))
+                {
+                    case 0:
+                    {
+                        vessel.ActionGroups.ToggleGroup(KSPActionGroup.Abort);
+                    } break;
+                    case 1:
+                    {
+                        MylStagingManager stagingManager = new MylStagingManager(this);
+                        stagingManager.NextStage();
+                    } break;
+                    case 2:
+                    {
+                        List<ModuleCommand> commandModules = vessel.FindPartModulesImplementing<ModuleCommand>();
+                        foreach (ModuleCommand module in commandModules)
+                        {
+                            if (!module.hasHibernation)
+                                continue;
+
+                            module.hibernation = true;
+                        }
+                    } break;
+                }
+            } break;
+        }
+    }
+
+    #endregion
+
+    #region Script Events
 
     public override bool ValidateScript(SteelScript script, out string reason)
     {
@@ -57,31 +261,24 @@ public class ComputerModule : BaseComputer, IResourceConsumer
             reason = $"Token limit surpassed! Current cost: {total}";
             return false;
         }
+
+        tokensUsed = total == 0 ? "none" : total.ToString(CultureInfo.CurrentCulture);
         
-        tokensUsed = total.ToString(CultureInfo.CurrentCulture);
         reason = "working";
         return true;
     }
 
     private static float CalculateCost(SteelScript script)
     {
+        if (script == null)
+            return 0.0f;
+        
         int termCost = script.TermTokens * 5;
         int callCost = script.CallTokens;
         float keyCost = script.KeyTokens * 0.5f;
         float total = termCost + callCost + keyCost;
 
         return total;
-    }
-    
-    public override double CalculateHeat()
-    {
-        float ratio = CalculateCost(Script) / tokenLimit;
-        if (ratio >= 0.75)
-        {
-            SetStatus("The temperature of the computer is high, stability issues probable", StatusKind.NotGreat);
-        }
-
-        return maxHeat * ratio;
     }
 
     protected override void PreExecute()
@@ -94,18 +291,58 @@ public class ComputerModule : BaseComputer, IResourceConsumer
         }
     }
 
+    private bool _heatCycle = false;
+    private double _skipUntil = 0.0;
+    protected override bool ShouldSkipCycle()
+    {
+        if (_heatCycle)
+        {
+            if (Time.fixedTime > _skipUntil)
+            {
+                _heatCycle = false;
+                return false;
+            }
+            
+            if (Math.Abs(Time.fixedTime - _skipUntil) > 0.5)
+            {
+                return true;
+            }
+            
+            _heatCycle = false;
+        }
+        
+        return false;
+    }
+
     #endregion
 
     #region Display
+    
+    [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Used")] [UsedImplicitly]
+    public string tokensUsed;
 
     public override string GetModuleDisplayName() => "Processing Chips";
 
     public override string GetInfo()
     {
-        string message = $"Computer chips for processing tokens and instructions. Warranty void if ingested.\n- Token limit of {tokenLimit}\n- Consumes {requiredConsumption} {requiredResource} per token";
+        string message = "Computer chips for processing tokens and instructions. Warranty void if ingested.";
+        message += canOverclock
+            ? $"\n- Token limit of {tokenLimit}, can be increased by {overclockPercent * 10} if overclocked"
+            : $"\n- Token limit of {tokenLimit}";
+
+        if (requiredConsumption != 0)
+        {
+            message += $"\n- Consumes {requiredConsumption} {requiredResource} per token";
+        }
+        
         if (createsHeat)
         {
-            message += "\n- Overclocked, produces heat";
+            message += "\n- Produces heat";
+        }
+
+        if (canOverclock)
+        {
+            message += "\n- Limiter removed, warranty voided";
         }
 
         return message;
@@ -113,11 +350,13 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
     #endregion
 
+    #region Logic
+
     public override void OnAwake()
     {
         base.OnAwake();
-        tokenField = tokenLimit.ToString(CultureInfo.CurrentCulture);
         tokensUsed = "none";
+        _originalLimit = tokenLimit;
 
         if (_consumedResources == null)
             _consumedResources = new List<PartResourceDefinition>();
@@ -132,17 +371,9 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
     public override void OnStart(StartState state)
     {
-        base.OnStart(state);
-        
         if (string.IsNullOrEmpty(requiredResource))
             requiredResource = "ElectricCharge";
 
-        if (string.IsNullOrEmpty(requiredConsumption))
-            requiredConsumption = "1.0";
-
-        if (!double.TryParse(requiredConsumption, NumberStyles.Float, new NumberFormatInfo(), out _consumptionAmount))
-            _consumptionAmount = 1.0;
-        
         if (resHandler.inputResources.Count != 0)
             return;
 
@@ -151,18 +382,39 @@ public class ComputerModule : BaseComputer, IResourceConsumer
             name = requiredResource,
             title = KSPUtil.PrintModuleName(requiredResource),
             id = requiredResource.GetHashCode(),
-            rate = _consumptionAmount
+            rate = requiredConsumption
         };
         
         resHandler.inputResources.Add(resource);
+
+        if (canOverclock)
+        {
+            Events[nameof(ToggleOverclocking)].active = true;
+            Events[nameof(ToggleOverclocking)].guiName = $"CPU Over Clocking: {isOverclocked}";
+        }
+        else
+        {
+            Events[nameof(ToggleOverclocking)].active = false;
+        }
+        
+        if (isOverclocked)
+            OverClockTokens();
+        
+        base.OnStart(state);
     }
 
+    private double _rateMultiplier = 1.0;
+    private double _resetRateAt = 0.0;
     private void FixedUpdate()
     {
         if (HighLogic.LoadedSceneIsFlight)
         {
+            if (Math.Abs(Time.fixedTime - _resetRateAt) < 0.5)
+                _rateMultiplier = 1.0;
+            
             string error = "";
             double rate = ShouldRun ? CalculateCost(Script) : 0.0;
+            rate *= _rateMultiplier;
         
             if (!resHandler.UpdateModuleResourceInputs(ref error, rate, 0.9, true) && ShouldRun)
             {
@@ -170,4 +422,6 @@ public class ComputerModule : BaseComputer, IResourceConsumer
             }
         }
     }
+
+    #endregion
 }
