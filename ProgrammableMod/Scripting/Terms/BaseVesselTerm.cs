@@ -6,7 +6,7 @@ using SteelLanguage.Token.Terms;
 
 namespace ProgrammableMod.Scripting.Terms;
 
-public abstract class BaseVesselTerm : BaseTerm
+public abstract class BaseComputerTerm : BaseTerm
 {
     internal BaseComputer Computer;
 
@@ -18,12 +18,10 @@ public abstract class BaseVesselTerm : BaseTerm
     protected virtual void ExtraBuilding()
     {
     }
-    
-    
 
     public override bool CopyFrom(BaseTerm term)
     {
-        if (term is BaseVesselTerm vesselTerm)
+        if (term is BaseComputerTerm vesselTerm)
         {
             Computer = vesselTerm.Computer;
             ExtraBuilding();

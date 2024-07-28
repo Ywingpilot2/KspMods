@@ -1,10 +1,8 @@
-﻿using System;
-using ProgrammableMod.Modules.Computers;
+﻿using ProgrammableMod.Modules.Computers;
 using SteelLanguage.Exceptions;
 using UniLinq;
-using UnityEngine;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel;
+namespace ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
 
 /// <summary>
 /// Util class used for managing vessel stages

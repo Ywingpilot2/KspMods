@@ -92,8 +92,6 @@ public record WhileFunction : BaseExecutable
                         return returnValue;
                 }
             }
-            
-            GC.Collect();
         }
 
         return new ReturnValue();

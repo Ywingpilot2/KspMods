@@ -4,6 +4,7 @@ using System.Globalization;
 using JetBrains.Annotations;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Terms.Vessel;
+using ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
 using SteelLanguage;
 using UnityEngine;
 
@@ -100,10 +101,15 @@ public class ComputerModule : BaseComputer, IResourceConsumer
             return maxHeat * ratio;
         }
     }
-    
+
+    #region Temp
+
     private double _lastStatusUpdate = 0.0;
     public override void OnMedTemp(double coreTemp, double shutdownTemp)
     {
+        if (mediumMalfunctionChance == 0)
+            return;
+        
         if (Rng.Next(1, mediumMalfunctionChance) != 5)
             return;
 
@@ -122,6 +128,9 @@ public class ComputerModule : BaseComputer, IResourceConsumer
     
     public override void OnHighTemp(double coreTemp, double shutdownTemp)
     {
+        if (highMalfunctionChance == 0)
+            return;
+        
         if (Rng.Next(1, highMalfunctionChance) != 5)
             return;
         
@@ -135,6 +144,10 @@ public class ComputerModule : BaseComputer, IResourceConsumer
         MediumAnomaly(Rng.Next(0, 7));
         HighAnomaly(Rng.Next(0, 7));
     }
+
+    #endregion
+
+    #region Errors
 
     private double _lastHeatCycle = 0.0;
     private void MediumAnomaly(int random)
@@ -207,7 +220,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
                 {
                     case 0:
                     {
-                        ShouldRun = false;
+                        shouldRun = false;
                     } break;
                     case 1:
                     {
@@ -251,6 +264,8 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
     #endregion
 
+    #endregion
+
     #region Script Events
 
     public override bool ValidateScript(SteelScript script, out string reason)
@@ -263,6 +278,13 @@ public class ComputerModule : BaseComputer, IResourceConsumer
         }
 
         tokensUsed = total == 0 ? "none" : total.ToString(CultureInfo.CurrentCulture);
+        
+        
+        if (HighLogic.LoadedSceneIsFlight && !vessel.IsFirstFrame() && (vessel.Connection.GetControlLevel() == Vessel.ControlLevel.NONE ||
+                                                                     vessel.Connection.GetControlLevel() == Vessel.ControlLevel.PARTIAL_UNMANNED))
+        {
+            throw new ControlLostException(0);
+        }
         
         reason = "working";
         return true;
@@ -279,16 +301,6 @@ public class ComputerModule : BaseComputer, IResourceConsumer
         float total = termCost + callCost + keyCost;
 
         return total;
-    }
-
-    protected override void PreExecute()
-    {
-        base.PreExecute();
-        if (vessel.Connection.GetControlLevel() == Vessel.ControlLevel.NONE ||
-            vessel.Connection.GetControlLevel() == Vessel.ControlLevel.PARTIAL_UNMANNED)
-        {
-            throw new ControlLostException(0);
-        }
     }
 
     private bool _heatCycle = false;
@@ -327,7 +339,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
     {
         string message = "Computer chips for processing tokens and instructions. Warranty void if ingested.";
         message += canOverclock
-            ? $"\n- Token limit of {tokenLimit}, can be increased by {overclockPercent * 10} if overclocked"
+            ? $"\n- Token limit of {tokenLimit}, can be increased by {tokenLimit + (_originalLimit * overclockPercent)} if overclocked"
             : $"\n- Token limit of {tokenLimit}";
 
         if (requiredConsumption != 0)
@@ -413,10 +425,10 @@ public class ComputerModule : BaseComputer, IResourceConsumer
                 _rateMultiplier = 1.0;
             
             string error = "";
-            double rate = ShouldRun ? CalculateCost(Script) : 0.0;
+            double rate = shouldRun ? CalculateCost(Script) : 0.0;
             rate *= _rateMultiplier;
         
-            if (!resHandler.UpdateModuleResourceInputs(ref error, rate, 0.9, true) && ShouldRun)
+            if (!resHandler.UpdateModuleResourceInputs(ref error, rate, 0.9, true) && shouldRun)
             {
                 ThrowException("Computer has ran out of power! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on");
             }

@@ -618,6 +618,9 @@ public abstract class BaseTerm : IToken
     /// <exception cref="InvalidTermCastException">Occurs when the cast was not valid</exception>
     public virtual object CastToType(string name)
     {
+        if (name == ValueType)
+            return GetValue();
+        
         throw new InvalidTermCastException(0, ValueType, name);
     }
 

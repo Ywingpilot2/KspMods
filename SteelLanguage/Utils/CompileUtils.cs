@@ -213,11 +213,12 @@ public static class CompileUtils
                     case SpecialFuncKind.As:
                     {
                         string san = token.SanitizeQuotes();
-                        string[] split = san.Split(new[] { " as " }, 2, StringSplitOptions.RemoveEmptyEntries);
+                        string[] split = token.SplitAt(san.IndexOf(" as ", StringComparison.Ordinal), options: StringSplitOptions.RemoveEmptyEntries);
+                            
                         if (split.Length != 2)
                             throw new InvalidParametersException(0, new[] { "term", "type" });
 
-                        Input convert = HandleToken(split[0].Trim(), "term", holder, compiler);
+                        Input convert = HandleToken(split[0].Remove(split[0].Length - 1).Trim(), "term", holder, compiler);
                         CastCall call = new CastCall(holder, compiler.CurrentLine, convert, type.Name);
                         return new Input(holder, call);
                     }

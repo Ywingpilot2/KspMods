@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SteelLanguage.Exceptions;
+using SteelLanguage.Library.System.Terms.Complex.Enumerators;
 using SteelLanguage.Reflection.Library;
 using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions.Single;
@@ -74,6 +76,7 @@ public record Function : IFunction
     {
         InReturn,
         Return,
+        YieldReturn,
         In,
         None
     }
@@ -81,10 +84,14 @@ public record Function : IFunction
     public string Name { get; }
     public string ReturnType { get; }
     public string[] InputTypes { get; }
+    
     private Func<BaseTerm[], ReturnValue> InReturn { get; }
     private Func<ReturnValue> Return { get; }
+    private string _yieldType;
+    private Func<IEnumerable<ReturnValue>> YieldReturn { get; }
     private Action<BaseTerm[]> In { get; }
     private Action None { get; }
+
     private readonly FunctionKind _kind;
     private static readonly BaseTerm[] Empty = new BaseTerm[0]; // array declaration is expensive!
 
@@ -100,6 +107,10 @@ public record Function : IFunction
             {
                 return Return.Invoke();
             }
+            case FunctionKind.YieldReturn:
+            {
+                return new ReturnValue(new FuncEnumerable(YieldReturn.Invoke(), _yieldType), "FuncEnumerator");
+            }
             case FunctionKind.In:
             {
                 In.Invoke(terms);
@@ -107,8 +118,7 @@ public record Function : IFunction
             case FunctionKind.None:
             {
                 None.Invoke();
-                break;
-            }
+            } break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -128,9 +138,17 @@ public record Function : IFunction
             {
                 return Return.Invoke();
             }
+            case FunctionKind.YieldReturn:
+            {
+                return new ReturnValue(new FuncEnumerable(YieldReturn.Invoke(), _yieldType), "FuncEnumerator");
+            }
             case FunctionKind.In:
             {
                 In.Invoke(Empty);
+            } break;
+            case FunctionKind.None:
+            {
+                None.Invoke();
             } break;
         }
 
@@ -204,6 +222,13 @@ public record Function : IFunction
         None = action;
         _kind = FunctionKind.None;
     }
+    
+    public Function(string name, Func<IEnumerable<ReturnValue>> action, string containedType) : this(name, "FuncEnumerator", new string[0])
+    {
+        YieldReturn = action;
+        _yieldType = containedType;
+        _kind = FunctionKind.YieldReturn;
+    }
 
     #endregion
 }
@@ -275,7 +300,7 @@ public record UserFunction : BaseExecutable, IFunction
 
             if (input.Value.StartsWith("params"))
             {
-                type = manager.GetTermType($"array<{input.Value.Split(' ')[1].Trim()}>");
+                type = manager.GetTermType($"Array<{input.Value.Split(' ')[1].Trim()}>");
             }
             else
             {

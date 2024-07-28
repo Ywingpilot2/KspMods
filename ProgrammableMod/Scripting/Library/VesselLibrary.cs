@@ -5,6 +5,10 @@ using KSP.UI.Screens;
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Terms.Vessel;
+using ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
+using ProgrammableMod.Scripting.Terms.Vessel.Parts;
+using ProgrammableMod.Scripting.Terms.Vessel.SAS;
+using ProgrammableMod.Scripting.Terms.Vessel.Target;
 using SteelLanguage;
 using SteelLanguage.Library;
 using SteelLanguage.Reflection.Library;
@@ -48,5 +52,7 @@ public class VesselLibrary : ILibrary
         TypeLibrary.AddTermType(new TermType(new SASTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new SASTypeTerm(), enumType));
         TypeLibrary.AddTermType(new TermType(new ActionGroupTerm(), enumType));
+        TypeLibrary.AddTermType(new TermType(new TargetTerm(), baseType, isNullable:true));
+        TypeLibrary.AddTermType(new TermType(new PartTerm(), baseType, isNullable:true));
     }
 }

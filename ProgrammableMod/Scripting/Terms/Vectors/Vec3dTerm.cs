@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Reflection.Type;
+using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions.Operator;
 using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
@@ -9,10 +9,10 @@ using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Terms.Vectors;
 
-public class Vec2Term : BaseTerm, IStashableTerm
+public class Vec3dTerm : BaseTerm, IStashableTerm
 {
-    public override string ValueType => "vec2";
-
+    public override string ValueType => "vec3";
+    
     public override IEnumerable<TermConstructor> GetConstructors()
     {
         foreach (TermConstructor constructor in base.GetConstructors())
@@ -20,16 +20,28 @@ public class Vec2Term : BaseTerm, IStashableTerm
             yield return constructor;
         }
 
-        yield return new TermConstructor(terms => new ReturnValue(new Vector2(terms[0].CastToFloat(), terms[1].CastToFloat()), "vec2"), 
-            "float", "float");
+        yield return new TermConstructor(terms => new ReturnValue(new Vector3(terms[0].CastToFloat(), terms[1].CastToFloat(), terms[2].CastToFloat()), "vec3"), 
+            "float", "float", "float");
     }
 
-    private Vector2 _value;
+    public override IEnumerable<TermField> GetFields()
+    {
+        foreach (TermField field in base.GetFields())
+        {
+            yield return field;
+        }
+
+        yield return new TermField("x", "float", _value.x);
+        yield return new TermField("y", "float", _value.y);
+        yield return new TermField("z", "float", _value.z);
+    }
+
+    private Vector3d _value;
     public override bool SetValue(object value)
     {
-        if (value is Vector2 vector2)
+        if (value is Vector3d vector3)
         {
-            _value = vector2;
+            _value = vector3;
             return true;
         }
 
@@ -38,9 +50,9 @@ public class Vec2Term : BaseTerm, IStashableTerm
 
     public override bool CopyFrom(BaseTerm term)
     {
-        if (term is Vec2Term vec2Term)
+        if (term is Vec3dTerm vec3Term)
         {
-            _value = vec2Term._value;
+            _value = vec3Term._value;
             return true;
         }
 
@@ -51,7 +63,7 @@ public class Vec2Term : BaseTerm, IStashableTerm
     {
         return _value;
     }
-    
+
     public override MathOperatorKind[] AllowedMathOps => new[]
     {
         MathOperatorKind.Add,
@@ -71,24 +83,24 @@ public class Vec2Term : BaseTerm, IStashableTerm
                 {
                     case int i:
                     {
-                        return _value + new Vector2(i, i);
+                        return _value + new Vector3(i, i, i);
                     }
                     case float i:
                     {
-                        return _value + new Vector2(i, i);
+                        return _value + new Vector3(i, i, i);
                     }
                     case Vector3 i:
                     {
-                        return _value + (Vector2)i;
+                        return _value + i;
                     }
                     case Vector2 i:
                     {
-                        return _value + i;
+                        return _value + (Vector3)i;
                     }
                     default:
                         throw new InvalidActionException(0, $"Cannot conduct math operation between {ValueType} and {subject.ValueType}");
                 }
-            }
+            } break;
             case MathOperatorKind.Subtract:
             {
                 object value = subject.GetValue();
@@ -96,19 +108,19 @@ public class Vec2Term : BaseTerm, IStashableTerm
                 {
                     case int i:
                     {
-                        return _value - new Vector2(i, i);
+                        return _value - new Vector3(i, i, i);
                     }
                     case float i:
                     {
-                        return _value - new Vector2(i, i);
+                        return _value - new Vector3(i, i, i);
                     }
                     case Vector3 i:
                     {
-                        return _value - (Vector2)i;
+                        return _value - i;
                     }
                     case Vector2 i:
                     {
-                        return _value - i;
+                        return _value - (Vector3)i;
                     }
                     default:
                         throw new InvalidActionException(0, $"Cannot conduct math operation between {ValueType} and {subject.ValueType}");
@@ -153,24 +165,7 @@ public class Vec2Term : BaseTerm, IStashableTerm
         throw new InvalidActionException(0, $"{kind} is not a supported math operator for {ValueType}");
     }
     
-    public override bool CanImplicitCastToType(TermType type)
-    {
-        if (type.Name == "vec2d")
-            return true;
-        
-        return base.CanImplicitCastToType(type);
-    }
-
-    public override object CastToType(string name)
-    {
-        if (name == "vec2d")
-            return new Vector2d(_value.x, _value.y);
-
-        if (name == "vec3")
-            return (Vector3)_value;
-
-        return base.CastToType(name);
-    }
+    
 
     public bool Save(ConfigNode node)
     {

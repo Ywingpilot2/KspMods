@@ -8,7 +8,7 @@ namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
 
 public class ReadOnlyCollectionTerm : EnumeratorTerm
 {
-    public override string ValueType => "readonly_collection";
+    public override string ValueType => "ReadOnlyCollection";
     
     public override IEnumerable<TermField> GetFields()
     {

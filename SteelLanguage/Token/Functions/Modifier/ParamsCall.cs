@@ -26,6 +26,6 @@ public class ParamsCall : TokenCall
             array.SetValue(input.GetValue(), i);
         }
 
-        return new ReturnValue(array, $"array<{_type}>");
+        return new ReturnValue(array, $"Array<{_type}>");
     }
 }

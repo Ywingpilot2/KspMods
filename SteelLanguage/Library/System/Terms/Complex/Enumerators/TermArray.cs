@@ -55,7 +55,7 @@ public class TermArray : IEnumerable
 
 public class ArrayTerm : EnumeratorTerm
 {
-    public override string ValueType => "array";
+    public override string ValueType => "Array";
 
     public override IEnumerable<TermField> GetFields()
     {

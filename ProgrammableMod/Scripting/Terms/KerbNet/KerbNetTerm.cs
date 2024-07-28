@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Terms.KerbNet;
 
-public class KerbNetTerm : BaseVesselTerm
+public class KerbNetTerm : BaseComputerTerm
 {
     public override string ValueType => "commnet";
     private SuperComputerTerm _kerfer;

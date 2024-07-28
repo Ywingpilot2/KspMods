@@ -88,7 +88,7 @@ public class TermList : ICollection<BaseTerm>
 
 public class ListTerm : CollectionTerm
 {
-    public override string ValueType => "list";
+    public override string ValueType => "List";
     protected override int Count => ((TermList)Value).Count;
 
     public override IEnumerable<TermConstructor> GetConstructors()

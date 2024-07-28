@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CommNet;
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Exceptions;
+using ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
@@ -11,7 +12,7 @@ using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Terms.Vessel;
 
-public class VesselTerm : BaseVesselTerm
+public class VesselTerm : BaseComputerTerm
 {
     public override string ValueType => "vessel";
     private MylStagingManager _manager;
@@ -24,10 +25,10 @@ public class VesselTerm : BaseVesselTerm
         {
             yield return field;
         }
-
-        yield return new TermField("angular_velocity", "vec3", Computer.runTime);
-        yield return new TermField("surf_velocity", "vec3", Computer.vessel != null ? Computer.vessel.srf_velocity : null);
-        yield return new TermField("acceleration", "vec3", Computer.vessel != null ? Computer.vessel.acceleration : null);
+        
+        yield return new TermField("orbit_velocity", "vec3d", Computer.vessel != null ? Computer.vessel.obt_velocity : null);
+        yield return new TermField("surf_velocity", "vec3d", Computer.vessel != null ? Computer.vessel.srf_velocity : null);
+        yield return new TermField("acceleration", "vec3d", Computer.vessel != null ? Computer.vessel.acceleration : null);
         yield return new TermField("vertical_speed", "double", Computer.vessel != null ? Computer.vessel.verticalSpeed : 0.0);
         yield return new TermField("horizontal_speed", "double", Computer.vessel != null ? Computer.vessel.horizontalSrfSpeed : 0.0);
         yield return new TermField("total_mass", "double", Computer.vessel != null ? Computer.vessel.totalMass : 0.0);
@@ -44,6 +45,9 @@ public class VesselTerm : BaseVesselTerm
         yield return new TermField("rcs_x", "float", Computer.State.X, true);
         yield return new TermField("rcs_y", "float", Computer.State.Y, true);
         yield return new TermField("rcs_z", "float", Computer.State.Z, true);
+
+        yield return new TermField("position", "vec3", Computer.vessel.GetTransform().position);
+        yield return new TermField("target", "target", Computer.vessel.targetObject);
     }
 
     public override bool SetField(string name, object value)
@@ -120,6 +124,23 @@ public class VesselTerm : BaseVesselTerm
 
             return new ReturnValue(Computer.vessel.ActionGroups.groups[idx + 1], "bool");
         }, "action");
+        yield return new Function("get_tgt_velocity", "vec3d",
+            () =>
+            {
+                if (Computer.vessel.targetObject != null)
+                    return new ReturnValue(Computer.vessel.obt_velocity - Computer.vessel.targetObject.GetObtVelocity(), "vec3d");
+
+                return new ReturnValue(new Vector3d(), "vec3d");
+            });
+        yield return new Function("get_parts", GetParts, "Part");
+    }
+
+    private IEnumerable<ReturnValue> GetParts()
+    {
+        foreach (Part part in Computer.vessel.Parts)
+        {
+            yield return new ReturnValue(part, "Part");
+        }
     }
 
     #endregion

@@ -8,7 +8,7 @@ namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
 
 public class CollectionTerm : EnumeratorTerm
 {
-    public override string ValueType => "collection";
+    public override string ValueType => "Collection";
     protected virtual int Count { get; }
 
     public override IEnumerable<IFunction> GetFunctions()

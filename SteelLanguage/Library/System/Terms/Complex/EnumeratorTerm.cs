@@ -9,10 +9,10 @@ namespace SteelLanguage.Library.System.Terms.Complex;
 
 public class EnumeratorTerm : BaseTerm
 {
-    public IEnumerable Value { get; set; }
+    public IEnumerable Value { get; protected set; }
     public override bool ContainsType => true;
 
-    public override string ValueType => "enumerable";
+    public override string ValueType => "Enumerable";
 
     #region Functions
 

@@ -43,6 +43,7 @@
         <Compile Include="Library\Numerics\NumericsLibrary.cs" />
         <Compile Include="Library\System\SystemLibrary.cs" />
         <Compile Include="Library\System\Terms\Complex\Enumerators\CollectionTerm.cs" />
+        <Compile Include="Library\System\Terms\Complex\Enumerators\FuncEnumerator.cs" />
         <Compile Include="Library\System\Terms\Complex\Enumerators\ListTerm.cs" />
         <Compile Include="Library\System\Terms\Complex\Enumerators\ReadOnlyCollectionTerm.cs" />
         <Compile Include="Library\System\Terms\Complex\Enumerators\TermArray.cs" />

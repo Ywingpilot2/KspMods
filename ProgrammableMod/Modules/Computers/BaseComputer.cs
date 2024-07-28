@@ -61,27 +61,6 @@ public abstract class BaseComputer : PartModule
     #region Misc properties
 
     protected ILibrary[] Libraries;
-    public bool ShouldRun
-    {
-        get => tokenContainer.shouldRun;
-        set
-        {
-            if (value)
-            {
-                runTime = Time.fixedTime;
-                ResetStatus();
-            }
-            else
-            {
-                running = false;
-            }
-            tokenContainer.shouldRun = value;
-            if (tokenContainer.shouldRun)
-                tokenContainer.shouldCompile = true;
-            
-            UpdateButton();
-        }
-    }
 
     internal FlightCtrlState State;
     private SteelCompiler _compiler;
@@ -96,8 +75,14 @@ public abstract class BaseComputer : PartModule
     {
         OnExecute();
 
-        if (tokenContainer.shouldRun && HighLogic.LoadedSceneIsFlight)
+        if (shouldRun && HighLogic.LoadedSceneIsFlight)
         {
+            if (Script == null)
+            {
+                ThrowException("Script is not compiled!");
+                return;
+            }
+            
             State = state;
             if (ShouldSkipCycle())
                 return;
@@ -107,7 +92,7 @@ public abstract class BaseComputer : PartModule
                 PreExecute();
 
                 CancellationTokenSource cancel = new CancellationTokenSource();
-                cancel.CancelAfter(80);
+                cancel.CancelAfter(150);
 
                 Parallel.Invoke(new ParallelOptions { CancellationToken = cancel.Token, MaxDegreeOfParallelism = 2 },
                     Script.Execute);
@@ -147,9 +132,13 @@ public abstract class BaseComputer : PartModule
         _compiler = new SteelCompiler(Libraries);
         _logControl = new LogControl(Rng.Next());
         _codeEditor = new CodeEditorControl(tokenContainer.craft, "code editor", _compiler, craft => tokenContainer.craft = craft);
+        if (HighLogic.LoadedSceneIsEditor)
+        {
+            Fields[nameof(shouldRun)].guiName = "Start On";
+        }
 
         ResetStatus();
-        if (tokenContainer.shouldCompile || ShouldRun)
+        if (tokenContainer.shouldCompile || shouldRun)
         {
             CompileScript();
         }
@@ -158,8 +147,6 @@ public abstract class BaseComputer : PartModule
         {
             AssignGameEvents();
         }
-        
-        UpdateButton();
     }
 
     private void OnDestroy()
@@ -172,8 +159,8 @@ public abstract class BaseComputer : PartModule
         BaseComputer computer = (BaseComputer)fromModule;
         tokenContainer.craft = new ScriptCraft(computer.tokenContainer.craft.Name, computer.tokenContainer.craft.Script,
             computer.tokenContainer.craft.Directory);
-        tokenContainer.shouldRun = computer.tokenContainer.shouldRun;
-        tokenContainer.shouldCompile = computer.tokenContainer.shouldRun;
+        shouldRun = computer.shouldRun;
+        tokenContainer.shouldCompile = computer.tokenContainer.shouldCompile;
     }
 
     #endregion
@@ -312,6 +299,12 @@ public abstract class BaseComputer : PartModule
             OnCompiled();
         }
     }
+    
+    [KSPAction("Compile Script")]
+    public void CompileAction(KSPActionParam param)
+    {
+        CompileScript();
+    }
 
     public abstract bool ValidateScript(SteelScript script, out string reason);
 
@@ -337,76 +330,14 @@ public abstract class BaseComputer : PartModule
 
     #region Execution buttons
 
-    #region Flight
+    [UI_Toggle(scene = UI_Scene.All, controlEnabled = true, enabledText = "Enabled", disabledText = "Disabled")]
+    [KSPField(guiActiveEditor = true, guiActive = true, guiName = "Execution:", isPersistant = true)]
+    public bool shouldRun = false;
     
-    [KSPAction("Toggle Computer")]
-    public void Toggle()
+    [KSPAction("Toggle Execution")]
+    public void Toggle(KSPActionParam param)
     {
-        if (tokenContainer.shouldRun)
-            StopExecuting();
-        else
-            Execute();
-    }
-
-    [KSPEvent(active = true, guiActive = true, guiName = "Start execution")]
-    [KSPAction("Turn On")]
-    public void Execute()
-    {
-        if (Script == null)
-        {
-            ScreenMessages.PostScreenMessage("No script has been compiled yet", 4.5f);
-            return;
-        }
-        ShouldRun = true;
-    }
-
-    [KSPEvent(active = false, guiActive = true, guiName = "Stop execution")]
-    [KSPAction("Turn Off")]
-    public void StopExecuting()
-    {
-        ShouldRun = false;
-    }
-
-    #endregion
-
-    #region Editor
-
-    [KSPEvent(guiActiveEditor = true, guiName = "Toggle startup")]
-    public void ToggleStart()
-    {
-        ShouldRun = !ShouldRun;
-    }
-
-    #endregion
-
-    protected void UpdateButton()
-    {
-        if (HighLogic.LoadedSceneIsFlight)
-        {
-            if (tokenContainer.shouldRun)
-            {
-                Events["StopExecuting"].active = true;
-                Events["Execute"].active = false;
-            }
-            else
-            {
-                Events["StopExecuting"].active = false;
-                Events["Execute"].active = true;
-            }
-        }
-        else
-        {
-            if (tokenContainer.shouldRun)
-            {
-                Events["ToggleStart"].guiName = "Start On";
-                Events["ToggleStart"].assigned = true;
-            }
-            else
-            {
-                Events["ToggleStart"].guiName = "Start Off";
-                Events["ToggleStart"].assigned = false;
-            }
-        }
+        shouldRun = !shouldRun;
     }
 
     #endregion
@@ -415,7 +346,10 @@ public abstract class BaseComputer : PartModule
 
     public void ThrowException(string message, StatusKind kind = StatusKind.Uhoh, bool displayPopup = true)
     {
-        ExceptionBoxControl.Show(message);
+        if (FlightGlobals.ActiveVessel == null || FlightGlobals.ActiveVessel.id == vessel.id)
+        {
+            ExceptionBoxControl.Show(message);
+        }
         SetStatus(message, kind);
     }
 
@@ -517,7 +451,7 @@ public abstract class BaseComputer : PartModule
     {
         if (kind == StatusKind.Uhoh)
         {
-            ShouldRun = false;
+            shouldRun = false;
             tokenContainer.shouldCompile = false;
             
             Fields["exception"].guiActive = true;
@@ -549,16 +483,9 @@ public abstract class BaseComputer : PartModule
 public class TokenContainer : IConfigNode
 {
     public ScriptCraft craft = new ScriptCraft("untitled script", "", KerbinSuperComputer.Library.GetCurrentScriptsPath());
-    
-    [SerializeField]
-    [Obsolete]
-    public string tokens = ""; // TODO: kill this thing
 
     public string Tokens => craft.Script;
 
-    [SerializeField]
-    public bool shouldRun;
-    
     [SerializeField]
     public bool shouldCompile;
 
@@ -566,26 +493,14 @@ public class TokenContainer : IConfigNode
 
     public void Load(ConfigNode node)
     {
-        if (node.HasValue("script-length") && int.TryParse(node.GetValue("script-length"), out int length))
-        {
-            tokens = TokensLoad(node, length);
-            craft = new ScriptCraft("untitled script", tokens, KerbinSuperComputer.Library.GetCurrentScriptsPath());
-        }
-
         if (node.HasNode("script-craft"))
         {
             CraftLoad(node.GetNode("script-craft"));
-            tokens = craft.Script;
         }
 
         if (node.HasValue("compile-startup"))
         {
             shouldCompile = true;
-        }
-
-        if (node.HasValue("script-startup"))
-        {
-            shouldRun = true;
         }
     }
 
@@ -629,11 +544,6 @@ public class TokenContainer : IConfigNode
         if (shouldCompile)
         {
             node.AddValue("compile-startup", "");
-        }
-        
-        if (shouldRun)
-        {
-            node.AddValue("script-startup", "");
         }
     }
 

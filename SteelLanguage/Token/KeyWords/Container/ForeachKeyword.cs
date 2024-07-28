@@ -24,7 +24,7 @@ public class ForeachKeyword : ContainerKeyword
         string termToken = split[0].Trim();
         string inputToken = split[1].Remove(0, 2).Trim();
         
-        Input input = CompileUtils.HandleToken(inputToken, "enumerable", tokenHolder, compiler);
+        Input input = CompileUtils.HandleToken(inputToken, "Enumerable", tokenHolder, compiler);
 
         string[] typeName = termToken.Split(new []{' '}, 2, StringSplitOptions.RemoveEmptyEntries);
         TermType type = tokenHolder.GetLibraryManager().GetTermType(typeName[0].Trim());

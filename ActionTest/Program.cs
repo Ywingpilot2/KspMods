@@ -83,21 +83,16 @@ namespace ActionTest
                     yield return function;
                 }
 
-                yield return new Function("enumerate_test", "enumerable", () =>
-                {
-                    TermArray array = new TermArray("int", 4);
-                    for (int i = 0; i < 4; i++)
-                    {
-                        TermI iTerm = new TermI()
-                        {
-                            TypeLibrary = TypeLibrary
-                        };
-                        iTerm.SetValue(i + 1);
-                        array.SetValue(iTerm, i);
-                    }
+                yield return new Function("enumerate_test", Action, "int");
+            }
 
-                    return new ReturnValue(array, "array<int>");
-                });
+            private static IEnumerable<ReturnValue> Action()
+            {
+                yield return new ReturnValue(0, "int");
+                yield return new ReturnValue(1, "int");
+                yield return new ReturnValue(2, "int");
+                yield return new ReturnValue(3, "int");
+                yield return new ReturnValue(4, "int");
             }
 
             public override bool SetField(string name, object value)

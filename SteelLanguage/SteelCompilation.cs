@@ -321,9 +321,9 @@ public sealed class SteelCompiler
                 {
                     TermType termType = CompileUtils.GetTypeFromTerm(input, holder);
 
-                    if (termType.Name.StartsWith("array") && termType.ContainedType == type && i >= inputs.Count - 1)
+                    if (termType.Name.StartsWith("Array") && termType.ContainedType == type && i >= inputs.Count - 1)
                     {
-                        inputTokens.Add(CompileUtils.HandleToken(input, $"array<{type}>", holder, this));
+                        inputTokens.Add(CompileUtils.HandleToken(input, $"Array<{type}>", holder, this));
                         parm = false;
                         break;
                     }

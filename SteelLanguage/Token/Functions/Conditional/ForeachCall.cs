@@ -105,11 +105,7 @@ public record ForeachFunc : BaseExecutable
                     }
                 }
             }
-
-            GC.Collect();
         }
-        
-        enumerator.Reset();
 
         return new ReturnValue();
     }

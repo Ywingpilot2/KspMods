@@ -8,6 +8,7 @@ using AeroDynamicKerbalInterfaces.Controls.ContentControl.Flow;
 using AeroDynamicKerbalInterfaces.Controls.ContentControl.Organization;
 using AeroDynamicKerbalInterfaces.Controls.ContentControl.Windows;
 using AeroDynamicKerbalInterfaces.Controls.Fields;
+using JetBrains.Annotations;
 using ProgrammableMod.Controls;
 using UnityEngine;
 using Random = System.Random;
@@ -16,24 +17,26 @@ namespace ProgrammableMod.Modules.Test;
 
 public class GuiTestModule : PartModule
 {
-    private bool _isOpen = false;
-    private int _winId;
+    [UI_Toggle(scene = UI_Scene.All, controlEnabled = true, enabledText = "yes", disabledText = "no", tipText = "fuck you")]
+    [KSPField(guiActive = true, guiActiveEditor = true)]
+    [UsedImplicitly]
+    public bool boolean = false;
 
-    [KSPEvent(active = true, guiActive = true, guiName = "Open UI", guiActiveEditor = true)]
-    public void StartExecute()
+    [UI_FloatRange(minValue = 0, maxValue = 100, controlEnabled = true, scene = UI_Scene.All, stepIncrement = 1f)]
+    [KSPField(guiActiveEditor = true, guiActive = true, guiName = "number")]
+    public float number = 0;
+
+    public float Number
     {
-        if (_isOpen)
-            return;
-
-        _winId = new System.Random().Next();
-        CodeLibraryControl libraryControl = new CodeLibraryControl(_winId);
-        AeroInterfaceManager.AddControl(libraryControl);
+        get => number;
+        set => number = value;
     }
 
-    [KSPEvent(active = true, guiActive = true, guiName = "Close UI", guiActiveEditor = true)]
-    public void Stop()
+    private void FixedUpdate()
     {
-        AeroInterfaceManager.RemoveControl(_winId);
-        _isOpen = false;
+        if (boolean)
+        {
+            Number = new Random().Next(0, 100);
+        }
     }
 }

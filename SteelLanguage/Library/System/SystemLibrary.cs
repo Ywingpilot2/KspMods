@@ -48,11 +48,6 @@ public class SystemLibrary : ILibrary
         new Function("not", "bool", inputTypes:new []{"bool"}, action: terms => new ReturnValue(!terms[0].CastToBool(), "bool")),
         new Function("and", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() && terms[1].CastToBool(), "bool")),
         new Function("or", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() || terms[1].CastToBool(), "bool")),
-        new Function("is_null", "bool", terms =>
-        {
-            BaseTerm term = terms[0];
-            return term.Kind == TermKind.Null ? new ReturnValue(term.GetValue() == null, "bool") : new ReturnValue(false, "bool");
-        }),
         new Function("concat", "string", terms =>
         {
             string str = terms[0].CastToStr();
@@ -93,7 +88,7 @@ public class SystemLibrary : ILibrary
 
     public IEnumerable<GlobalTerm> GlobalTerms => new[]
     {
-        new GlobalTerm("null", "null-type")
+        new GlobalTerm("NULL", "null-type")
     };
 
     public IEnumerable<IKeyword> Keywords => new IKeyword[]
@@ -139,5 +134,6 @@ public class SystemLibrary : ILibrary
         TypeLibrary.AddTermType(new TermType(new ArrayTerm(), enumerableType, isNullable:true));
         TypeLibrary.AddTermType(new TermType(new NullTerm(), baseType, isNullable:true));
         TypeLibrary.AddTermType(new TermType(new ListTerm(), collectionType, isNullable:true));
+        TypeLibrary.AddTermType(new TermType(new FuncEnumeratorTerm(), enumerableType, isNullable:true));
     }
 }

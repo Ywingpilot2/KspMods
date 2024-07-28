@@ -1,36 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using CommNet;
-using ProgrammableMod.Scripting.Exceptions;
 using SteelLanguage.Exceptions;
-using SteelLanguage.Library.System.Terms.Complex;
-using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel;
+namespace ProgrammableMod.Scripting.Terms.Vessel.SAS;
 
-public class SASTypeTerm : EnumTerm
-{
-    public override string ValueType => "sas_mode";
-
-    protected override string[] Values => new[]
-    {
-        "stability",
-        "prograde",
-        "retrograde",
-        "normal",
-        "antinormal",
-        "radialin",
-        "radialout",
-        "target",
-        "antitarget",
-        "maneuver"
-    };
-}
-
-public class SASTerm : BaseVesselTerm
+public class SASTerm : BaseComputerTerm
 {
     public override string ValueType => "autopilot";
     
