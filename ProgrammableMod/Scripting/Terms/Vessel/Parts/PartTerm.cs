@@ -89,11 +89,11 @@ public class PartTerm : BaseTerm
         }
         
         yield return new TermField("name", "string", _value != null ? _value.protoPartSnapshot.partInfo.title : null);
-        yield return new TermField("name", "string", _value != null ? _value.mass : null);
-        yield return new TermField("name", "string", _value != null ? _value.protoPartSnapshot.partInfo.author : null);
-        yield return new TermField("name", "string", _value != null ? _value.protoPartSnapshot.partInfo.description : null);
-        yield return new TermField("name", "string", _value != null ? _value.protoPartSnapshot.partInfo.manufacturer : null);
-        yield return new TermField("name", "string", _value != null ? _value.protoPartSnapshot.partInfo.tags : null);
+        yield return new TermField("mass", "string", _value != null ? _value.mass : null);
+        yield return new TermField("author", "string", _value != null ? _value.protoPartSnapshot.partInfo.author : null);
+        yield return new TermField("description", "string", _value != null ? _value.protoPartSnapshot.partInfo.description : null);
+        yield return new TermField("manufacturer", "string", _value != null ? _value.protoPartSnapshot.partInfo.manufacturer : null);
+        yield return new TermField("tags", "string", _value != null ? _value.protoPartSnapshot.partInfo.tags : null);
     }
 
     #endregion
