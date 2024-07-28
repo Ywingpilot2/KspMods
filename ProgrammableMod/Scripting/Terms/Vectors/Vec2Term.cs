@@ -152,20 +152,9 @@ public class Vec2Term : BaseTerm, IStashableTerm
         
         throw new InvalidActionException(0, $"{kind} is not a supported math operator for {ValueType}");
     }
-    
-    public override bool CanImplicitCastToType(TermType type)
-    {
-        if (type.Name == "vec2d")
-            return true;
-        
-        return base.CanImplicitCastToType(type);
-    }
 
     public override object CastToType(string name)
     {
-        if (name == "vec2d")
-            return new Vector2d(_value.x, _value.y);
-
         if (name == "vec3")
             return (Vector3)_value;
 
@@ -183,7 +172,7 @@ public class Vec2Term : BaseTerm, IStashableTerm
         if (node.HasValue("value"))
             return false;
 
-        _value = ConfigNode.ParseVector3(node.GetValue("value"));
+        _value = ConfigNode.ParseVector2(node.GetValue("value"));
         return true;
     }
 }

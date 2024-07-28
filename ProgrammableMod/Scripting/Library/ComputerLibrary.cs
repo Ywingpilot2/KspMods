@@ -54,5 +54,6 @@ public class ComputerLibrary : ILibrary
         TypeLibrary.AddTermType(new TermType(new PiecewiseCTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new Vec2Term(), baseType));
         TypeLibrary.AddTermType(new TermType(new Vec3Term(), baseType));
+        TypeLibrary.AddTermType(new TermType(new Vec3dTerm(), baseType));
     }
 }

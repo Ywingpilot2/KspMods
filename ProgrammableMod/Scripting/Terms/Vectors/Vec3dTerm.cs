@@ -11,7 +11,7 @@ namespace ProgrammableMod.Scripting.Terms.Vectors;
 
 public class Vec3dTerm : BaseTerm, IStashableTerm
 {
-    public override string ValueType => "vec3";
+    public override string ValueType => "vec3d";
     
     public override IEnumerable<TermConstructor> GetConstructors()
     {
@@ -20,8 +20,8 @@ public class Vec3dTerm : BaseTerm, IStashableTerm
             yield return constructor;
         }
 
-        yield return new TermConstructor(terms => new ReturnValue(new Vector3(terms[0].CastToFloat(), terms[1].CastToFloat(), terms[2].CastToFloat()), "vec3"), 
-            "float", "float", "float");
+        yield return new TermConstructor(terms => new ReturnValue(new Vector3d(terms[0].CastToDouble(), terms[1].CastToDouble(), terms[2].CastToDouble()), "vec3d"), 
+            "double", "double", "double");
     }
 
     public override IEnumerable<TermField> GetFields()
@@ -31,9 +31,9 @@ public class Vec3dTerm : BaseTerm, IStashableTerm
             yield return field;
         }
 
-        yield return new TermField("x", "float", _value.x);
-        yield return new TermField("y", "float", _value.y);
-        yield return new TermField("z", "float", _value.z);
+        yield return new TermField("x", "double", _value.x);
+        yield return new TermField("y", "double", _value.y);
+        yield return new TermField("z", "double", _value.z);
     }
 
     private Vector3d _value;
@@ -164,8 +164,6 @@ public class Vec3dTerm : BaseTerm, IStashableTerm
         
         throw new InvalidActionException(0, $"{kind} is not a supported math operator for {ValueType}");
     }
-    
-    
 
     public bool Save(ConfigNode node)
     {
@@ -178,7 +176,7 @@ public class Vec3dTerm : BaseTerm, IStashableTerm
         if (node.HasValue("value"))
             return false;
 
-        _value = ConfigNode.ParseVector3(node.GetValue("value"));
+        _value = ConfigNode.ParseVector3D(node.GetValue("value"));
         return true;
     }
 }
