@@ -10,7 +10,7 @@ using SteelLanguage.Token.Terms;
 
 namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
 
-public class TermArray : IEnumerable
+public record TermArray : IEnumerable
 {
     public string ValueType { get; }
     public int Length { get; }
@@ -56,6 +56,7 @@ public class TermArray : IEnumerable
 public class ArrayTerm : EnumeratorTerm
 {
     public override string ValueType => "Array";
+    private TermArray _value = new TermArray();
 
     public override IEnumerable<TermField> GetFields()
     {
@@ -64,7 +65,7 @@ public class ArrayTerm : EnumeratorTerm
             yield return field;
         }
 
-        yield return new TermField("length", "int", ((TermArray)Value).Length);
+        yield return new TermField("length", "int", _value.Length);
     }
 
     public override IEnumerable<TermConstructor> GetConstructors()
@@ -85,16 +86,14 @@ public class ArrayTerm : EnumeratorTerm
         
         yield return new Function("get", ContainedType, terms =>
         {
-            TermArray array = (TermArray)Value;
-            BaseTerm term = array.GetValue(terms[0].CastToInt());
-            return new ReturnValue(term.GetValue(), array.ValueType);
+            BaseTerm term = _value.GetValue(terms[0].CastToInt());
+            return new ReturnValue(term.GetValue(), _value.ValueType);
         }, "int");
         yield return new Function("set", terms =>
         {
-            TermArray array = (TermArray)Value;
             BaseTerm term = terms[0];
             BaseTerm i = terms[1];
-            array.SetValue(term, i.CastToInt());
+            _value.SetValue(term, i.CastToInt());
         }, "term", "int");
     }
 
@@ -102,7 +101,7 @@ public class ArrayTerm : EnumeratorTerm
     {
         if (term is ArrayTerm array)
         {
-            Value = array.Value;
+            _value = array._value;
             ContainedType = array.ContainedType; // TODO: Should we do this if the contained types don't match?
             return true;
         }
@@ -114,7 +113,7 @@ public class ArrayTerm : EnumeratorTerm
     {
         if (value is TermArray array)
         {
-            Value = array;
+            _value = array;
             ContainedType = array.ValueType;
             Kind = TermKind.Class;
             return true;
@@ -122,7 +121,7 @@ public class ArrayTerm : EnumeratorTerm
 
         if (value == null)
         {
-            Value = null;
+            _value = null;
             ContainedType = null;
             Kind = TermKind.Null;
             return true;
@@ -131,8 +130,8 @@ public class ArrayTerm : EnumeratorTerm
         return false;
     }
 
-    public ArrayTerm()
+    public override object GetValue()
     {
-        Value = new TermArray();
+        return _value;
     }
 }

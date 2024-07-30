@@ -22,7 +22,7 @@ internal class PiecewiseCTerm : BaseTerm
         {
             ArrayTerm arrayTerm = (ArrayTerm)terms[0];
 
-            TermArray array = (TermArray)arrayTerm.Value;
+            TermArray array = (TermArray)arrayTerm.GetEnumerableValue();
             Vector2[] vecs = new Vector2[array.Length];
             for (int i = 0; i < array.Length; i++)
             {

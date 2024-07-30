@@ -88,10 +88,12 @@
         <Compile Include="Controls\CodeLibraryControl.cs" />
         <Compile Include="Controls\ExceptionBox.cs" />
         <Compile Include="Controls\LogControl.cs" />
+        <Compile Include="Controls\PartRenameControl.cs" />
         <Compile Include="Extensions\StringExtension.cs" />
         <Compile Include="Modules\Computers\BaseComputer.cs" />
         <Compile Include="Modules\Computers\ComputerModule.cs" />
         <Compile Include="Modules\ComputerTemp\ModuleComputerTemp.cs" />
+        <Compile Include="Modules\PartNameModule.cs" />
         <Compile Include="Modules\Test\GuiTestModule.cs" />
         <Compile Include="Modules\Test\ThrottleTest.cs" />
         <Compile Include="Scripting\Config\ScriptLibrary\ScriptLibrary.cs" />

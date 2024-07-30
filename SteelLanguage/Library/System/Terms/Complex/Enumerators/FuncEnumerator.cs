@@ -41,12 +41,14 @@ public record struct FuncEnumerable : IEnumerable
 public class FuncEnumeratorTerm : EnumeratorTerm
 {
     public override string ValueType => "FuncEnumerator";
+    private FuncEnumerable _value;
+
     public override bool SetValue(object value)
     {
         if (value is FuncEnumerable enumerable)
         {
             enumerable.Manager = TypeLibrary;
-            Value = enumerable;
+            _value = enumerable;
             return true;
         }
         
@@ -57,10 +59,15 @@ public class FuncEnumeratorTerm : EnumeratorTerm
     {
         if (term is FuncEnumeratorTerm enumeratorTerm)
         {
-            Value = enumeratorTerm.Value;
+            SetValue(enumeratorTerm.GetEnumerableValue());
             return true;
         }
         
         return false;
+    }
+
+    public override object GetValue()
+    {
+        return _value;
     }
 }

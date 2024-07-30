@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommNet;
+using ProgrammableMod.Modules;
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
@@ -133,6 +134,7 @@ public class VesselTerm : BaseComputerTerm
                 return new ReturnValue(new Vector3d(), "vec3d");
             });
         yield return new Function("get_parts", GetParts, "Part");
+        yield return new Function("get_part", "Part", terms => new ReturnValue(GetPart(terms[0].CastToStr()), "Part"), "string");
     }
 
     private IEnumerable<ReturnValue> GetParts()
@@ -141,6 +143,21 @@ public class VesselTerm : BaseComputerTerm
         {
             yield return new ReturnValue(part, "Part");
         }
+    }
+
+    private Part GetPart(string name)
+    {
+        foreach (Part part in Computer.vessel.Parts)
+        {
+            if (!part.HasModuleImplementing<PartNameModule>())
+                continue;
+
+            PartNameModule nameModule = part.FindModuleImplementing<PartNameModule>();
+            if (nameModule.partName == name)
+                return part;
+        }
+
+        throw new PartNotFoundException(0, name);
     }
 
     #endregion

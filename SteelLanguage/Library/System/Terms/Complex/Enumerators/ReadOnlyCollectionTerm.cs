@@ -9,6 +9,7 @@ namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
 public class ReadOnlyCollectionTerm : EnumeratorTerm
 {
     public override string ValueType => "ReadOnlyCollection";
+    private TermArray _value = new TermArray();
     
     public override IEnumerable<TermField> GetFields()
     {
@@ -17,7 +18,7 @@ public class ReadOnlyCollectionTerm : EnumeratorTerm
             yield return field;
         }
 
-        yield return new TermField("length", "int", ((TermArray)Value).Length);
+        yield return new TermField("length", "int", _value.Length);
     }
     
     public override IEnumerable<IFunction> GetFunctions()
@@ -29,9 +30,8 @@ public class ReadOnlyCollectionTerm : EnumeratorTerm
         
         yield return new Function("get", ContainedType, terms =>
         {
-            TermArray array = (TermArray)Value;
-            BaseTerm term = array.GetValue(terms[0].CastToInt());
-            return new ReturnValue(term.GetValue(), array.ValueType);
+            BaseTerm term = _value.GetValue(terms[0].CastToInt());
+            return new ReturnValue(term.GetValue(), _value.ValueType);
         }, "int");
     }
     
@@ -39,7 +39,7 @@ public class ReadOnlyCollectionTerm : EnumeratorTerm
     {
         if (term is ReadOnlyCollectionTerm array)
         {
-            Value = array.Value;
+            _value = array._value;
             ContainedType = array.ContainedType; // TODO: Should we do this if the contained types don't match?
             return true;
         }
@@ -51,7 +51,7 @@ public class ReadOnlyCollectionTerm : EnumeratorTerm
     {
         if (value is TermArray array)
         {
-            Value = array;
+            _value = array;
             ContainedType = array.ValueType;
             Kind = TermKind.Class;
             return true;
@@ -59,12 +59,17 @@ public class ReadOnlyCollectionTerm : EnumeratorTerm
 
         if (value == null)
         {
-            Value = null;
+            _value = null;
             ContainedType = null;
             Kind = TermKind.Null;
             return true;
         }
 
         return false;
+    }
+    
+    public override object GetValue()
+    {
+        return _value;
     }
 }

@@ -10,7 +10,7 @@ using SteelLanguage.Utils;
 
 namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
 
-public class TermList : ICollection<BaseTerm>
+public record TermList : ICollection<BaseTerm>
 {
     public int Count => _baseTerms.Count;
     public string ValueType { get; }
@@ -89,7 +89,8 @@ public class TermList : ICollection<BaseTerm>
 public class ListTerm : CollectionTerm
 {
     public override string ValueType => "List";
-    protected override int Count => ((TermList)Value).Count;
+    protected override int Count => _value.Count;
+    private TermList _value = new TermList("term");
 
     public override IEnumerable<TermConstructor> GetConstructors()
     {
@@ -99,7 +100,7 @@ public class ListTerm : CollectionTerm
             TermList list = new TermList(ContainedType);
             EnumeratorTerm term = (EnumeratorTerm)terms[0];
 
-            foreach (BaseTerm baseTerm in term.Value)
+            foreach (BaseTerm baseTerm in term.GetEnumerableValue())
             {
                 list.Add(baseTerm);
             }
@@ -110,29 +111,29 @@ public class ListTerm : CollectionTerm
 
     protected override void Add(BaseTerm term)
     {
-        ((TermList)Value).Add(term);
+        _value.Add(term);
     }
 
     protected override bool Remove(BaseTerm term)
     {
-        return ((TermList)Value).Remove(term);
+        return _value.Remove(term);
     }
 
     protected override bool Contains(BaseTerm term)
     {
-        return ((TermList)Value).Contains(term);
+        return _value.Contains(term);
     }
 
     protected override void Clear()
     {
-        ((TermList)Value).Clear();
+        _value.Clear();
     }
     
     public override bool SetValue(object value)
     {
         if (value is TermList array)
         {
-            Value = array;
+            _value = array;
             ContainedType = array.ValueType;
             Kind = TermKind.Class;
             return true;
@@ -140,7 +141,7 @@ public class ListTerm : CollectionTerm
 
         if (value == null)
         {
-            Value = null;
+            _value = null;
             ContainedType = null;
             Kind = TermKind.Null;
             return true;
@@ -153,11 +154,16 @@ public class ListTerm : CollectionTerm
     {
         if (term is ListTerm list)
         {
-            Value = list.Value;
+            _value = list._value;
             ContainedType = list.ContainedType; // TODO: Should we do this if the contained types don't match?
             return true;
         }
 
         return false;
+    }
+    
+    public override object GetValue()
+    {
+        return _value;
     }
 }

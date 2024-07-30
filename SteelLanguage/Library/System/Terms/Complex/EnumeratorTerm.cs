@@ -9,7 +9,12 @@ namespace SteelLanguage.Library.System.Terms.Complex;
 
 public class EnumeratorTerm : BaseTerm
 {
-    public IEnumerable Value { get; protected set; }
+    /// <summary>
+    /// Programmer utility. This is exactly the same as <see cref="GetValue"/>, except it returns a <see cref="IEnumerable"/>
+    /// </summary>
+    /// <returns><see cref="GetValue"/> as an <see cref="IEnumerable"/></returns>
+    public IEnumerable GetEnumerableValue() => (IEnumerable)GetValue();
+
     public override bool ContainsType => true;
 
     public override string ValueType => "Enumerable";
@@ -23,12 +28,12 @@ public class EnumeratorTerm : BaseTerm
             yield return function;
         }
 
-        yield return new Function("next", "bool", () => new ReturnValue(Value.GetEnumerator().MoveNext(), "bool"));
+        yield return new Function("next", "bool", () => new ReturnValue(GetEnumerableValue().GetEnumerator().MoveNext(), "bool"));
         yield return new Function("reset", () =>
         {
-            Value.GetEnumerator().Reset();
+            GetEnumerableValue().GetEnumerator().Reset();
         });
-        yield return new Function("get_current", "term", () => new ReturnValue(Value.GetEnumerator().Current, ContainedType));
+        yield return new Function("get_current", "term", () => new ReturnValue(GetEnumerableValue().GetEnumerator().Current, ContainedType));
     }
 
     #endregion
@@ -47,7 +52,7 @@ public class EnumeratorTerm : BaseTerm
 
     public override object GetValue()
     {
-        return Value;
+        throw new NotImplementedException();
     }
 
     #endregion

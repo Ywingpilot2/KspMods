@@ -49,7 +49,7 @@ public record ForeachFunc : BaseExecutable
         bool shouldContinue = false;
         EnumeratorTerm term = (EnumeratorTerm)_enumerator.GetValue();
 
-        IEnumerator enumerator = term.Value.GetEnumerator();
+        IEnumerator enumerator = term.GetEnumerableValue().GetEnumerator();
         while (enumerator.MoveNext())
         {
             if (shouldBreak)

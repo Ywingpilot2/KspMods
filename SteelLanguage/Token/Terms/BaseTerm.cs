@@ -124,7 +124,7 @@ public abstract class BaseTerm : IToken
     /// If <see cref="ContainsType"/> is true, the name of the type this term contains. Otherwise null
     /// </summary>
     /// <seealso cref="TermType"/>
-    public string ContainedType { get; set; }
+    public virtual string ContainedType { get; set; }
 
     #endregion
 

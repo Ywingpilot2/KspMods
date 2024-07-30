@@ -32,7 +32,7 @@ public class TooSlowException : ExecutionException
 
 public class TypeNotStashableException : ExecutionException
 {
-    private string _type;
+    private readonly string _type;
     public override string Message => $"The the type {_type} at line {LineNumber} does not support being stashed onto the kerbnet";
 
     public TypeNotStashableException(int lineNumber, string type) : base(lineNumber)
@@ -43,7 +43,7 @@ public class TypeNotStashableException : ExecutionException
 
 public class StashableNotFoundException : ExecutionException
 {
-    private string _name;
+    private readonly string _name;
     public override string Message => $"Call at {LineNumber} cannot be made as stashable of name {_name} does not exist";
 
     public StashableNotFoundException(int lineNumber, string name) : base(lineNumber)
@@ -54,11 +54,34 @@ public class StashableNotFoundException : ExecutionException
 
 public class StashableInvalidException : ExecutionException
 {
-    private ProtoStash _stash;
+    private readonly ProtoStash _stash;
 
     public override string Message => $"Stashable {_stash.Name} of type {_stash.ValueType} requested at line {LineNumber} was invalid";
 
     public StashableInvalidException(int lineNumber, ProtoStash stash) : base(lineNumber)
     {
+        _stash = stash;
+    }
+}
+
+public class PartNotFoundException : ExecutionException
+{
+    private readonly string _name;
+    public override string Message => $"Could not find part named \"{_name}\" at line number {LineNumber}";
+
+    public PartNotFoundException(int lineNumber, string name) : base(lineNumber)
+    {
+        _name = name;
+    }
+}
+
+public class ActionNotFoundException : ExecutionException
+{
+    private readonly string _name;
+    public override string Message => $"Could not find action named \"{_name}\" at line number {LineNumber}";
+    
+    public ActionNotFoundException(int lineNumber, string name) : base(lineNumber)
+    {
+        _name = name;
     }
 }

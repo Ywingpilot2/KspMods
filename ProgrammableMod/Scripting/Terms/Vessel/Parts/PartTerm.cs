@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using ProgrammableMod.Modules;
+using ProgrammableMod.Scripting.Exceptions;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
@@ -13,9 +15,14 @@ public class PartTerm : BaseTerm
     public override string ValueType => "Part";
     private Part _value;
 
-    #region Fields Cache
+    #region Cache
+
+    private static readonly KSPActionParam ActiveParams = new KSPActionParam(KSPActionGroup.None, KSPActionType.Activate);
+    private static readonly KSPActionParam DeactiveParams = new KSPActionParam(KSPActionGroup.None, KSPActionType.Deactivate);
+    private static readonly KSPActionParam ToggleParams = new KSPActionParam(KSPActionGroup.None, KSPActionType.Toggle);
 
     private Dictionary<string, PartField> _fields = new();
+    private Dictionary<string, BaseAction> _actions = new();
     private uint _flightId = 0;
 
     private void GenerateCacheFromPart(Part part)
@@ -25,19 +32,28 @@ public class PartTerm : BaseTerm
             return;
         
         _fields.Clear();
+        _actions.Clear();
         _flightId = part.flightID;
         
         foreach (PartModule module in part.Modules)
         {
             foreach (BaseField field in module.Fields)
             {
-                if (!field.guiActive || field.uiControlFlight == null)
+                if (!field.guiActive || field.uiControlFlight is UI_Label)
                     continue;
                 
                 if (_fields.ContainsKey(field.guiName))
                     continue; // TODO: throw some kind of error
                     
                 _fields.Add(field.guiName, new PartField(field, module.Fields));
+            }
+
+            foreach (BaseAction action in module.Actions)
+            {
+                if (_actions.ContainsKey(action.guiName))
+                    continue; // TODO: throw some kind of error
+                
+                _actions.Add(action.guiName, action);
             }
         }
     }
@@ -64,6 +80,7 @@ public class PartTerm : BaseTerm
         {
             _value = partTerm._value;
             _fields = partTerm._fields;
+            _actions = partTerm._actions;
             _flightId = partTerm._flightId;
             
             return true;
@@ -87,13 +104,17 @@ public class PartTerm : BaseTerm
         {
             yield return field;
         }
-        
-        yield return new TermField("name", "string", _value != null ? _value.protoPartSnapshot.partInfo.title : null);
+
+        string name = "";
+        if (_value != null && _value.HasModuleImplementing<PartNameModule>())
+            name = _value.FindModuleImplementing<PartNameModule>().partName;
+
+        yield return new TermField("name", "string", name);
+        yield return new TermField("part_name", "string", _value != null ? _value.protoPartSnapshot.partInfo.title : null);
         yield return new TermField("mass", "string", _value != null ? _value.mass : null);
         yield return new TermField("author", "string", _value != null ? _value.protoPartSnapshot.partInfo.author : null);
         yield return new TermField("description", "string", _value != null ? _value.protoPartSnapshot.partInfo.description : null);
         yield return new TermField("manufacturer", "string", _value != null ? _value.protoPartSnapshot.partInfo.manufacturer : null);
-        yield return new TermField("tags", "string", _value != null ? _value.protoPartSnapshot.partInfo.tags : null);
     }
 
     #endregion
@@ -112,6 +133,30 @@ public class PartTerm : BaseTerm
         {
             SetPartField(terms[0].CastToStr(), terms[1]);
         }, "string", "term");
+        yield return new Function("has_value", "bool",
+            terms => new ReturnValue(_fields.ContainsKey(terms[0].CastToStr()), "bool"), "string");
+        yield return new Function("highlight", terms =>
+        {
+            _value.Highlight(terms[0].CastToBool());
+        }, "bool");
+        yield return new Function("activate_action", terms =>
+        {
+            string value = terms[0].CastToStr();
+            if (!_actions.ContainsKey(value))
+                throw new ActionNotFoundException(0, value);
+
+            _actions[value].Invoke(terms[1].CastToBool() ? ActiveParams : DeactiveParams);
+        }, "string", "bool");
+        yield return new Function("toggle_action", terms =>
+        {
+            string value = terms[0].CastToStr();
+            if (!_actions.ContainsKey(value))
+                throw new ActionNotFoundException(0, value);
+
+            _actions[value].Invoke(ToggleParams);
+        }, "string");
+        yield return new Function("has_action", "bool",
+            terms => new ReturnValue(_actions.ContainsKey(terms[0].CastToStr()), "bool"), "string");
     }
 
     #endregion

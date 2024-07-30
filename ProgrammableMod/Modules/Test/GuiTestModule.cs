@@ -23,7 +23,7 @@ public class GuiTestModule : PartModule
     public bool boolean = false;
 
     [UI_FloatRange(minValue = 0, maxValue = 100, controlEnabled = true, scene = UI_Scene.All, stepIncrement = 1f)]
-    [KSPField(guiActiveEditor = true, guiActive = true, guiName = "number")]
+    [KSPField(guiActiveEditor = true, guiActive = true, guiName = "number", groupName = "test", groupDisplayName = "#autoLOC_8003391")]
     public float number = 0;
 
     public float Number
@@ -38,5 +38,11 @@ public class GuiTestModule : PartModule
         {
             Number = new Random().Next(0, 100);
         }
+    }
+
+    [KSPEvent(guiActive = true, guiActiveEditor = true, groupName = "test", groupDisplayName = "#autoLOC_8003391", guiName = "test event")]
+    public void TestFunc()
+    {
+        
     }
 }
