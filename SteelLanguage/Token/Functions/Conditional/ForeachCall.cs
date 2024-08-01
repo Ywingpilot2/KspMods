@@ -40,7 +40,7 @@ public class ForeachCall : TokenCall
 
 public record ForeachFunc : BaseExecutable
 {
-    private Input _enumerator;
+    private readonly Input _enumerator;
     private readonly string _term;
 
     public override ReturnValue Execute()
@@ -107,7 +107,7 @@ public record ForeachFunc : BaseExecutable
             }
         }
 
-        return new ReturnValue();
+        return ReturnValue.None;
     }
 
     public override void PostCompilation()

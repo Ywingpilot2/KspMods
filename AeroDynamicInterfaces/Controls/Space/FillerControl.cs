@@ -4,7 +4,7 @@ namespace AeroDynamicKerbalInterfaces.Controls.Space;
 
 public class FillerControl : Control
 {
-    private int _pixels;
+    private readonly int _pixels;
     
     /// <summary>
     /// Construct a control which will fill an empty space

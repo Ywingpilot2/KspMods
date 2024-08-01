@@ -54,6 +54,7 @@ public sealed class StringTerm : BaseTerm
 
     #endregion
 
+    // TODO: Remove this and replace with parse functions instead
     #region Casting
 
     public override string CastToStr()

@@ -6,8 +6,8 @@ namespace SteelLanguage.Token.Functions.Operator;
 
 public class MathCall : TokenCall
 {
-    private Input _a;
-    private Input _b;
+    private readonly Input _a;
+    private readonly Input _b;
     private readonly MathOperatorKind _kind;
 
     public MathCall(ITokenHolder container, int line, Input a, Input b, MathOperatorKind kind) : base(container, line)

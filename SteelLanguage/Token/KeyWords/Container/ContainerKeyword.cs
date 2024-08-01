@@ -9,7 +9,7 @@ public abstract class ContainerKeyword : IKeyword
     public abstract void CompileKeyword(string token, SteelCompiler compiler, SteelScript script,
         ITokenHolder tokenHolder);
     
-    protected void ParseTokens(BaseExecutable func, SteelCompiler compiler, string token = null)
+    protected static void ParseTokens(BaseExecutable func, SteelCompiler compiler, string token = null)
     {
         string line;
         while (true)

@@ -4,7 +4,7 @@ namespace AeroDynamicKerbalInterfaces.Exceptions;
 
 public class StyleNotFoundException : Exception
 {
-    private string? _style;
+    private readonly string? _style;
 
     public override string Message
     {

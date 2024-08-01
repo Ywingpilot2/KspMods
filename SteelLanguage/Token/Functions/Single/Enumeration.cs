@@ -37,7 +37,7 @@ public class ContinueCall : TokenCall
 
 public class ReturnCall : TokenCall
 {
-    private Input _returnValue;
+    private readonly Input _returnValue;
     
     public ReturnCall(ITokenHolder container, int line, Input input) : base(container, line)
     {
@@ -51,7 +51,7 @@ public class ReturnCall : TokenCall
     public override ReturnValue Call()
     {
         if (_returnValue.Type == InputType.Null)
-            return new ReturnValue();
+            return ReturnValue.None;
         
         BaseTerm term = _returnValue.GetValue();
         return new ReturnValue(term.GetValue(), term.ValueType);

@@ -30,7 +30,7 @@ public class AssignmentCall : TokenCall
                 throw new InvalidAssignmentException(Line, GetTerm(_term));
         }
         
-        return new ReturnValue();
+        return ReturnValue.None;
     }
 
     public override void PostCompilation()

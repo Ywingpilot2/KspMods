@@ -7,7 +7,10 @@ public readonly record struct ReturnValue
     public bool HasValue => Value != null;
     public string Type { get; }
     public object Value { get; }
+
+    public static readonly ReturnValue None = new();
     
+    [Obsolete(message:"Please use ReturnValue.None instead")]
     public ReturnValue()
     {
     }

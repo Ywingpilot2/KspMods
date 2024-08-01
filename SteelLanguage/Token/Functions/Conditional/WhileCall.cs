@@ -38,7 +38,7 @@ public class WhileCall : TokenCall
 
 public record WhileFunction : BaseExecutable
 {
-    private Input _condition;
+    private readonly Input _condition;
 
     public override ReturnValue Execute()
     {
@@ -94,7 +94,7 @@ public record WhileFunction : BaseExecutable
             }
         }
 
-        return new ReturnValue();
+        return ReturnValue.None;
     }
 
     public override void PostCompilation()

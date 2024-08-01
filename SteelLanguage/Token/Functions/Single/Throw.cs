@@ -5,7 +5,7 @@ namespace SteelLanguage.Token.Functions.Single;
 
 public class ThrowCall : TokenCall
 {
-    private Input _input;
+    private readonly Input _input;
     
     public ThrowCall(ITokenHolder container, int line, Input exception) : base(container, line)
     {

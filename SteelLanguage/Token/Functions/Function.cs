@@ -87,7 +87,7 @@ public record Function : IFunction
     
     private Func<BaseTerm[], ReturnValue> InReturn { get; }
     private Func<ReturnValue> Return { get; }
-    private string _yieldType;
+    private readonly string _yieldType;
     private Func<IEnumerable<ReturnValue>> YieldReturn { get; }
     private Action<BaseTerm[]> In { get; }
     private Action None { get; }
@@ -123,7 +123,7 @@ public record Function : IFunction
                 throw new ArgumentOutOfRangeException();
         }
 
-        return new ReturnValue();
+        return ReturnValue.None;
     }
 
     public ReturnValue Execute()
@@ -152,7 +152,7 @@ public record Function : IFunction
             } break;
         }
 
-        return new ReturnValue();
+        return ReturnValue.None;
     }
 
     #region Events
@@ -276,7 +276,7 @@ public record UserFunction : BaseExecutable, IFunction
 
         if (ReturnType == "void")
         {
-            return new ReturnValue();
+            return ReturnValue.None;
         }
         else
             throw new FunctionLacksReturnException(0, this);

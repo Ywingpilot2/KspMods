@@ -6,8 +6,8 @@ namespace SteelLanguage.Token.Functions.Operator;
 
 public class BoolOpCall : TokenCall
 {
-    private Input _a;
-    private Input _b;
+    private readonly Input _a;
+    private readonly Input _b;
     private readonly BoolOperatorKind _kind;
 
     public BoolOpCall(ITokenHolder container, int line, Input a, Input b, BoolOperatorKind kind) : base(container, line)

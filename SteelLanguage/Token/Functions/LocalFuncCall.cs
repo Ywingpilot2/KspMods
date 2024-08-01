@@ -7,7 +7,7 @@ namespace SteelLanguage.Token.Functions;
 
 public class LocalCall : TokenCall
 {
-    private Input _input;
+    private readonly Input _input;
     private readonly string _funcName;
     private readonly Input[] _inputs;
     

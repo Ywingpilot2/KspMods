@@ -57,7 +57,7 @@ public class MatchCall : TokenCall
             ReturnValue returnValue = _default.Execute();
             _default.PostExecution();
             
-            if (!returnValue.HasValue) return new ReturnValue();
+            if (!returnValue.HasValue) return ReturnValue.None;
             
             switch (returnValue.Value)
             {
@@ -68,7 +68,7 @@ public class MatchCall : TokenCall
             }
         }
 
-        return new ReturnValue();
+        return ReturnValue.None;
     }
 
     public override void PostCompilation()

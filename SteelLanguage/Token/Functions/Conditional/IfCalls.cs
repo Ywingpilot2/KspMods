@@ -19,7 +19,7 @@ public class IfCall : TokenCall, IConditionalCall
 {
     public SingleExecutableFunc ExecutableFunc { get; }
     public IConditionalCall Else { get; set; }
-    private Input _condition;
+    private readonly Input _condition;
     
     public IfCall(ITokenHolder container, int line, Input condition) : base(container, line)
     {
@@ -29,7 +29,7 @@ public class IfCall : TokenCall, IConditionalCall
 
     public override ReturnValue Call()
     {
-        ReturnValue value = new ReturnValue();
+        ReturnValue value = ReturnValue.None;
         if (_condition.GetValue().CastToBool())
         {
             value = ExecutableFunc.Execute();
@@ -137,6 +137,6 @@ public record SingleExecutableFunc : BaseExecutable
             }
         }
 
-        return new ReturnValue();
+        return ReturnValue.None;
     }
 }
