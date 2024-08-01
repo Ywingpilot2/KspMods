@@ -2,22 +2,12 @@
 
 namespace SteelLanguage.Reflection.Type;
 
-public struct GlobalTerm
+public record struct GlobalTerm(string Name, string TypeName)
 {
-    public string Name { get; }
-    public string TypeName { get; }
     public BaseTerm Source { get; }
 
-    public GlobalTerm(string name, string typeName)
+    public GlobalTerm(BaseTerm source) : this(source.Name, source.ValueType)
     {
-        Name = name;
-        TypeName = typeName;
-    }
-
-    public GlobalTerm(BaseTerm source)
-    {
-        Name = source.Name;
-        TypeName = source.ValueType;
         Source = source;
     }
 }
