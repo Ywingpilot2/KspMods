@@ -150,7 +150,7 @@ public sealed class SteelCompiler
 
     #region Terms
 
-    internal void ParseTerm(string token, ITokenHolder holder)
+    private void ParseTerm(string token, ITokenHolder holder)
     {
         AssignmentKind kind = CompileUtils.DetermineAssignment(token, holder);
         string[] values = CompileUtils.GetTermValues(token);
@@ -321,7 +321,7 @@ public sealed class SteelCompiler
                 {
                     TermType termType = CompileUtils.GetTypeFromTerm(input, holder);
 
-                    if (termType.Name.StartsWith("Array") && termType.ContainedType == type && i >= inputs.Count - 1)
+                    if (termType.Name.StartsWith("Array") && termType.ContainedType[0] == type && i >= inputs.Count - 1)
                     {
                         inputTokens.Add(CompileUtils.HandleToken(input, $"Array<{type}>", holder, this));
                         parm = false;

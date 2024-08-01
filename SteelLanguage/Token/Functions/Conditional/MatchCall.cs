@@ -10,9 +10,7 @@ namespace SteelLanguage.Token.Functions.Conditional;
 
 public class MatchCall : TokenCall
 {
-    
-    
-    private Input _check;
+    private readonly Input _check;
     private readonly Input[] _keys;
     
     private readonly SingleExecutableFunc[] _values;

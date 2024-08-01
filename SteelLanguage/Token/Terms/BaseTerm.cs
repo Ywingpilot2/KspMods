@@ -121,10 +121,15 @@ public abstract class BaseTerm : IToken
     public virtual bool ContainsType => false;
     
     /// <summary>
+    /// The names of the valid types for <see cref="ContainsType"/>
+    /// </summary>
+    public virtual string[] ContainedTypeInputs { get; }
+
+    /// <summary>
     /// If <see cref="ContainsType"/> is true, the name of the type this term contains. Otherwise null
     /// </summary>
     /// <seealso cref="TermType"/>
-    public virtual string ContainedType { get; set; }
+    public virtual string[] ContainedType { get; set; } = new string[0];
 
     #endregion
 
@@ -707,6 +712,22 @@ public abstract class BaseTerm : IToken
     public virtual bool ConductBoolOp(BoolOperatorKind kind, BaseTerm subject)
     {
         throw new NotImplementedException($"{ValueType} term does not support any operators");
+    }
+
+    #endregion
+
+    #region Indexing
+
+    /// <summary>
+    /// Whether or not this term supports indexing operations
+    /// </summary>
+    public virtual bool SupportsIndexing { get; }
+    public virtual string IndexerType { get; }
+    public virtual string IndexingReturnType => "term";
+
+    public virtual ReturnValue ConductIndexingOperation(BaseTerm input)
+    {
+        throw new NotImplementedException($"{ValueType} does not support indexing");
     }
 
     #endregion

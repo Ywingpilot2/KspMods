@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SteelLanguage.Library.Collections.Terms;
 using SteelLanguage.Library.System.Terms.Complex;
 using SteelLanguage.Library.System.Terms.Complex.Enumerators;
 using SteelLanguage.Library.System.Terms.Literal;

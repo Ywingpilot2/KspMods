@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using SteelLanguage.Library.System.Terms.Complex;
+using SteelLanguage.Library.System.Terms.Complex.Enumerators;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
+namespace SteelLanguage.Library.Collections.Terms;
 
 public class ReadOnlyCollectionTerm : EnumeratorTerm
 {
@@ -28,7 +30,7 @@ public class ReadOnlyCollectionTerm : EnumeratorTerm
             yield return function;
         }
         
-        yield return new Function("get", ContainedType, terms =>
+        yield return new Function("get", GetEnumerationType(), terms =>
         {
             BaseTerm term = _value.GetValue(terms[0].CastToInt());
             return new ReturnValue(term.GetValue(), _value.ValueType);
@@ -52,7 +54,7 @@ public class ReadOnlyCollectionTerm : EnumeratorTerm
         if (value is TermArray array)
         {
             _value = array;
-            ContainedType = array.ValueType;
+            ContainedType.SetValue(array.ValueType, 0);
             Kind = TermKind.Class;
             return true;
         }

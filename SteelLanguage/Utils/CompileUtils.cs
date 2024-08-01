@@ -40,7 +40,10 @@ public static class CompileUtils
         "/",
         "*",
         "^",
-        "%"
+        "%",
+        "[",
+        "]",
+        ","
     };
 
     private static readonly string[] Comparisons =
@@ -78,7 +81,7 @@ public static class CompileUtils
     public static string[] GetTermValues(string token)
     {
         string[] split = token.SanitizedSplit('=', 2);
-        string[] typeName = split[0].Trim().Split(' ');
+        string[] typeName = split[0].Trim().SanitizedSplit(' ', 2, direction:ScanDirection.RightToLeft);
 
         if (typeName.Length == 2)
         {
@@ -115,7 +118,7 @@ public static class CompileUtils
     public static AssignmentKind DetermineAssignment(string token, ITokenHolder holder)
     {
         string[] split = token.SanitizedSplit('=', 2);
-        string[] typeName = split[0].Trim().Split(' ');
+        string[] typeName = split[0].Trim().SanitizedSplit(' ', 2, direction:ScanDirection.RightToLeft);
         
         if (typeName.Length == 1) // This is assigning an existing variable
         {
@@ -144,6 +147,8 @@ public static class CompileUtils
         if (!NameIsValid(name, holder))
             throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]}");
         
+        TypeNameIsValid(typeName[0], holder);
+        
         TokenKind kind = GetTokenKind(split[1].Trim(), holder);
         return kind switch
         {
@@ -168,6 +173,31 @@ public static class CompileUtils
             return false;
 
         return true;
+    }
+
+    public static void TypeNameIsValid(string name, ITokenHolder holder)
+    {
+        TermType type = holder.GetLibraryManager().GetTermType(name);
+        if (type.ContainsType)
+        {
+            if (type.ContainedType.Length != type.TypeArgs.Length)
+                throw new InvalidParametersException(0, type.TypeArgs);
+            
+            for (int i = 0; i < type.ContainedType.Length; i++)
+            {
+                string a = type.ContainedType[i];
+                string b = type.TypeArgs[i];
+                
+                TermType typeC = holder.GetLibraryManager().GetTermType(a);
+                if (a != b && !typeC.IsSubclassOf(b))
+                    throw new InvalidParametersException(0, type.TypeArgs);
+            }
+        }
+        else
+        {
+            if (name.EndsWith(">"))
+                throw new InvalidParametersException(0, new string[0]);
+        }
     }
 
     #endregion
@@ -266,6 +296,18 @@ public static class CompileUtils
                     {
                         BoolOperatorKind op = GetBoolOpFromToken(token);
                         return new Input(holder, HandleBoolOperation(token, op, holder, compiler));
+                    }
+                    case OperatorKind.Indexer:
+                    {
+                        string[] split = token.SanitizedSplit('[', 2, StringSplitOptions.RemoveEmptyEntries, ScanDirection.RightToLeft);
+                        string sourceToken = split[0].TrimStart('[', ' ', '\t').TrimEnd();
+                        TermType sourceType = GetTypeFromToken(sourceToken, holder, GetTokenKind(sourceToken, holder));
+                        if (!sourceType.SupportsIndexing)
+                            throw new InvalidCompilationException(0, $"Type {sourceType.Name} does not support indexing");
+
+                        Input input = HandleToken(sourceToken, sourceType.Name, holder, compiler);
+                        Input inputI = HandleToken(split[1].Remove(split[1].Length - 1).Trim(), sourceType.IndexingType, holder, compiler);
+                        return new Input(holder, new IndexerCall(holder, compiler.CurrentLine, input, inputI));
                     }
                     default:
                         throw new InvalidActionException(0, $"{kind} is not a supported operator ");
@@ -500,6 +542,19 @@ public static class CompileUtils
                     case OperatorKind.Comparison:
                     case OperatorKind.Bool:
                         return holder.GetLibraryManager().GetTermType("bool");
+                    case OperatorKind.Indexer:
+                    {
+                        string[] split = token.SanitizedSplit('[', 2, StringSplitOptions.RemoveEmptyEntries);
+                        if (split.Length != 2)
+                            throw new InvalidCompilationException(0, $"token \"{token}\" is not a valid indexing operation");
+
+                        string name = split[0].Trim();
+                        TermType type = GetTypeFromToken(name, holder, GetTokenKind(name, holder));
+                        if (!type.SupportsIndexing)
+                            throw new IndexingNotSupportedException(0, type.Name);
+                        
+                        return holder.GetLibraryManager().GetTermType(type.IndexingReturnType);
+                    }
                     default:
                         throw new InvalidActionException(0, $"{kind} is not a supported operator");
                 }
@@ -517,6 +572,58 @@ public static class CompileUtils
             default:
                 throw new InvalidActionException(0, $"Could not determine the kind of token \"{token}\" is, are you sure its a valid?");
         }
+    }
+    
+    public static List<string> ParseCallInputs(string prms, char startChar = '(', char endChar = ')')
+    {
+        List<string> inputs = new List<string>();
+
+        string current = "";
+        bool isStr = false;
+        int methodLevel = 0;
+        if (prms.Length > 1)
+        {
+            for (int i = 1; i < prms.Length; i++)
+            {
+                char p = prms[i - 1];
+                char c = prms[i];
+
+                if (p == '"')
+                {
+                    isStr = !isStr;
+                }
+
+                if (c == startChar && !isStr) // TODO: 
+                {
+                    methodLevel++;
+                }
+
+                if (c == endChar && !isStr)
+                {
+                    methodLevel--;
+                }
+
+                current += p;
+                
+                if ((isStr || methodLevel != 0) && i + 1 < prms.Length)
+                    continue;
+
+                if (c == ',' || i + 1 >= prms.Length)
+                {
+                    current += c;
+
+                    inputs.Add(current.Trim(' ', '\t', ','));
+                    current = "";
+                }
+            }
+        }
+        else if (prms.Length != 0) // Lazy way to account for single character params lol
+        {
+            current = prms;
+            inputs.Add(current.Trim(' ', '\t'));
+        }
+
+        return inputs;
     }
 
     #region Operator
@@ -666,6 +773,9 @@ public static class CompileUtils
         if (MathOps.Any(s => san.SanitizeParenthesis().Contains($" {s} ")))
             return OperatorKind.Math;
 
+        if (token.EndsWith("]"))
+            return OperatorKind.Indexer;
+
         throw new InvalidCompilationException(0,"not a valid operator");
     }
 
@@ -719,6 +829,9 @@ public static class CompileUtils
         
         if (holder.HasTerm(token))
             return TokenKind.Term;
+
+        if (token.EndsWith("]"))
+            return TokenKind.Operator;
         
         if (TokenIsConstant(token))
             return TokenKind.Constant;

@@ -73,7 +73,7 @@ public class ArrayTerm : EnumeratorTerm
         yield return new TermConstructor(terms =>
         {
             int length = terms[0].CastToInt();
-            return new ReturnValue(new TermArray(ContainedType, length), "array");
+            return new ReturnValue(new TermArray(GetEnumerationType(), length), "Array");
         }, "int");
     }
 
@@ -84,7 +84,7 @@ public class ArrayTerm : EnumeratorTerm
             yield return function;
         }
         
-        yield return new Function("get", ContainedType, terms =>
+        yield return new Function("get", GetEnumerationType(), terms =>
         {
             BaseTerm term = _value.GetValue(terms[0].CastToInt());
             return new ReturnValue(term.GetValue(), _value.ValueType);
@@ -114,7 +114,10 @@ public class ArrayTerm : EnumeratorTerm
         if (value is TermArray array)
         {
             _value = array;
-            ContainedType = array.ValueType;
+            ContainedType = new[]
+            {
+                array.ValueType
+            };
             Kind = TermKind.Class;
             return true;
         }
@@ -133,5 +136,15 @@ public class ArrayTerm : EnumeratorTerm
     public override object GetValue()
     {
         return _value;
+    }
+    
+    public override string IndexerType => "int";
+    public override bool SupportsIndexing => true;
+    public override string IndexingReturnType => GetEnumerationType();
+
+    public override ReturnValue ConductIndexingOperation(BaseTerm input)
+    {
+        BaseTerm element = _value.GetValue(input.CastToInt());
+        return new ReturnValue(element.GetValue(), element.ValueType);
     }
 }

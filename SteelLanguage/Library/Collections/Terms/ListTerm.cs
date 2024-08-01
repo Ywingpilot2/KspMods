@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
+using SteelLanguage.Library.System.Terms.Complex;
 using SteelLanguage.Library.System.Terms.Literal;
+using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Functions.Modifier;
 using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
-using SteelLanguage.Utils;
 
-namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
+namespace SteelLanguage.Library.Collections.Terms;
 
-public record TermList : ICollection<BaseTerm>
+internal record TermList : ICollection<BaseTerm>
 {
     public int Count => _baseTerms.Count;
     public string ValueType { get; }
@@ -25,6 +26,11 @@ public record TermList : ICollection<BaseTerm>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    public BaseTerm AtIndex(int idx)
+    {
+        return _baseTerms[idx];
     }
 
     public void Add(BaseTerm item)
@@ -94,10 +100,10 @@ public class ListTerm : CollectionTerm
 
     public override IEnumerable<TermConstructor> GetConstructors()
     {
-        yield return new TermConstructor(_ => new ReturnValue(new TermList(ContainedType), "list"));
+        yield return new TermConstructor(() => new ReturnValue(new TermList(GetEnumerationType()), "List"));
         yield return new TermConstructor(terms =>
         {
-            TermList list = new TermList(ContainedType);
+            TermList list = new TermList(GetEnumerationType());
             EnumeratorTerm term = (EnumeratorTerm)terms[0];
 
             foreach (BaseTerm baseTerm in term.GetEnumerableValue())
@@ -105,23 +111,32 @@ public class ListTerm : CollectionTerm
                 list.Add(baseTerm);
             }
 
-            return new ReturnValue(list, "list");
+            return new ReturnValue(list, "List");
         }, "enumerable");
     }
 
-    protected override void Add(BaseTerm term)
+    #region Functions
+
+    public override IEnumerable<IFunction> GetFunctions()
     {
-        _value.Add(term);
+        foreach (IFunction function in base.GetFunctions())
+        {
+            yield return function;
+        }
+
+        yield return new Function("contains", "bool", terms => new ReturnValue(_value.Contains(terms[0]), ValueType), GetEnumerationType());
     }
 
-    protected override bool Remove(BaseTerm term)
+    #region Collection
+
+    protected override void Add(BaseTerm[] term)
     {
-        return _value.Remove(term);
+        _value.Add(term[0]);
     }
 
-    protected override bool Contains(BaseTerm term)
+    protected override bool Remove(BaseTerm[] term)
     {
-        return _value.Contains(term);
+        return _value.Remove(term[0]);
     }
 
     protected override void Clear()
@@ -134,7 +149,10 @@ public class ListTerm : CollectionTerm
         if (value is TermList array)
         {
             _value = array;
-            ContainedType = array.ValueType;
+            ContainedType = new[]
+            {
+                _value.ValueType
+            };
             Kind = TermKind.Class;
             return true;
         }
@@ -149,7 +167,21 @@ public class ListTerm : CollectionTerm
 
         return false;
     }
-    
+
+    #endregion
+
+    #endregion
+
+    public override string IndexerType => "int";
+    public override bool SupportsIndexing => true;
+    public override string IndexingReturnType => GetEnumerationType();
+
+    public override ReturnValue ConductIndexingOperation(BaseTerm input)
+    {
+        BaseTerm element = _value.AtIndex(input.CastToInt());
+        return new ReturnValue(element.GetValue(), element.ValueType);
+    }
+
     public override bool CopyFrom(BaseTerm term)
     {
         if (term is ListTerm list)

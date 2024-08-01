@@ -403,3 +403,27 @@ public class TokenMustBeConstantException : CompilationException
         _token = invalidToken;
     }
 }
+
+public class IndexingNotSupportedException : CompilationException
+{
+    private readonly string _name;
+    public override string Message
+    {
+        get
+        {
+            if (_name != null)
+            {
+                return $"Indexing operation at line {LineNumber} is invalid as type {_name} does not support indexing";
+            }
+            else
+            {
+                return $"Indexing operation at line {LineNumber} is invalid";
+            }
+        }
+    }
+    
+    public IndexingNotSupportedException(int lineNumber, string name) : base(lineNumber)
+    {
+        _name = name;
+    }
+}

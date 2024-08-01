@@ -40,12 +40,12 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Library\Collections\Terms\CollectionTerm.cs" />
+        <Compile Include="Library\Collections\Terms\ListTerm.cs" />
+        <Compile Include="Library\Collections\Terms\ReadOnlyCollectionTerm.cs" />
         <Compile Include="Library\Numerics\NumericsLibrary.cs" />
         <Compile Include="Library\System\SystemLibrary.cs" />
-        <Compile Include="Library\System\Terms\Complex\Enumerators\CollectionTerm.cs" />
         <Compile Include="Library\System\Terms\Complex\Enumerators\FuncEnumerator.cs" />
-        <Compile Include="Library\System\Terms\Complex\Enumerators\ListTerm.cs" />
-        <Compile Include="Library\System\Terms\Complex\Enumerators\ReadOnlyCollectionTerm.cs" />
         <Compile Include="Library\System\Terms\Complex\Enumerators\TermArray.cs" />
         <Compile Include="Library\System\Terms\Complex\EnumeratorTerm.cs" />
         <Compile Include="Library\System\Terms\Complex\EnumTerm.cs" />
@@ -86,6 +86,7 @@
         <Compile Include="Token\Functions\Operator\BoolOpCall.cs" />
         <Compile Include="Token\Functions\Operator\BoolOperatorKind.cs" />
         <Compile Include="Token\Functions\Operator\ComparisonCall.cs" />
+        <Compile Include="Token\Functions\Operator\IndexerCall.cs" />
         <Compile Include="Token\Functions\Operator\MathCall.cs" />
         <Compile Include="Token\Functions\Operator\MathOperatorKind.cs" />
         <Compile Include="Token\Functions\Single\Constructor.cs" />
@@ -114,9 +115,6 @@
         <Compile Include="Token\Terms\Technical\VoidTerm.cs" />
         <Compile Include="Token\TokenKind.cs" />
         <Compile Include="Utils\CompileUtils.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Library\Enumeration" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

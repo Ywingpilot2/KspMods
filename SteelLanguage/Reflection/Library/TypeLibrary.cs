@@ -4,6 +4,7 @@ using SteelLanguage.Exceptions;
 using SteelLanguage.Extensions;
 using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Terms;
+using SteelLanguage.Utils;
 
 namespace SteelLanguage.Reflection.Library;
 
@@ -31,7 +32,9 @@ public class TypeLibrary
         {
             string[] split = name.SanitizedSplit('<', 2, StringSplitOptions.RemoveEmptyEntries);
             
-            string containedType = split[1].Remove(split[1].Length - 1);
+            string prms = split[1].Remove(split[1].Length - 1);
+            string[] containedType = CompileUtils.ParseCallInputs(prms, '<', '>').ToArray(); // TODO: idiotic
+            
             string currentType = split[0].Trim();
             
             if (!Types.ContainsKey(currentType))

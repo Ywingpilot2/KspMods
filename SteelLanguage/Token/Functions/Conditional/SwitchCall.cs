@@ -9,7 +9,7 @@ namespace SteelLanguage.Token.Functions.Conditional;
 
 public class SwitchCall : TokenCall
 {
-    private Input _check;
+    private readonly Input _check;
 
     private readonly Dictionary<object, int> _cases;
     private readonly object[] _keys;

@@ -5,7 +5,7 @@ using SteelLanguage.Token.Terms;
 
 namespace SteelLanguage.Token.Functions.Single;
 
-public struct TermConstructor : IFunction
+public readonly record struct TermConstructor : IFunction
 {
     public string Name => GetSig();
     public string ReturnType { get; }
@@ -18,11 +18,17 @@ public struct TermConstructor : IFunction
 
     public ReturnValue Execute(params BaseTerm[] terms)
     {
+        if (Kind == ConstructorKind.Partial)
+            _partial.Invoke();
+        
         return _filled.Invoke(terms);
     }
 
     public ReturnValue Execute()
     {
+        if (Kind == ConstructorKind.Filled)
+            _filled.Invoke(new BaseTerm[0]);
+        
         return _partial.Invoke();
     }
 

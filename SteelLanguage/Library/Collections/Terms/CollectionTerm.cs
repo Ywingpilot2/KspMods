@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using SteelLanguage.Library.System.Terms.Complex;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 
-namespace SteelLanguage.Library.System.Terms.Complex.Enumerators;
+namespace SteelLanguage.Library.Collections.Terms;
 
 public class CollectionTerm : EnumeratorTerm
 {
@@ -18,17 +19,12 @@ public class CollectionTerm : EnumeratorTerm
             yield return function;
         }
 
-        yield return new Function("add", terms =>
-        {
-            Add(terms[0]);
-        }, ContainedType);
+        yield return new Function("add", Add, ContainedTypeInputs);
         yield return new Function("remove", terms =>
         {
-            Remove(terms[0]);
-        }, ContainedType);
+            Remove(terms);
+        }, ContainedTypeInputs);
         yield return new Function("add", Clear);
-        yield return new Function("contains", "bool", terms => new ReturnValue(Contains(terms[0]), "bool"),
-            ContainedType);
     }
 
     public override IEnumerable<TermField> GetFields()
@@ -41,21 +37,16 @@ public class CollectionTerm : EnumeratorTerm
         yield return new TermField("count", "int", Count);
     }
 
-    protected virtual void Add(BaseTerm term)
+    protected virtual void Add(BaseTerm[] term)
     {
     }
     
-    protected virtual bool Remove(BaseTerm term)
+    protected virtual bool Remove(BaseTerm[] term)
     {
         return false;
     }
 
     protected virtual void Clear()
     {
-    }
-
-    protected virtual bool Contains(BaseTerm term)
-    {
-        return false;
     }
 }

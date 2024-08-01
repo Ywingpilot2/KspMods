@@ -13,7 +13,7 @@ using SteelLanguage.Utils;
 
 namespace SteelLanguage.Reflection.Type;
 
-public sealed class TermType
+public sealed record TermType
 {
     public string Name
     {
@@ -21,7 +21,7 @@ public sealed class TermType
         {
             if (ContainsType && ContainedType != null)
             {
-                return $"{Term.ValueType}<{ContainedType}>";
+                return $"{Term.ValueType}<{string.Join(", ", ContainedType)}>";
             }
 
             return Term.ValueType;
@@ -33,8 +33,13 @@ public sealed class TermType
     public bool DefaultConstruction => HasConstructor("");
 
     public bool ContainsType => Term.ContainsType;
-    public string ContainedType { get; set; }
-    
+    public string[] ContainedType { get; set; }
+    public string[] TypeArgs => Term.ContainedTypeInputs;
+
+    public bool SupportsIndexing => Term.SupportsIndexing;
+    public string IndexingType => Term.IndexerType;
+    public string IndexingReturnType => Term.IndexingReturnType;
+
     public MathOperatorKind[] AllowedMathOps => Term.AllowedMathOps;
     public ComparisonOperatorKind[] AllowedComparisons => Term.AllowedComparisons;
     public BoolOperatorKind[] AllowedBoolOps => Term.AllowedBoolOps;

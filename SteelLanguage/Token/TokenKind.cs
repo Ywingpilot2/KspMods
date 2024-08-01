@@ -18,7 +18,8 @@ public enum OperatorKind
 {
     Math = 0,
     Comparison = 1, 
-    Bool = 2
+    Bool = 2,
+    Indexer = 3
 }
 
 public enum SpecialFuncKind

@@ -16,6 +16,9 @@ public class EnumeratorTerm : BaseTerm
     public IEnumerable GetEnumerableValue() => (IEnumerable)GetValue();
 
     public override bool ContainsType => true;
+    public override string[] ContainedTypeInputs => new []{"term"};
+
+    public virtual string GetEnumerationType() => ContainedType[0];
 
     public override string ValueType => "Enumerable";
 
@@ -33,7 +36,7 @@ public class EnumeratorTerm : BaseTerm
         {
             GetEnumerableValue().GetEnumerator().Reset();
         });
-        yield return new Function("get_current", "term", () => new ReturnValue(GetEnumerableValue().GetEnumerator().Current, ContainedType));
+        yield return new Function("get_current", "term", () => new ReturnValue(GetEnumerableValue().GetEnumerator().Current, GetEnumerationType()));
     }
 
     #endregion
