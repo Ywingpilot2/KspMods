@@ -2,7 +2,7 @@
 
 namespace ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
 
-public class ActionGroupTerm : EnumTerm
+internal class ActionGroupTerm : EnumTerm
 {
     public override string ValueType => "action";
 

@@ -51,7 +51,7 @@ public enum TermKind
 ///
 /// <item>
 /// <term>Construction </term>
-/// <description>Sometimes construction happens at initialization, sometimes at runtime. Construction is the process of giving an initialized term a value.</description>
+/// <description>Construction is the process of giving an initialized term a value. It occurs during runtime when a <see cref="AssignmentCall"/> assigns a term a value with <see cref="CopyFrom"/></description>
 /// </item>
 ///
 /// </list>

@@ -119,31 +119,41 @@ public static class CompileUtils
     {
         string[] split = token.SanitizedSplit('=', 2);
         string[] typeName = split[0].Trim().SanitizedSplit(' ', 2, direction:ScanDirection.RightToLeft);
-        
-        if (typeName.Length == 1) // This is assigning an existing variable
-        {
-            if (typeName[0].Contains('.'))
-            {
-                string pName = token.SanitizedSplit('.', 2)[0].Trim();
-                if (!NameIsValid(pName, holder))
-                    throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]}");
-                
-                if (!holder.HasTerm(pName))
-                    throw new TermNotExistException(0, typeName[0]);
 
-                return AssignmentKind.Field;
+        string name;
+        if (typeName.Length != 2) // This is assigning an existing variable
+        {
+            name = split[0].Trim();
+            if (name.Contains('.'))
+            {
+                string pName = name.SanitizedSplit('.', 2)[0].Trim();
+                if (GetTokenKind(pName, holder) is TokenKind.Type)
+                {
+                    TypeNameIsValid(pName, holder);
+                    return AssignmentKind.StaticField;
+                }
+                else
+                {
+                    if (!NameIsValid(pName, holder))
+                        throw new InvalidCompilationException(0, $"Cannot name a term {pName}");
+                
+                    if (!holder.HasTerm(pName))
+                        throw new TermNotExistException(0, typeName[0]);
+                    
+                    return AssignmentKind.Field;
+                }
             }
             
-            if (!NameIsValid(typeName[0], holder))
-                throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]}");
+            if (!NameIsValid(name, holder))
+                throw new InvalidCompilationException(0, $"Cannot name a term {name}");
             
-            if (!holder.HasTerm(typeName[0]))
-                throw new TermNotExistException(0, typeName[0]);
+            if (!holder.HasTerm(name))
+                throw new TermNotExistException(0, name);
 
             return AssignmentKind.Assignment;
         }
         
-        string name = typeName[1].Trim();
+        name = typeName[1].Trim();
         if (!NameIsValid(name, holder))
             throw new InvalidCompilationException(0, $"Cannot name a term {typeName[1]}");
         

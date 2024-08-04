@@ -7,10 +7,6 @@ namespace SteelLanguage.Library.System.Terms.Literal;
 public class NullTerm : BaseTerm
 {
     public override string ValueType => "null-type";
-    public override bool Parse(string value)
-    {
-        throw new TypeNotConstructableException(0, "null-type");
-    }
 
     public override bool CanImplicitCastToStr => true;
 

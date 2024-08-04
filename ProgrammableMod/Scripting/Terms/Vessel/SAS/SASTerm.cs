@@ -6,7 +6,7 @@ using SteelLanguage.Token.Interaction;
 
 namespace ProgrammableMod.Scripting.Terms.Vessel.SAS;
 
-public class SASTerm : BaseComputerTerm
+internal class SASTerm : BaseComputerTerm
 {
     public override string ValueType => "autopilot";
     

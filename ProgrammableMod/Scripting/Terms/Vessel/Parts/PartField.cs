@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Terms.Vessel.Parts;
 
-public readonly record struct PartField
+internal readonly record struct PartField
 {
     public string Name { get; }
     private readonly string _internalName;

@@ -3,7 +3,7 @@ using SteelLanguage.Exceptions;
 
 namespace ProgrammableMod.Scripting.Exceptions;
 
-public class KerbnetLostException : ExecutionException
+internal class KerbnetLostException : ExecutionException
 {
     public override string Message => $"Call made at line {LineNumber} cannot be made, kerb net connection has been lost!";
 
@@ -12,7 +12,7 @@ public class KerbnetLostException : ExecutionException
     }
 }
 
-public class ControlLostException : ExecutionException
+internal class ControlLostException : ExecutionException
 {
     public override string Message => $"Call made at line {LineNumber} cannot be made, vessel is not currently controllable!";
 
@@ -21,7 +21,7 @@ public class ControlLostException : ExecutionException
     }
 }
 
-public class TooSlowException : ExecutionException
+internal class TooSlowException : ExecutionException
 {
     public override string Message => "Our engineers typically suggest writing scripts which don't loop forever, so they have shut down the script to prevent such a time paradox.";
 
@@ -30,7 +30,7 @@ public class TooSlowException : ExecutionException
     }
 }
 
-public class TypeNotStashableException : ExecutionException
+internal class TypeNotStashableException : ExecutionException
 {
     private readonly string _type;
     public override string Message => $"The the type {_type} at line {LineNumber} does not support being stashed onto the kerbnet";
@@ -41,7 +41,7 @@ public class TypeNotStashableException : ExecutionException
     }
 }
 
-public class StashableNotFoundException : ExecutionException
+internal class StashableNotFoundException : ExecutionException
 {
     private readonly string _name;
     public override string Message => $"Call at {LineNumber} cannot be made as stashable of name {_name} does not exist";
@@ -52,7 +52,7 @@ public class StashableNotFoundException : ExecutionException
     }
 }
 
-public class StashableInvalidException : ExecutionException
+internal class StashableInvalidException : ExecutionException
 {
     private readonly ProtoStash _stash;
 
@@ -64,7 +64,7 @@ public class StashableInvalidException : ExecutionException
     }
 }
 
-public class PartNotFoundException : ExecutionException
+internal class PartNotFoundException : ExecutionException
 {
     private readonly string _name;
     public override string Message => $"Could not find part named \"{_name}\" at line number {LineNumber}";
@@ -75,7 +75,7 @@ public class PartNotFoundException : ExecutionException
     }
 }
 
-public class ActionNotFoundException : ExecutionException
+internal class ActionNotFoundException : ExecutionException
 {
     private readonly string _name;
     public override string Message => $"Could not find action named \"{_name}\" at line number {LineNumber}";

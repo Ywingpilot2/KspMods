@@ -7,7 +7,7 @@ namespace ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
 /// <summary>
 /// Util class used for managing vessel stages
 /// </summary>
-public class MylStagingManager
+internal class MylStagingManager
 {
     private readonly BaseComputer _computer;
 
@@ -121,7 +121,7 @@ public class MylStagingManager
     }
 }
 
-public struct MylStageInfo
+internal struct MylStageInfo
 {
     public int Id { get; }
     

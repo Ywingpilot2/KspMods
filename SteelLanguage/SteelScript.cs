@@ -157,10 +157,7 @@ public sealed class SteelScript : ITokenHolder
 
     private void PreExecution()
     {
-        foreach (BaseTerm term in EnumerateTerms())
-        {
-            term.SetValue(_compiledValues[term.Name]);
-        }
+        
     }
 
     private void PostExecution()

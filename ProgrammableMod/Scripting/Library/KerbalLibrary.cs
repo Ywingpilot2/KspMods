@@ -7,6 +7,7 @@ using SteelLanguage.Library;
 using SteelLanguage.Reflection.Library;
 using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions;
+using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.KeyWords;
 using SteelLanguage.Token.KeyWords.Container;
 using SteelLanguage.Token.Terms;
@@ -20,6 +21,7 @@ namespace ProgrammableMod.Scripting.Library;
 public class KerbalLibrary : ILibrary
 {
     public string Name => "kerbnet";
+    private readonly BaseComputer _computer;
 
     public IEnumerable<IFunction> GlobalFunctions { get; }
     public IEnumerable<GlobalTerm> GlobalTerms { get; }
@@ -28,6 +30,7 @@ public class KerbalLibrary : ILibrary
 
     public KerbalLibrary(BaseComputer computer) : this()
     {
+        _computer = computer;
         GlobalTerms = new[]
         {
             new GlobalTerm(new KerbNetTerm
@@ -36,6 +39,11 @@ public class KerbalLibrary : ILibrary
                 Computer = computer,
                 Name = "KERBNET",
             })
+        };
+        
+        GlobalFunctions = new IFunction[]
+        {
+            new Function("has_access", "bool", () => new ReturnValue(_computer.vessel.Connection.IsConnected, "bool"))
         };
     }
 

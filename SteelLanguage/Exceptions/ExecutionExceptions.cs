@@ -45,14 +45,15 @@ public class InvalidAssignmentException : ExecutionException
     public InvalidAssignmentException(int lineNumber) : base(lineNumber)
     {
     }
-        
-    public InvalidAssignmentException(int lineNumber, BaseTerm term) : base(lineNumber)
+
+    public InvalidAssignmentException(int lineNumber, BaseTerm term) : this(lineNumber, term.Name, term.ValueType)
     {
-        if (term.Kind == TermKind.Null)
-            return;
-            
-        _name = term.Name;
-        _type = term.ValueType;
+    }
+
+    public InvalidAssignmentException(int lineNumber, string name, string type) : base(lineNumber)
+    {
+        _name = name;
+        _type = type;
     }
 }
 

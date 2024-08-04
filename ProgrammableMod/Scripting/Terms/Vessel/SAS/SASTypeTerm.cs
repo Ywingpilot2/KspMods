@@ -2,7 +2,7 @@
 
 namespace ProgrammableMod.Scripting.Terms.Vessel.SAS;
 
-public class SASTypeTerm : EnumTerm
+internal class SASTypeTerm : EnumTerm
 {
     public override string ValueType => "sas_mode";
 

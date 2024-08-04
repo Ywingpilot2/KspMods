@@ -6,7 +6,7 @@ using SteelLanguage.Token.Terms;
 
 namespace ProgrammableMod.Scripting.Terms;
 
-public abstract class BaseComputerTerm : BaseTerm
+internal abstract class BaseComputerTerm : BaseTerm
 {
     internal BaseComputer Computer;
 

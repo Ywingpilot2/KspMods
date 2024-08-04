@@ -163,10 +163,12 @@ public sealed class SteelCompiler
             {
                 TermType type = manager.GetTermType(values[0]);
                 BaseTerm term = type.Construct(values[1], CurrentLine, manager);
-                if (!term.Parse(values[2]))
-                    throw new InvalidAssignmentException(CurrentLine, term);
                 
+                Input constant = CompileUtils.HandleToken(values[2], term.ValueType, holder, this);
+                AssignmentCall call = new AssignmentCall(term, constant, holder, CurrentLine);
+
                 holder.AddTerm(term);
+                holder.AddCall(call);
             } break;
             case AssignmentKind.Term:
             {
@@ -215,11 +217,24 @@ public sealed class SteelCompiler
             {
                 BaseTerm term = holder.GetTerm(values[0]);
                 TermField field = term.GetField(values[1]);
+                
                 if (!field.Set)
                     throw new FieldReadOnlyException(CurrentLine, field.Name);
                 
                 Input input = CompileUtils.HandleToken(values[2], field.Value.Type, holder, this);
                 AssignmentCall call = new AssignmentCall(term, field.Name, input, holder, CurrentLine);
+                holder.AddCall(call);
+                _currentScript.CallTokens++;
+            } break;
+            case AssignmentKind.StaticField:
+            {
+                TermField field = holder.GetLibraryManager().GetTermType(values[0]).GetStaticField(values[1]);
+                
+                if (!field.Set)
+                    throw new FieldReadOnlyException(CurrentLine, field.Name);
+                
+                Input input = CompileUtils.HandleToken(values[2], field.Value.Type, holder, this);
+                AssignmentCall call = new AssignmentCall(holder.GetLibraryManager().GetTermType(values[0]), field.Name, input, holder, CurrentLine);
                 holder.AddCall(call);
                 _currentScript.CallTokens++;
             } break;

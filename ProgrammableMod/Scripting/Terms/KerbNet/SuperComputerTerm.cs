@@ -10,7 +10,7 @@ using SteelLanguage.Token.Terms;
 namespace ProgrammableMod.Scripting.Terms.KerbNet;
 
 [SuppressMessage("ReSharper", "HeapView.BoxingAllocation")]
-public class SuperComputerTerm : BaseTerm
+internal class SuperComputerTerm : BaseTerm
 {
     public override string ValueType => "kerfur";
 

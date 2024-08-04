@@ -4,7 +4,7 @@ using SteelLanguage.Token.Terms;
 
 namespace ProgrammableMod.Scripting.Terms.Vessel.Target;
 
-public class TargetTerm : BaseTerm
+internal class TargetTerm : BaseTerm
 {
     public override string ValueType => "target";
     private ITargetable _targetable;

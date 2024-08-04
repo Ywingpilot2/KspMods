@@ -6,5 +6,6 @@ public enum AssignmentKind
     Term = 1,
     Assignment = 2,
     Function = 3,
-    Field = 4
+    Field = 4,
+    StaticField = 5
 }

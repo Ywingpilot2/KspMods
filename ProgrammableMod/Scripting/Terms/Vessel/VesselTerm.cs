@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Terms.Vessel;
 
-public class VesselTerm : BaseComputerTerm
+internal class VesselTerm : BaseComputerTerm
 {
     public override string ValueType => "vessel";
     private MylStagingManager _manager;
@@ -35,7 +35,7 @@ public class VesselTerm : BaseComputerTerm
         yield return new TermField("total_mass", "double", Computer.vessel != null ? Computer.vessel.totalMass : 0.0);
         yield return new TermField("stage_manager", "staging", _manager);
         yield return new TermField("sas", "autopilot", Computer);
-        
+
         // navigation
         yield return new TermField("throttle", "float", Computer.State.mainThrottle, true);
         yield return new TermField("yaw", "float", Computer.State.yaw, true);
@@ -47,8 +47,12 @@ public class VesselTerm : BaseComputerTerm
         yield return new TermField("rcs_y", "float", Computer.State.Y, true);
         yield return new TermField("rcs_z", "float", Computer.State.Z, true);
 
-        yield return new TermField("position", "vec3", Computer.vessel.GetTransform().position);
-        yield return new TermField("target", "target", Computer.vessel.targetObject);
+        yield return new TermField("position", "vec3", Computer.vessel != null ? Computer.vessel.GetTransform().position : null);
+        yield return new TermField("target", "target", Computer.vessel != null ? Computer.vessel.targetObject : null);
+        
+        yield return new TermField("altitude", "double", Computer.vessel != null ? Computer.vessel.altitude : 0.0);
+        yield return new TermField("ground_dist", "float", Computer.vessel != null ? Computer.vessel.heightFromTerrain : 0.0f);
+        yield return new TermField("atmo_density", "double", Computer.vessel != null ? Computer.vessel.atmDensity : 0.0);
     }
 
     public override bool SetField(string name, object value)

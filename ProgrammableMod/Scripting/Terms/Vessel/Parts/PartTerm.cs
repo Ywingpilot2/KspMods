@@ -10,7 +10,7 @@ using SteelLanguage.Utils;
 
 namespace ProgrammableMod.Scripting.Terms.Vessel.Parts;
 
-public class PartTerm : BaseTerm
+internal class PartTerm : BaseTerm
 {
     public override string ValueType => "Part";
     private Part _value;

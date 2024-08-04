@@ -64,6 +64,8 @@ namespace ActionTest
         {
             public override string ValueType => "program_t";
             private string _value;
+            private string _value2;
+            private int _value3 = 3;
             
             public override bool SetValue(object value)
             {
@@ -74,6 +76,30 @@ namespace ActionTest
             public override IEnumerable<TermField> GetFields()
             {
                 yield return new TermField("value", "string", _value, true);
+            }
+
+            public override IEnumerable<TermField> GetStaticFields()
+            {
+                yield return new TermField("value2", "string", _value2, true);
+                yield return new TermField("value3", "int", _value3, true);
+            }
+
+            public override bool SetStaticField(string name, object value)
+            {
+                switch (name)
+                {
+                    case "value2":
+                    {
+                        _value2 = value.ToString();
+                        return true;
+                    }
+                    case "value3":
+                    {
+                        _value3 = (int)value;
+                        return true;
+                    }
+                }
+                return false;
             }
 
             public override IEnumerable<IFunction> GetFunctions()
@@ -166,11 +192,6 @@ namespace ActionTest
                     {
                         Console.WriteLine("Executing file...");
                         ExecuteScript(GetGlobalPath(split[1].Trim('"', ' ')));
-                    } break;
-                    case "begin-interaction":
-                    {
-                        interaction = true;
-                        Console.WriteLine("Beginning AS-Interactive...");
                     } break;
                     case "exit":
                     {

@@ -6,7 +6,7 @@ using SteelLanguage.Token.Terms;
 
 namespace ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
 
-public class StagingTerm : BaseTerm
+internal class StagingTerm : BaseTerm
 {
     public override string ValueType => "staging";
     private MylStagingManager _manager;
@@ -62,7 +62,7 @@ public class StagingTerm : BaseTerm
     }
 }
 
-public class StageInfoTerm : BaseTerm
+internal class StageInfoTerm : BaseTerm
 {
     public override string ValueType => "stage";
     private MylStageInfo _stageInfo;
