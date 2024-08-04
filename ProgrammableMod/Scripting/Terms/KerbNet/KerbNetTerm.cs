@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using ProgrammableMod.Scripting.Exceptions;
 using SteelLanguage.Token.Fields;
+using SteelLanguage.Token.Functions;
+using SteelLanguage.Token.Interaction;
 using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Terms.KerbNet;
@@ -22,23 +24,30 @@ internal class KerbNetTerm : BaseComputerTerm
             EstablishConnection();
         }
 
-        yield return new TermField("time", "float", Time.fixedTime);
-        yield return new TermField("has_access", "bool", Computer.vessel != null && Computer.vessel.Connection.IsConnected);
+        yield return new TermField("time", "float", HighLogic.CurrentGame.UniversalTime);
         yield return new TermField("super_computer", "kerfur", _kerfer);
+    }
+
+    public override IEnumerable<IFunction> GetFunctions()
+    {
+        foreach (IFunction function in base.GetFunctions())
+        {
+            yield return function;
+        }
+
+        yield return new Function("enumerate_bodies", EnumerateBodies, "CelestialBody");
+    }
+
+    private IEnumerable<ReturnValue> EnumerateBodies()
+    {
+        foreach (CelestialBody body in FlightGlobals.Bodies)
+        {
+            yield return new ReturnValue(body, "CelestialBody");
+        }
     }
 
     protected override void ExtraBuilding()
     {
         _kerfer = new SuperComputerTerm();
-    }
-
-    /// <summary>
-    /// Connect to the <see cref="KerbinSuperComputer"/>!
-    /// Warranty void if connection unstable.
-    /// </summary>
-    private void EstablishConnection()
-    {
-        if (!Computer.vessel.Connection.IsConnected && !Computer.compiling)
-            throw new KerbnetLostException(0);
     }
 }

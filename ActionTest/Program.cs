@@ -66,6 +66,7 @@ namespace ActionTest
             private string _value;
             private string _value2;
             private int _value3 = 3;
+            private int _value4 = 3;
             
             public override bool SetValue(object value)
             {
@@ -76,6 +77,7 @@ namespace ActionTest
             public override IEnumerable<TermField> GetFields()
             {
                 yield return new TermField("value", "string", _value, true);
+                yield return new TermField("value4", "int", _value4, true);
             }
 
             public override IEnumerable<TermField> GetStaticFields()
@@ -96,6 +98,11 @@ namespace ActionTest
                     case "value3":
                     {
                         _value3 = (int)value;
+                        return true;
+                    }
+                    case "value4":
+                    {
+                        _value4 = (int)value;
                         return true;
                     }
                 }
@@ -123,7 +130,17 @@ namespace ActionTest
 
             public override bool SetField(string name, object value)
             {
-                _value = value.ToString();
+                switch (name)
+                {
+                    case "value":
+                    {
+                        _value = value.ToString();
+                    } break;
+                    case "value4":
+                    {
+                        _value4 = (int)value;
+                    } break;
+                }
                 return true;
             }
 

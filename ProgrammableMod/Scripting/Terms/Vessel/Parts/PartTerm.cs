@@ -2,6 +2,7 @@
 using ProgrammableMod.Modules;
 using ProgrammableMod.Scripting.Exceptions;
 using SteelLanguage.Exceptions;
+using SteelLanguage.Library.System.Terms.Literal;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
@@ -71,6 +72,12 @@ internal class PartTerm : BaseTerm
             return true;
         }
 
+        if (value is null)
+        {
+            _value = null;
+            return true;
+        }
+
         return false;
     }
 
@@ -83,6 +90,12 @@ internal class PartTerm : BaseTerm
             _actions = partTerm._actions;
             _flightId = partTerm._flightId;
             
+            return true;
+        }
+
+        if (term is NullTerm)
+        {
+            _value = null;
             return true;
         }
 

@@ -65,7 +65,7 @@ internal class StagingTerm : BaseTerm
 internal class StageInfoTerm : BaseTerm
 {
     public override string ValueType => "stage";
-    private MylStageInfo _stageInfo;
+    private DeltaVStageInfo _stageInfo;
 
     public override IEnumerable<TermField> GetFields()
     {
@@ -73,17 +73,36 @@ internal class StageInfoTerm : BaseTerm
         {
             yield return field;
         }
+        
+        yield return new TermField("start_mass", "double", _stageInfo?.startMass);
+        yield return new TermField("end_mass", "double", _stageInfo?.endMass);
+        yield return new TermField("deltav", "float", _stageInfo?.deltaVActual);
+        yield return new TermField("burn_time", "double", _stageInfo?.stageBurnTime);
+        yield return new TermField("isp", "double", _stageInfo?.ispActual);
+        yield return new TermField("thrust", "float", _stageInfo?.thrustActual);
+    }
 
-        yield return new TermField("id", "int", _stageInfo.Id);
-        yield return new TermField("mass", "double", _stageInfo.Mass);
-        yield return new TermField("dry_mass", "double", _stageInfo.DryMass);
-        yield return new TermField("deltav", "float", _stageInfo.DeltaV);
-        yield return new TermField("burn_time", "double", _stageInfo.BurnTime);
+    public override IEnumerable<IFunction> GetFunctions()
+    {
+        foreach (IFunction function in base.GetFunctions())
+        {
+            yield return function;
+        }
+
+        yield return new Function("enumerate_parts", EnumerateParts, "Part");
+    }
+
+    private IEnumerable<ReturnValue> EnumerateParts()
+    {
+        foreach (DeltaVPartInfo partInfo in _stageInfo.parts)
+        {
+            yield return new ReturnValue(partInfo.part, "Part");
+        }
     }
 
     public override bool SetValue(object value)
     {
-        if (value is MylStageInfo stageInfo)
+        if (value is DeltaVStageInfo stageInfo)
         {
             _stageInfo = stageInfo;
             return true;

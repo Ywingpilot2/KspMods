@@ -34,10 +34,10 @@ public abstract class BaseComputer : PartModule
 {
     #region Display
 
-    [KSPField(isPersistant = false, guiActive = true, guiName = "Program Status", guiActiveEditor = true)] [UsedImplicitly]
+    [KSPField(isPersistant = false, guiActive = true, guiName = "Program Status", guiActiveEditor = true, guiActiveUnfocused = true, unfocusedRange = 25f)] [UsedImplicitly]
     public string status = "Operating";
     
-    [KSPField(isPersistant = false, guiActive = false, guiName = "Error")] [UsedImplicitly]
+    [KSPField(isPersistant = false, guiActive = false, guiName = "Error", guiActiveUnfocused = true, unfocusedRange = 25f)] [UsedImplicitly]
     public string exception;
 
     #endregion
@@ -313,14 +313,14 @@ public abstract class BaseComputer : PartModule
     #region UI Buttons
 
     private CodeEditorControl _codeEditor;
-    [KSPEvent(active = true, guiActive = true, guiName = "Open Code Editor", guiActiveEditor = true)]
+    [KSPEvent(active = true, guiActive = true, guiName = "Open Code Editor", guiActiveEditor = true, guiActiveUncommand = true, externalToEVAOnly = true)]
     public void OpenEditor()
     {
         AeroInterfaceManager.AddControl(_codeEditor);
     }
 
     private LogControl _logControl;
-    [KSPEvent(active = true, guiActive = true, guiName = "Open Log", guiActiveEditor = true)]
+    [KSPEvent(active = true, guiActive = true, guiName = "Open Log", guiActiveEditor = true, guiActiveUncommand = true)]
     public void OpenLog()
     {
         AeroInterfaceManager.AddControl(_logControl);
@@ -331,7 +331,7 @@ public abstract class BaseComputer : PartModule
     #region Execution buttons
 
     [UI_Toggle(scene = UI_Scene.All, controlEnabled = true, enabledText = "Enabled", disabledText = "Disabled")]
-    [KSPField(guiActiveEditor = true, guiActive = true, guiName = "Execution:", isPersistant = true)]
+    [KSPField(guiActiveEditor = true, guiActive = true, guiName = "Execution:", isPersistant = true, guiActiveUnfocused = true, unfocusedRange = 10f)]
     public bool shouldRun = false;
     
     [KSPAction("Toggle Execution")]

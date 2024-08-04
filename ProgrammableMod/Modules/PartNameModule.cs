@@ -6,7 +6,7 @@ namespace ProgrammableMod.Modules;
 
 public class PartNameModule : PartModule
 {
-    [KSPField(groupName = "VesselNaming", groupDisplayName = "#autoLOC_8003391", guiActive = false, guiActiveEditor = false, guiName = "Part Name", isPersistant = true)]
+    [KSPField(groupName = "VesselNaming", groupDisplayName = "#autoLOC_8003391", guiActive = false, guiActiveEditor = false, guiName = "Part Name", isPersistant = true, guiActiveUnfocused = false)]
     public string partName = "";
 
     private PartRenameControl _renameControl;

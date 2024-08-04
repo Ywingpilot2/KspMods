@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Terms.Graphmatics;
 using ProgrammableMod.Scripting.Terms.Graphmatics.Curves;
+using ProgrammableMod.Scripting.Terms.KerbNet.SolarSystem;
 using ProgrammableMod.Scripting.Terms.Vectors;
 using SteelLanguage;
 using SteelLanguage.Library;
@@ -55,5 +56,7 @@ public class ComputerLibrary : ILibrary
         TypeLibrary.AddTermType(new TermType(new Vec2Term(), baseType));
         TypeLibrary.AddTermType(new TermType(new Vec3Term(), baseType));
         TypeLibrary.AddTermType(new TermType(new Vec3dTerm(), baseType));
+        TypeLibrary.AddTermType(new TermType(new OrbitTerm(), baseType, isNullable:true));
+        TypeLibrary.AddTermType(new TermType(new CelestialBodyTerm(), baseType, isNullable:true));
     }
 }

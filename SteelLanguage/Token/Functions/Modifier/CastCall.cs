@@ -1,4 +1,5 @@
 ﻿using System;
+using SteelLanguage.Library.System.Terms.Literal;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 
@@ -20,6 +21,9 @@ public class CastCall : TokenCall
         try
         {
             BaseTerm term = _from.GetValue();
+            if (term is NullTerm)
+                return ReturnValue.None;
+
             return new ReturnValue(term.CastToType(_type), _type);
         }
         catch (Exception e)

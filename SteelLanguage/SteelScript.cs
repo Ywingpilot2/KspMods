@@ -22,11 +22,10 @@ public sealed class SteelScript : ITokenHolder
 {
     public ITokenHolder Container { get; }
 
-    private Dictionary<string, IFunction> Functions { get; }
-    private Dictionary<string, BaseTerm> Terms { get; }
-    private readonly Dictionary<string, object> _compiledValues;
+    private readonly Dictionary<string, IFunction> _functions;
+    private Dictionary<string, BaseTerm> _terms;
     private LibraryManager LibraryManager { get; }
-    private List<TokenCall> TokenCalls { get; }
+    private readonly List<TokenCall> _tokenCalls;
 
     #region Tokens
 
@@ -39,9 +38,9 @@ public sealed class SteelScript : ITokenHolder
 
     #region Enumeration
 
-    public IEnumerable<TokenCall> EnumerateCalls() => TokenCalls;
+    public IEnumerable<TokenCall> EnumerateCalls() => _tokenCalls;
 
-    public IEnumerable<BaseTerm> EnumerateTerms() => Terms.Values;
+    public IEnumerable<BaseTerm> EnumerateTerms() => _terms.Values;
 
     #endregion
 
@@ -52,25 +51,25 @@ public sealed class SteelScript : ITokenHolder
         if (LibraryManager.HasFunction(name))
             return LibraryManager.GetFunction(name);
             
-        if (!Functions.ContainsKey(name))
+        if (!_functions.ContainsKey(name))
             throw new FunctionNotExistException(0, name);
 
-        return Functions[name];
+        return _functions[name];
     }
 
-    public bool HasFunction(string name) => Functions.ContainsKey(name) || LibraryManager.HasFunction(name);
+    public bool HasFunction(string name) => _functions.ContainsKey(name) || LibraryManager.HasFunction(name);
         
     public void AddCall(TokenCall call)
     {
-        TokenCalls.Add(call);
+        _tokenCalls.Add(call);
     }
         
     public void AddFunc(IFunction function)
     {
-        if (Functions.ContainsKey(function.Name))
+        if (_functions.ContainsKey(function.Name))
             throw new FunctionExistsException(0, function.Name);
             
-        Functions.Add(function.Name, function);
+        _functions.Add(function.Name, function);
     }
 
     #endregion
@@ -82,20 +81,20 @@ public sealed class SteelScript : ITokenHolder
         if (LibraryManager.HasGlobalTerm(name))
             return LibraryManager.GetGlobalTerm(name);
             
-        if (!Terms.ContainsKey(name))
+        if (!_terms.ContainsKey(name))
             throw new TermNotExistException(0, name);
 
-        return Terms[name];
+        return _terms[name];
     }
 
-    public bool HasTerm(string name) => Terms.ContainsKey(name) || LibraryManager.HasGlobalTerm(name);
+    public bool HasTerm(string name) => _terms.ContainsKey(name) || LibraryManager.HasGlobalTerm(name);
 
     public void AddTerm(BaseTerm term)
     {
-        if (Terms.ContainsKey(term.Name))
+        if (_terms.ContainsKey(term.Name))
             throw new TermAlreadyExistsException(0, term.Name);
             
-        Terms.Add(term.Name, term);
+        _terms.Add(term.Name, term);
     }
 
     public LibraryManager GetLibraryManager() => LibraryManager;
@@ -108,7 +107,7 @@ public sealed class SteelScript : ITokenHolder
     public void Execute()
     {
         PreExecution();
-        foreach (TokenCall functionCall in TokenCalls)
+        foreach (TokenCall functionCall in _tokenCalls)
         {
             CurrentLine = functionCall.Line;
             try
@@ -157,24 +156,17 @@ public sealed class SteelScript : ITokenHolder
 
     private void PreExecution()
     {
-        
     }
 
     private void PostExecution()
     {
-        //GC.Collect();
     }
 
     internal void PostCompilation()
     {
-        foreach (TokenCall call in TokenCalls)
+        foreach (TokenCall call in _tokenCalls)
         {
             call.PostCompilation();
-        }
-
-        foreach (BaseTerm term in Terms.Values)
-        {
-            _compiledValues.Add(term.Name, term.GetValue());
         }
     }
 
@@ -204,11 +196,11 @@ public sealed class SteelScript : ITokenHolder
 
     public SteelScript()
     {
-        Functions = new Dictionary<string, IFunction>();
-        Terms = new Dictionary<string, BaseTerm>();
-        TokenCalls = new List<TokenCall>();
+        _functions = new Dictionary<string, IFunction>();
+        _terms = new Dictionary<string, BaseTerm>();
+        _tokenCalls = new List<TokenCall>();
         LibraryManager = new LibraryManager();
-        _compiledValues = new Dictionary<string, object>();
+        new Dictionary<string, object>();
     }
 
     #endregion

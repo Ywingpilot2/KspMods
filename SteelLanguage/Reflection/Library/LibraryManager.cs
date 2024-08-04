@@ -15,7 +15,7 @@ public class LibraryManager
     private readonly Dictionary<string, ILibrary> _libraries;
     private readonly Dictionary<string, IKeyword> _keywords;
     private readonly Dictionary<string, IFunction> _functions;
-    private readonly Dictionary<string, BaseTerm> _globals;
+    private Dictionary<string, BaseTerm> _globals;
     
     public bool HasGlobalTerm(string name) => _globals.ContainsKey(name);
 
@@ -33,6 +33,18 @@ public class LibraryManager
         {
             yield return globalsValue;
         }
+    }
+
+    public void RemakeGlobals()
+    {
+        Dictionary<string, BaseTerm> globals = new Dictionary<string, BaseTerm>();
+        foreach (KeyValuePair<string,BaseTerm> valuePair in _globals)
+        {
+            BaseTerm copy = valuePair.Value.GetTermType().Construct(valuePair.Value.Name, valuePair.Value.Line, this);
+            globals.Add(valuePair.Key, copy);
+        }
+
+        _globals = globals;
     }
 
     public bool HasFunction(string name) => _functions.ContainsKey(name);

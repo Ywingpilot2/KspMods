@@ -14,7 +14,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 {
     #region Module Fields
 
-    [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Available")]
+    [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Available", guiActiveUnfocused = true, unfocusedRange = 25f)]
     public float tokenLimit;
 
     [KSPField]
@@ -46,7 +46,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
     #region Module Events
 
     private float _originalLimit;
-    [KSPEvent(active = false, guiActive = true, guiName = "CPU Over Clocking: false")]
+    [KSPEvent(active = false, guiActive = true, guiName = "CPU Over Clocking: false", guiActiveUnfocused = true, unfocusedRange = 25f)]
     public void ToggleOverclocking()
     {
         if (!HighLogic.LoadedSceneIsFlight)
@@ -330,7 +330,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
     #region Display
     
-    [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Used")] [UsedImplicitly]
+    [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Tokens Used", guiActiveUnfocused = true, unfocusedRange = 25f)] [UsedImplicitly]
     public string tokensUsed;
 
     public override string GetModuleDisplayName() => "Processing Chips";
@@ -344,7 +344,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
         if (requiredConsumption != 0)
         {
-            message += $"\n- Consumes {requiredConsumption} {requiredResource} per token";
+            message += $"\n- Consumes {requiredConsumption} {KSPUtil.PrintModuleName(requiredResource)} per token";
         }
         
         if (createsHeat)

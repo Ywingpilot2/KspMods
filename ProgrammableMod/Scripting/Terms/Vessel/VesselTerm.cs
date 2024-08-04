@@ -139,6 +139,16 @@ internal class VesselTerm : BaseComputerTerm
             });
         yield return new Function("get_parts", GetParts, "Part");
         yield return new Function("get_part", "Part", terms => new ReturnValue(GetPart(terms[0].CastToStr()), "Part"), "string");
+        yield return new Function("get_orbit", "Orbit", () =>
+        {
+            EstablishConnection();
+            return new ReturnValue(Computer.vessel.orbit, "Orbit");
+        });
+        yield return new Function("get_body", "CelestialBody", () =>
+        {
+            EstablishConnection();
+            return new ReturnValue(Computer.vessel.mainBody, "CelestialBody");
+        });
     }
 
     private IEnumerable<ReturnValue> GetParts()

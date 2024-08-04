@@ -2,6 +2,7 @@
 using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Exceptions;
 using ProgrammableMod.Scripting.Terms.KerbNet;
+using ProgrammableMod.Scripting.Terms.KerbNet.SolarSystem;
 using SteelLanguage;
 using SteelLanguage.Library;
 using SteelLanguage.Reflection.Library;

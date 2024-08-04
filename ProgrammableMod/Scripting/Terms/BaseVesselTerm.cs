@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ProgrammableMod.Modules.Computers;
+using ProgrammableMod.Scripting.Exceptions;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Terms;
@@ -46,5 +47,15 @@ internal abstract class BaseComputerTerm : BaseTerm
     public override object GetValue()
     {
         return Computer;
+    }
+    
+    /// <summary>
+    /// Connect to the <see cref="KerbinSuperComputer"/>!
+    /// Warranty void if connection unstable.
+    /// </summary>
+    protected void EstablishConnection()
+    {
+        if (!Computer.vessel.Connection.IsConnected && !Computer.compiling)
+            throw new KerbnetLostException(0);
     }
 }

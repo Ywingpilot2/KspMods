@@ -23,16 +23,12 @@ internal class MylStagingManager
 
     #region Stage Info
 
-    public MylStageInfo GetStage(int stage)
+    public DeltaVStageInfo GetStage(int stage)
     {
         if (!ValidateStage(stage))
             stage = 0;
-        
-        if (_computer.vessel.VesselDeltaV.OperatingStageInfo.ElementAtOrDefault(stage) == null)
-            return new MylStageInfo();
-        
-        return new MylStageInfo(stage, GetStageMass(stage), GetStageDryMass(stage), GetStageDeltaV(stage),
-            GetStageBurnTime(stage));
+
+        return _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
     }
 
     private double GetStageBurnTime(int stage)
@@ -43,7 +39,7 @@ internal class MylStagingManager
         DeltaVStageInfo info = _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
         if (info == null)
             return 0.0f;
-
+        
         return info.stageBurnTime;
     }
 
@@ -85,9 +81,9 @@ internal class MylStagingManager
 
     #endregion
 
-    public MylStageInfo NextStage()
+    public DeltaVStageInfo NextStage()
     {
-        MylStageInfo info = GetStage(_computer.vessel.currentStage - 1);
+        DeltaVStageInfo info = GetStage(_computer.vessel.currentStage - 1);
         
         int current = _computer.vessel.currentStage - 1;
         foreach (Part part in _computer.vessel.parts)
@@ -119,29 +115,4 @@ internal class MylStagingManager
     {
         _computer = computer;
     }
-}
-
-internal struct MylStageInfo
-{
-    public int Id { get; }
-    
-    public double Mass { get; }
-    public double DryMass { get; }
-    
-    public float DeltaV { get; }
-    public double BurnTime { get; }
-
-    public MylStageInfo()
-    {
-        Id = -1;
-    }
-
-    public MylStageInfo(int id, double mass, double dryMass, float deltaV, double burnTime)
-    {
-        Id = id;
-        Mass = mass;
-        DryMass = dryMass;
-        DeltaV = deltaV;
-        BurnTime = burnTime;
-    }   
 }

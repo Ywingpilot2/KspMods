@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SteelLanguage.Library.System.Terms.Literal;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Terms;
 
@@ -21,6 +22,7 @@ internal class TargetTerm : BaseTerm
         yield return new TermField("surface_velocity", "vec3", _targetable.GetSrfVelocity());
         yield return new TermField("forward", "vec3", _targetable.GetFwdVector());
         yield return new TermField("position", "vec3", _targetable.GetTransform().position);
+        yield return new TermField("orbit", "Orbit", _targetable.GetOrbit());
     }
 
     public override bool SetValue(object value)
@@ -28,6 +30,12 @@ internal class TargetTerm : BaseTerm
         if (value is ITargetable targetable)
         {
             _targetable = targetable;
+            return true;
+        }
+
+        if (value is null)
+        {
+            _targetable = null;
             return true;
         }
 
@@ -39,6 +47,12 @@ internal class TargetTerm : BaseTerm
         if (term is TargetTerm targetTerm)
         {
             _targetable = targetTerm._targetable;
+            return true;
+        }
+
+        if (term is NullTerm)
+        {
+            _targetable = null;
             return true;
         }
 

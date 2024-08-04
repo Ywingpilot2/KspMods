@@ -1,5 +1,6 @@
 ﻿using System;
 using SteelLanguage.Exceptions;
+using SteelLanguage.Library.System.Terms.Literal;
 using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
@@ -34,6 +35,10 @@ public class AssignmentCall : TokenCall
             {
                 BaseTerm term = Input.GetValue();
                 object value = term.GetValue();
+                if (GetTerm(_term) is NullTerm)
+                    throw new NullReferenceException(
+                        $"The requested assignment call at line {Line} for the field {_field} cannot be conducted because the referenced term({_term}) was null");
+                
                 if (GetTerm(_term).GetField(_field).Value.Type != term.ValueType)
                     value = term.CastToType(GetTerm(_term).GetField(_field).Value.Type);
             
