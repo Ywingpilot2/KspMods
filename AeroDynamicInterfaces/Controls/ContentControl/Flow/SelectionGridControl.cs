@@ -41,7 +41,7 @@ public class SelectionGridControl : Control
         }
     }
 
-    public override void Draw()
+    protected override void Draw()
     {
         int previous = Selected;
         Selected = GUILayout.SelectionGrid(Selected, Contents, HorizontalCount, GetStyle(), LayoutOptions);

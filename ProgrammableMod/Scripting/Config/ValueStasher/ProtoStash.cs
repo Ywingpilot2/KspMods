@@ -4,18 +4,11 @@ using SteelLanguage.Exceptions;
 
 namespace ProgrammableMod.Scripting.Config.ValueStasher;
 
-public readonly struct ProtoStash
+public readonly record struct ProtoStash(string Name, string ValueType, ConfigNode Node)
 {
-    public string Name { get; }
-    public string ValueType { get; }
-    public ConfigNode Node { get; }
-
-    public ProtoStash(string name, string valueType, ConfigNode node)
-    {
-        Name = name;
-        ValueType = valueType;
-        Node = node;
-    }
+    public string Name { get; } = Name;
+    public string ValueType { get; } = ValueType;
+    public ConfigNode Node { get; } = Node;
 
     public bool IsBasic => bool.Parse(Node.GetValue("basic_type"));
 
@@ -34,7 +27,7 @@ public readonly struct ProtoStash
             case "string": return Node.GetValue("value").ConfigDirty();
         }
         
-        throw new InvalidActionException(0, $"Stashed value {Name} of type {ValueType} was not a basic type(int, string, uint)");
+        throw new InvalidActionException(0, $"Stashed value {Name} of type {ValueType} was not a basic type(int, string, float)");
     }
     
     public int GetAsInt()

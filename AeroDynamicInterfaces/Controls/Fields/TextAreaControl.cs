@@ -24,7 +24,7 @@ public class TextAreaControl : Control
     
     protected void Updated() => OnUpdated?.Invoke(this, EventArgs.Empty);
 
-    public override void Draw()
+    protected override void Draw()
     {
         if (ReadOnly)
         {

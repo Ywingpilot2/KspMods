@@ -21,13 +21,13 @@ public class ColumnControl : Control
     {
     }
 
-    public override void Draw()
+    protected override void Draw()
     {
         GUILayout.BeginHorizontal(LayoutOptions);
         
         foreach (Control childControl in this)
         {
-            childControl.Draw();
+            childControl.RenderControl();
         }
         
         GUILayout.EndHorizontal();

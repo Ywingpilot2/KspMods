@@ -16,7 +16,7 @@ public class FillerControl : Control
         _pixels = pixels;
     }
 
-    public override void Draw()
+    protected override void Draw()
     {
         if (_pixels == 0)
             GUILayout.FlexibleSpace();

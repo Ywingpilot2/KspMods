@@ -13,6 +13,8 @@ namespace ProgrammableMod.Controls;
 
 public sealed class ExceptionBoxControl : DragWindow
 {
+    private readonly double _closeTime;
+    
     public static void Show(string message)
     {
         AeroInterfaceManager.AddControl(new ExceptionBoxControl(new System.Random().Next(), message));
@@ -29,5 +31,6 @@ public sealed class ExceptionBoxControl : DragWindow
         Add(new LabelControl(rng.Next(), "An error has occured! Message:"));
         Add(new ScrollViewControl(rng.Next(), new LabelControl(rng.Next(), new GUIContent(message), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true))));
         Add(new ButtonControl(rng.Next(), "OK", (_,_) => Close()));
+        _closeTime = Time.fixedTime + 32;
     }
 }

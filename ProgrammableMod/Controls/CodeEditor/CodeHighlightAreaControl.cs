@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AeroDynamicKerbalInterfaces.Controls.Fields;
-using JetBrains.Annotations;
-using ProgrammableMod.Extensions;
 using SteelLanguage;
-using SteelLanguage.Extensions;
 using SteelLanguage.Reflection.Library;
 using SteelLanguage.Reflection.Type;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.KeyWords.Container;
 using UnityEngine;
 
-namespace ProgrammableMod.Controls;
+namespace ProgrammableMod.Controls.CodeEditor;
 
 
 // TODO: fix this
@@ -107,7 +103,7 @@ public class CodeHighlightAreaControl : TextAreaControl
     #endregion
 
     private string _styledText;
-    public override void Draw()
+    protected override void Draw()
     {
         string upd = GUILayout.TextArea(_styledText, GetStyle(), LayoutOptions);
         

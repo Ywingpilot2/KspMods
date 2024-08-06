@@ -1,20 +1,18 @@
 ﻿using System;
 using AeroDynamicKerbalInterfaces;
-using AeroDynamicKerbalInterfaces.Controls;
 using AeroDynamicKerbalInterfaces.Controls.Buttons;
-using AeroDynamicKerbalInterfaces.Controls.ContentControl;
 using AeroDynamicKerbalInterfaces.Controls.ContentControl.Flow;
 using AeroDynamicKerbalInterfaces.Controls.ContentControl.Organization;
 using AeroDynamicKerbalInterfaces.Controls.ContentControl.Windows;
 using AeroDynamicKerbalInterfaces.Controls.Fields;
 using AeroDynamicKerbalInterfaces.Controls.Space;
-using JetBrains.Annotations;
+using ProgrammableMod.Controls.CodeLibrary;
 using ProgrammableMod.Scripting.Config.ScriptLibrary;
 using SteelLanguage;
 using UnityEngine;
 using Random = System.Random;
 
-namespace ProgrammableMod.Controls;
+namespace ProgrammableMod.Controls.CodeEditor;
 
 public sealed class CodeEditorControl : DragWindow
 {

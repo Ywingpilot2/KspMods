@@ -11,7 +11,8 @@ public class ScrollViewControl : Control
     public bool AutoScrollBottom { get; set; }
 
     private float _height;
-    public override void Draw()
+
+    protected override void Draw()
     {
         ScrollPosition = GUILayout.BeginScrollView(ScrollPosition, GetStyle(), LayoutOptions);
 
@@ -20,7 +21,7 @@ public class ScrollViewControl : Control
         
         foreach (Control childControl in this)
         {
-            childControl.Draw();
+            childControl.RenderControl();
             
             if (Event.current.type == EventType.Repaint)
                 _height += GUILayoutUtility.GetLastRect().height;

@@ -25,7 +25,7 @@ public class AeroInterfaceManager : MonoBehaviour
         GUI.skin = ThemesDictionary.Skin;
         foreach (Control control in Controls.Values)
         {
-            control.Draw();
+            control.RenderControl();
         }
         
         GUI.skin = null;

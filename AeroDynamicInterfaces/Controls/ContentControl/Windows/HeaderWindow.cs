@@ -27,7 +27,7 @@ public class HeaderWindow : WindowControl
     {
         foreach (Control control in this)
         {
-            control.Draw();
+            control.RenderControl();
         }
     }
 

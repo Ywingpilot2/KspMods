@@ -19,7 +19,7 @@ public sealed class LogControl : DragWindow
     public List<string> LogText { get; }
     private readonly TextAreaControl _textControl;
 
-    public override void Draw()
+    protected override void Draw()
     {
         UpdateControl();
         base.Draw();

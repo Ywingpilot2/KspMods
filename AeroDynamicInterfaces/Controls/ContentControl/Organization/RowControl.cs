@@ -21,13 +21,13 @@ public class RowControl : Control
     {
     }
 
-    public override void Draw()
+    protected override void Draw()
     {
         GUILayout.BeginVertical(LayoutOptions);
 
         foreach (Control control in this)
         {
-            control.Draw();
+            control.RenderControl();
         }
         
         GUILayout.EndVertical();

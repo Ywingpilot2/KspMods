@@ -6,7 +6,7 @@ namespace ProgrammableMod.Scripting.Terms.Graphmatics.Curves; // shutup rider "g
 /// <summary>
 /// My beloved
 /// </summary>
-internal struct PiecewiseCurve : IPiecewise, IConfigNode
+internal readonly record struct PiecewiseCurve : IPiecewise, IConfigNode
 {
     public Vector2[] Points { get; }
 

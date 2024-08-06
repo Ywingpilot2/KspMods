@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AeroDynamicKerbalInterfaces;
 using JetBrains.Annotations;
 using ProgrammableMod.Controls;
+using ProgrammableMod.Controls.CodeEditor;
 using ProgrammableMod.Extensions;
 using ProgrammableMod.Modules.ComputerTemp;
 using ProgrammableMod.Scripting.Config.ScriptLibrary;
@@ -225,7 +226,7 @@ public abstract class BaseComputer : PartModule
         
         if (Rng.Next(0, 10) <= 5 || data.flightID == part.flightID)
         {
-            ThrowException($"Oh no, an unknown error has occured! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {Rng.Next(404)}");
+            ThrowException($"Vessel stability compromised! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {Rng.Next(404)}");
         }
 
         if (data.flightID == part.flightID)

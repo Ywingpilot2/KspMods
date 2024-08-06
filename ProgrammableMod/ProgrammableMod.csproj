@@ -83,9 +83,10 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Controls\CodeEditorControl.cs" />
-        <Compile Include="Controls\CodeHighlightAreaControl.cs" />
-        <Compile Include="Controls\CodeLibraryControl.cs" />
+        <Compile Include="Controls\CodeEditor\CodeEditorControl.cs" />
+        <Compile Include="Controls\CodeEditor\CodeHighlightAreaControl.cs" />
+        <Compile Include="Controls\CodeLibrary\CodeLibraryControl.cs" />
+        <Compile Include="Controls\CodeLibrary\ScriptCraftGridControl.cs" />
         <Compile Include="Controls\ExceptionBox.cs" />
         <Compile Include="Controls\LogControl.cs" />
         <Compile Include="Controls\PartRenameControl.cs" />

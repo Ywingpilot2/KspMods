@@ -17,16 +17,11 @@ public class PartNameModule : PartModule
         _renameControl.Show(partName);
     }
 
-    public override void OnAwake()
-    {
-        base.OnAwake();
-        _renameControl = new PartRenameControl("", OnApplyName);
-    }
-
     public override void OnStart(StartState state)
     {
         base.OnStart(state);
 
+        _renameControl = new PartRenameControl("", OnApplyName);
         if (string.IsNullOrEmpty(partName))
         {
             if (HighLogic.LoadedSceneIsFlight)

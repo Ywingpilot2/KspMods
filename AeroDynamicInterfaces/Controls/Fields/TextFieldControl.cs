@@ -23,7 +23,7 @@ public class TextFieldControl : Control
 
     protected void Updated() => OnUpdated?.Invoke(this, EventArgs.Empty);
 
-    public override void Draw()
+    protected override void Draw()
     {
         string upd = GUILayout.TextField(Content.text, GetStyle(), LayoutOptions);
         if (upd != Content.text)

@@ -10,7 +10,7 @@ public class WindowControl : Control
 
     protected Rect WindowRect;
 
-    public override void Draw()
+    protected override void Draw()
     {
         WindowRect = GUILayout.Window(new System.Random(GetHashCode()).Next(), WindowRect, DrawWindow, GUIContent.none, GetStyle(), LayoutOptions);
     }

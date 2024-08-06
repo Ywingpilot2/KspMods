@@ -23,7 +23,7 @@ public class LabelControl : Control
     {
     }
 
-    public override void Draw()
+    protected override void Draw()
     {
         GUILayout.Label(Content, GetStyle(), LayoutOptions);
     }

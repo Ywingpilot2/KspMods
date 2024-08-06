@@ -82,9 +82,27 @@ public abstract class Control : ICollection<Control>
     public GUILayoutOption[] LayoutOptions { get; set; }
     public Control? ParentControl { get; set; }
     private Dictionary<int, Control> ChildControls { get; }
+    private List<Control> ChildControlsList { get; }
     public GUIContent Content { get; set; }
 
-    public abstract void Draw();
+    public void RenderControl()
+    {
+        PreDraw();
+        Draw();
+        PostDraw();
+    }
+
+    protected virtual void PreDraw()
+    {
+        
+    }
+    
+    protected abstract void Draw();
+
+    protected virtual void PostDraw()
+    {
+        
+    }
 
     public Vector2 GetSize()
     {
@@ -100,6 +118,7 @@ public abstract class Control : ICollection<Control>
         Id = id;
         Content = content;
         ChildControls = new Dictionary<int, Control>();
+        ChildControlsList = new List<Control>();
         AddRange(children);
         
         foreach (Control control in this)
@@ -165,7 +184,7 @@ public abstract class Control : ICollection<Control>
 
     public IEnumerator<Control> GetEnumerator()
     {
-        return ChildControls.Values.GetEnumerator();
+        return ChildControlsList.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -181,9 +200,21 @@ public abstract class Control : ICollection<Control>
         return ChildControls[id];
     }
 
+    public int IndexOf(Control item) => ChildControlsList.IndexOf(item);
+
+    public int IndexOf(int id)
+    {
+        Control? control = GetControl(id);
+        if (control == null)
+            return -1;
+
+        return IndexOf(control);
+    }
+
     public void Add(Control item)
     {
         ChildControls.Add(item.Id, item);
+        ChildControlsList.Add(item);
         item.ParentControl = this;
     }
 
@@ -203,6 +234,7 @@ public abstract class Control : ICollection<Control>
         }
         
         ChildControls.Clear();
+        ChildControlsList.Clear();
     }
 
     public bool Contains(int id) => ChildControls.ContainsKey(id);
@@ -222,7 +254,7 @@ public abstract class Control : ICollection<Control>
 
     public bool Remove(Control item)
     {
-        if (ChildControls.Remove(item.Id))
+        if (ChildControls.Remove(item.Id) && ChildControlsList.Remove(item))
             return true;
 
         return false;

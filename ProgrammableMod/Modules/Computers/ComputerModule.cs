@@ -224,7 +224,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
                     } break;
                     case 1:
                     {
-                        ThrowException($"Oh no, an unknown error has occured! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {Rng.Next(404)}");
+                        ThrowException("Temperature anomalies occuring! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.");
                     } break;
                     case 3:
                     {

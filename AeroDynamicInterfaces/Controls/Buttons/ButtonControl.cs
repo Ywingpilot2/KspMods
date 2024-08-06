@@ -10,7 +10,7 @@ public class ButtonControl : Control
     public event EventHandler? OnPressed;
     protected void Pressed() => OnPressed?.Invoke(this, EventArgs.Empty);
 
-    public override void Draw()
+    protected override void Draw()
     {
         if (GUILayout.Button(Content, GetStyle(), LayoutOptions))
         {

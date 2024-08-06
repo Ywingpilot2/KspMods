@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Terms.Graphmatics.Curves;
 
-internal struct PiecewiseLinear : IPiecewise
+internal readonly record struct PiecewiseLinear : IPiecewise
 {
     public Vector2[] Points { get; }
 
