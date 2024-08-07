@@ -20,6 +20,13 @@ public sealed class ExceptionBoxControl : DragWindow
         AeroInterfaceManager.AddControl(new ExceptionBoxControl(new System.Random().Next(), message));
     }
 
+    protected override void PostDraw()
+    {
+        base.PostDraw();
+        if (Time.fixedTime >= _closeTime)
+            Close();
+    }
+
     private void Close()
     {
         AeroInterfaceManager.RemoveControl(Id);

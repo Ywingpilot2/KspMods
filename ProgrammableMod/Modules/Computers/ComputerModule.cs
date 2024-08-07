@@ -29,6 +29,9 @@ public class ComputerModule : BaseComputer, IResourceConsumer
     [KSPField]
     public bool canOverclock = false;
 
+    [KSPField]
+    public float overclockPowerMod = 1.0f;
+
     [KSPField(isPersistant = true)]
     public bool isOverclocked = false;
 
@@ -46,7 +49,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
     #region Module Events
 
     private float _originalLimit;
-    [KSPEvent(active = false, guiActive = true, guiName = "CPU Over Clocking: false", guiActiveUnfocused = true, unfocusedRange = 25f)]
+    [KSPEvent(active = false, guiActive = true, guiActiveEditor = true, guiName = "CPU Over Clocking: false", guiActiveUnfocused = true, unfocusedRange = 25f)]
     public void ToggleOverclocking()
     {
         if (!HighLogic.LoadedSceneIsFlight)
@@ -427,6 +430,9 @@ public class ComputerModule : BaseComputer, IResourceConsumer
             string error = "";
             double rate = shouldRun ? CalculateCost(Script) : 0.0;
             rate *= _rateMultiplier;
+
+            if (isOverclocked)
+                rate *= overclockPowerMod;
         
             if (!resHandler.UpdateModuleResourceInputs(ref error, rate, 0.9, true) && shouldRun)
             {
