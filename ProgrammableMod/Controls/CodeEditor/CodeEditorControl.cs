@@ -83,13 +83,14 @@ public sealed class CodeEditorControl : DragWindow
         Add(_nameText);
         Add(new ScrollViewControl(rng.Next(), _codeText){AutoScrollBottom = false});
 
-        ColumnControl columnControl = new ColumnControl(rng.Next());
-        columnControl.Add(new ButtonControl(rng.Next(), new GUIContent("Cancel"), (_,_) => Hide(), GUILayout.Width(115)));
-        columnControl.Add(new FillerControl(rng.Next()));
-        
-        columnControl.Add(new ButtonControl(rng.Next(), new GUIContent("Load"), (_,_) => Load(), GUILayout.Width(150)));
-        columnControl.Add(new ButtonControl(rng.Next(), new GUIContent("Save"), (_,_) => Save(), GUILayout.Width(150)));
-        
+        ColumnControl columnControl = new ColumnControl(rng.Next())
+        {
+            new ButtonControl(rng.Next(), new GUIContent("Cancel"), (_, _) => Hide(), GUILayout.Width(115)),
+            new FillerControl(rng.Next()),
+            new ButtonControl(rng.Next(), new GUIContent("Load"), (_,_) => Load(), GUILayout.Width(150)),
+            new ButtonControl(rng.Next(), new GUIContent("Save"), (_,_) => Save(), GUILayout.Width(150))
+        };
+
         Add(columnControl);
         
         _onSave = onSave;

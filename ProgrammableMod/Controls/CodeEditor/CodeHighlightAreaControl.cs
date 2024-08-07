@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AeroDynamicKerbalInterfaces.Controls.Fields;
+using AeroDynamicKerbalInterfaces.Themes;
 using SteelLanguage;
 using SteelLanguage.Reflection.Library;
 using SteelLanguage.Reflection.Type;
@@ -101,19 +102,18 @@ public class CodeHighlightAreaControl : TextAreaControl
     }
 
     #endregion
-
-    private string _styledText;
+    
     protected override void Draw()
     {
-        string upd = GUILayout.TextArea(_styledText, GetStyle(), LayoutOptions);
-        
-        if (upd != _styledText)
-        {
-            Updated();
-            Content.text = StripText(upd);
-            _styledText = ThiccifyText(Content.text);
-        }
+        Color color = GUI.color;
+        GUI.color = Color.clear;
+        base.Draw();
+        GUI.color = color;
+
+        GUI.Label(GUILayoutUtility.GetLastRect(), ThiccifyText(Text), new GUIStyle(ThemesDictionary.GetStyle("LabelPlain")){wordWrap = false,richText = true});
     }
+
+    #region Color Utils
 
     private string ThiccifyText(string text)
     {
@@ -125,15 +125,7 @@ public class CodeHighlightAreaControl : TextAreaControl
         return text;
     }
 
-    private string StripText(string text)
-    {
-        foreach (ColorStyler styler in Replacers)
-        {
-            text = styler.CleanText(text);
-        }
-
-        return text;
-    }
+    #endregion
 
     public CodeHighlightAreaControl(int id, string content, SteelCompiler compiler) : base(id, content)
     {
@@ -143,8 +135,6 @@ public class CodeHighlightAreaControl : TextAreaControl
             GUILayout.ExpandWidth(true),
             GUILayout.ExpandHeight(true)
         };
-
-        _styledText = ThiccifyText(Content.text);
 
         WordWrap = false;
         RichText = true;

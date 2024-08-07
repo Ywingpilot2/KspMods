@@ -18,7 +18,13 @@ public class EnumeratorTerm : BaseTerm
     public override bool ContainsType => true;
     public override string[] ContainedTypeInputs => new []{"term"};
 
-    public virtual string GetEnumerationType() => ContainedType[0];
+    public virtual string GetEnumerationType()
+    {
+        if (ContainedType == null || ContainedType.Length == 0)
+            return "term";
+
+        return ContainedType[0];
+    }
 
     public override string ValueType => "Enumerable";
 

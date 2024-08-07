@@ -43,7 +43,7 @@ internal sealed class CodeLibraryControl : DragWindow
         _grid.SetContent(contents);
     }
 
-    public CodeLibraryControl(int id) : base(id, "Select Script", new Rect(Screen.width / 2, Screen.height / 2, 625, 460))
+    public CodeLibraryControl(int id) : base(id, "Select Script", new Rect(Screen.width / 2, Screen.height / 2, 645, 460))
     {
         TextAlignment = TextAnchor.UpperLeft;
 

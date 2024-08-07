@@ -123,6 +123,15 @@ public static class ThemesDictionary
         };
         AddStyle("LabelTitle", style); // TODO: this is broken, investigate why
 
+        style = new GUIStyle(HighLogic.Skin.label)
+        {
+            normal = new GUIStyleState()
+            {
+                textColor = HighLogic.Skin.textArea.normal.textColor
+            }
+        };
+        AddStyle("LabelPlain", style);
+
         #endregion
 
         #region Custom Style
