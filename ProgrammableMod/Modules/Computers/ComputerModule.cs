@@ -52,9 +52,6 @@ public class ComputerModule : BaseComputer, IResourceConsumer
     [KSPEvent(active = false, guiActive = true, guiActiveEditor = true, guiName = "CPU Over Clocking: false", guiActiveUnfocused = true, unfocusedRange = 25f)]
     public void ToggleOverclocking()
     {
-        if (!HighLogic.LoadedSceneIsFlight)
-            return;
-
         isOverclocked = !isOverclocked;
         Events[nameof(ToggleOverclocking)].guiName = $"CPU Over Clocking: {isOverclocked}";
         OverClockTokens();
