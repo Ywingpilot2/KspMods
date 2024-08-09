@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ProgrammableMod.Modules.Computers;
 
 namespace ProgrammableMod.Modules.ComputerTemp;
 
 public class ModuleComputerHeat : ModuleCoreHeat
 {
-    private readonly Random _rng = new Random();
-
     public override double CoreTemperature
     {
         get
@@ -94,7 +91,7 @@ public class ModuleComputerHeat : ModuleCoreHeat
         if (!computer.running)
             return;
         
-        computer.ThrowException($"Computer CPU is overheating! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.\nError Code: {_rng.Next(405)}");
+        computer.ThrowException("Computer CPU is overheating! Any unsaved progress, in progress actions, or other important functions will be inoperable until computer is turned back on.");
     }
     
     protected override void ResolveConverterEnergy(double deltaTime)
@@ -105,4 +102,6 @@ public class ModuleComputerHeat : ModuleCoreHeat
     {
         // TODO:
     }
+
+    
 }

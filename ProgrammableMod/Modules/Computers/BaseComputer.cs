@@ -334,11 +334,22 @@ public abstract class BaseComputer : PartModule
     [UI_Toggle(scene = UI_Scene.All, controlEnabled = true, enabledText = "Enabled", disabledText = "Disabled")]
     [KSPField(guiActiveEditor = true, guiActive = true, guiName = "Execution:", isPersistant = true, guiActiveUnfocused = true, unfocusedRange = 10f)]
     public bool shouldRun = false;
+
+    public bool ShouldRun
+    {
+        get => shouldRun;
+        set
+        {
+            shouldRun = value;
+            if (!value)
+                running = false;
+        }
+    }
     
     [KSPAction("Toggle Execution")]
     public void Toggle(KSPActionParam param)
     {
-        shouldRun = !shouldRun;
+        ShouldRun = !shouldRun;
     }
 
     #endregion
@@ -452,7 +463,7 @@ public abstract class BaseComputer : PartModule
     {
         if (kind == StatusKind.Uhoh)
         {
-            shouldRun = false;
+            ShouldRun = false;
             tokenContainer.shouldCompile = false;
             
             Fields["exception"].guiActive = true;

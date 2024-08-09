@@ -220,7 +220,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
                 {
                     case 0:
                     {
-                        shouldRun = false;
+                        ShouldRun = false;
                     } break;
                     case 1:
                     {
