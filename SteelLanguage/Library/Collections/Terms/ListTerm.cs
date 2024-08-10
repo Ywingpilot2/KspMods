@@ -112,7 +112,7 @@ public class ListTerm : CollectionTerm
             }
 
             return new ReturnValue(list, "List");
-        }, "enumerable");
+        }, $"Enumerable<{GetEnumerationType()}>");
     }
 
     #region Functions

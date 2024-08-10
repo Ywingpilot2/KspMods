@@ -24,7 +24,7 @@ public class CollectionTerm : EnumeratorTerm
         {
             Remove(terms);
         }, ContainedTypeInputs);
-        yield return new Function("add", Clear);
+        yield return new Function("clear", Clear);
     }
 
     public override IEnumerable<TermField> GetFields()

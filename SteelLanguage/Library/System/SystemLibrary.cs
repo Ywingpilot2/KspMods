@@ -33,22 +33,7 @@ public class SystemLibrary : ILibrary
 
             return new ReturnValue(Equals(a, b), "bool");
         }),
-        new Function("not_equal", "bool", inputTypes: new[] { "term", "term" }, action: terms =>
-        {
-            object a = terms[0].GetValue();
-            object b = terms[1].GetValue();
-
-            if (a == null && b == null) // both values are null therefore technically equal
-            {
-                return new ReturnValue(false, "bool");
-            }
-
-            return new ReturnValue(!Equals(a, b), "bool");
-        }),
         new Function("to_string", "string", inputTypes: "term", action: terms => new ReturnValue(TermToString(terms[0]), "string")),
-        new Function("not", "bool", inputTypes:new []{"bool"}, action: terms => new ReturnValue(!terms[0].CastToBool(), "bool")),
-        new Function("and", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() && terms[1].CastToBool(), "bool")),
-        new Function("or", "bool", inputTypes:new []{"bool","bool"}, action: terms => new ReturnValue(terms[0].CastToBool() || terms[1].CastToBool(), "bool")),
         new Function("concat", "string", terms =>
         {
             string str = terms[0].CastToStr();

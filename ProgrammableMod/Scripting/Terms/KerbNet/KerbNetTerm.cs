@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ProgrammableMod.Scripting.Exceptions;
+using SteelLanguage.Exceptions;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
@@ -36,6 +37,17 @@ internal class KerbNetTerm : BaseComputerTerm
         }
 
         yield return new Function("enumerate_bodies", EnumerateBodies, "CelestialBody");
+        yield return new Function("get_body", "CelestialBody", terms =>
+        {
+            string name = terms[0].CastToStr();
+            foreach (CelestialBody celestialBody in FlightGlobals.Bodies)
+            {
+                if (celestialBody.GetName() == name)
+                    return new ReturnValue(celestialBody, "CelestialBody");
+            }
+
+            throw new InvalidActionException(0, $"Could not find body of name {name}");
+        }, "string");
     }
 
     private IEnumerable<ReturnValue> EnumerateBodies()

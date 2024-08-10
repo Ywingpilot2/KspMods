@@ -268,7 +268,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
 
     #region Script Events
 
-    public override bool ValidateScript(SteelScript script, out string reason)
+    protected override bool ValidateScript(SteelScript script, out string reason)
     {
         float total = CalculateCost(script);
         if (total > tokenLimit)

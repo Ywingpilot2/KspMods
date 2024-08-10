@@ -26,7 +26,7 @@ namespace ProgrammableMod.Modules.Computers;
 
 public enum StatusKind
 {
-    Exceptional,
+    Exceptional = 0,
     NotGreat = 1,
     Uhoh = 2
 }
@@ -76,35 +76,35 @@ public abstract class BaseComputer : PartModule
     {
         OnExecute();
 
-        if (shouldRun && HighLogic.LoadedSceneIsFlight)
+        if (!shouldRun || !HighLogic.LoadedSceneIsFlight) 
+            return;
+
+        if (Script == null)
         {
-            if (Script == null)
-            {
-                ThrowException("Script is not compiled!");
-                return;
-            }
+            ThrowException("Script is not compiled!");
+            return;
+        }
             
-            State = state;
-            if (ShouldSkipCycle())
-                return;
+        State = state;
+        if (ShouldSkipCycle())
+            return;
 
-            try
-            {
-                PreExecute();
+        try
+        {
+            PreExecute();
 
-                CancellationTokenSource cancel = new CancellationTokenSource();
-                cancel.CancelAfter(150);
+            CancellationTokenSource cancel = new CancellationTokenSource();
+            cancel.CancelAfter(150);
 
-                Parallel.Invoke(new ParallelOptions { CancellationToken = cancel.Token, MaxDegreeOfParallelism = 2 },
-                    Script.Execute);
-                cancel.Token.ThrowIfCancellationRequested();
+            Parallel.Invoke(new ParallelOptions { CancellationToken = cancel.Token, MaxDegreeOfParallelism = 2 },
+                Script.Execute);
+            cancel.Token.ThrowIfCancellationRequested();
 
-                PostExecute();
-            }
-            catch (Exception e)
-            {
-                CatchException(e);
-            }
+            PostExecute();
+        }
+        catch (Exception e)
+        {
+            CatchException(e);
         }
     }
 
@@ -300,14 +300,36 @@ public abstract class BaseComputer : PartModule
             OnCompiled();
         }
     }
+
+    protected abstract bool ValidateScript(SteelScript script, out string reason);
+
+    #endregion
+
+    #region Actions
+    
+    [KSPAction("Stop Execution")]
+    public void StopExecAction(KSPActionParam param)
+    {
+        ShouldRun = false;
+    }
+
+    [KSPAction("Start Execution")]
+    public void StartExecAction(KSPActionParam param)
+    {
+        ShouldRun = true;
+    }
+
+    [KSPAction("Toggle Execution")]
+    public void ToggleExecAction(KSPActionParam param)
+    {
+        ShouldRun = !shouldRun;
+    }
     
     [KSPAction("Compile Script")]
     public void CompileAction(KSPActionParam param)
     {
         CompileScript();
     }
-
-    public abstract bool ValidateScript(SteelScript script, out string reason);
 
     #endregion
 
@@ -344,12 +366,6 @@ public abstract class BaseComputer : PartModule
             if (!value)
                 running = false;
         }
-    }
-    
-    [KSPAction("Toggle Execution")]
-    public void Toggle(KSPActionParam param)
-    {
-        ShouldRun = !shouldRun;
     }
 
     #endregion
@@ -547,6 +563,8 @@ public class TokenContainer : IConfigNode
 
     #endregion
 
+    #region Saving
+
     public void Save(ConfigNode node)
     {
         ConfigNode craftNode = new ConfigNode("script-craft");
@@ -575,4 +593,6 @@ public class TokenContainer : IConfigNode
         node.AddValue("directory", craft.Directory);
         node.AddValue("craft-name", craft.Name);
     }
+
+    #endregion
 }

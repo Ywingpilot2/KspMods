@@ -39,7 +39,7 @@ public class NumberTerm : BaseTerm
     }
 
     protected ValueType Number;
-    protected virtual global::System.Type NumberType { get; }
+    protected virtual Type NumberType { get; }
     protected static readonly NumberFormatInfo Info = new NumberFormatInfo();
 
     protected static string[] NumberTypes = new[]
@@ -212,7 +212,7 @@ public class NumberTerm : BaseTerm
 public class TermI : NumberTerm
 {
     public override string ValueType => "int";
-    protected override global::System.Type NumberType => typeof(int);
+    protected override Type NumberType => typeof(int);
 
     public override bool CanImplicitCastToBool => true;
 
@@ -341,7 +341,7 @@ public class TermI : NumberTerm
 public class TermF : NumberTerm
 {
     public override string ValueType => "float";
-    protected override global::System.Type NumberType => typeof(float);
+    protected override Type NumberType => typeof(float);
     
     public override bool Parse(string value)
     {
@@ -451,7 +451,7 @@ public class TermF : NumberTerm
 public class TermU : NumberTerm
 {
     public override string ValueType => "uint";
-    protected override global::System.Type NumberType => typeof(uint);
+    protected override Type NumberType => typeof(uint);
 
     public override bool CanImplicitCastToBool => true;
 
@@ -552,7 +552,7 @@ public class TermU : NumberTerm
 public class TermD : NumberTerm
 {
     public override string ValueType => "double";
-    protected override global::System.Type NumberType => typeof(double);
+    protected override Type NumberType => typeof(double);
 
     public override IEnumerable<TermField> GetStaticFields()
     {

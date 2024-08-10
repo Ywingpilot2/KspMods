@@ -344,19 +344,19 @@ public abstract class BaseTerm : IToken
     {
         yield return new Function("equals", "bool", inputTypes: new[] { "term" }, action: terms =>
         {
-            object a = terms[0].GetValue();
+            object a = GetValue();
             object b = terms[1].GetValue();
             return new ReturnValue(a.Equals(b), "bool");
         });
-        yield return new Function("to_string", "string", terms =>
+        yield return new Function("to_string", "string", () =>
         {
-            if (terms[0].CanImplicitCastToStr)
+            if (CanImplicitCastToStr)
             {
-                return new ReturnValue(terms[0].CastToStr(), "string");
+                return new ReturnValue(CastToStr(), "string");
             }
             else
             {
-                return new ReturnValue(terms[0].GetValue().ToString(), "string");
+                return new ReturnValue(GetValue().ToString(), "string");
             }
         });
     }

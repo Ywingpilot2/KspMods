@@ -11,7 +11,6 @@ public class ScrollViewControl : Control
     public bool AutoScrollBottom { get; set; }
 
     private float _height;
-
     protected override void Draw()
     {
         ScrollPosition = GUILayout.BeginScrollView(ScrollPosition, GetStyle(), LayoutOptions);

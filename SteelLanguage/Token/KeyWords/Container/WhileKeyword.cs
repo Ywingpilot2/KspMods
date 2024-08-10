@@ -10,14 +10,8 @@ public class WhileKeyword : ContainerKeyword
 {
     public override string Name => "while";
 
-    private SteelCompiler _compiler;
-    private SteelScript _script;
-
     public override void CompileKeyword(string token, SteelCompiler compiler, SteelScript script, ITokenHolder holder)
     {
-        _compiler = compiler;
-        _script = script;
-
         string[] split = token.SanitizedSplit('(', 2);
         string prms = split[1].Trim();
         prms = prms.Remove(prms.Length - 1);
