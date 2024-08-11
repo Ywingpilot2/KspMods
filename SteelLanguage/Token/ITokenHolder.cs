@@ -35,11 +35,18 @@ public interface ITokenHolder : IFunctionHolder, ICallHolder
     public ITokenHolder Container { get; }
 
     /// <summary>
-    /// Gets a <see cref="BaseTerm"/> from this holder
+    /// Gets a <see cref="BaseTerm"/> from one of the <see cref="TermHolder"/>s this contains
     /// </summary>
     /// <param name="name">The name of the term to get</param>
     /// <returns>The requested <see cref="BaseTerm"/></returns>
     public BaseTerm GetTerm(string name);
+
+    /// <summary>
+    /// Gets a <see cref="TermHolder"/> from this holder
+    /// </summary>
+    /// <param name="name">The name of the holder to get</param>
+    /// <returns>The requested <see cref="TermHolder"/></returns>
+    public TermHolder GetHolder(string name);
     
     /// <summary>
     /// Whether or not this holder has a <see cref="BaseTerm"/> with the specified name
@@ -53,6 +60,8 @@ public interface ITokenHolder : IFunctionHolder, ICallHolder
     /// </summary>
     /// <param name="term">The term to add</param>
     public void AddTerm(BaseTerm term);
+
+    public void AddHolder(TermHolder holder);
 
     /// <summary>
     /// Gets the current <see cref="SteelScript"/>'s <see cref="LibraryManager"/>

@@ -28,8 +28,7 @@ public class AssignmentCall : TokenCall
         {
             case AssignmentCallKind.Term:
             {
-                if (!GetTerm(_term).CopyFrom(Input.GetValue()))
-                    throw new InvalidAssignmentException(Line, GetTerm(_term));
+                GetHolder(_term).SetTerm(Input.GetValue());
             } break;
             case AssignmentCallKind.LocalField:
             {
@@ -66,16 +65,16 @@ public class AssignmentCall : TokenCall
         Input.PostCompilation();
     }
 
-    public AssignmentCall(BaseTerm term, Input input, ITokenHolder container, int line) : base(container, line)
+    public AssignmentCall(string termName, Input input, ITokenHolder container, int line) : base(container, line)
     {
-        _term = term.Name;
+        _term = termName;
         Input = input;
         _kind = AssignmentCallKind.Term;
     }
     
-    public AssignmentCall(BaseTerm term, string field, Input input, ITokenHolder container, int line) : base(container, line)
+    public AssignmentCall(string termName, string field, Input input, ITokenHolder container, int line) : base(container, line)
     {
-        _term = term.Name;
+        _term = termName;
         _field = field;
         Input = input;
         _kind = AssignmentCallKind.LocalField;

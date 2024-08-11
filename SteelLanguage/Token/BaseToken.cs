@@ -10,6 +10,7 @@ public abstract class BaseToken : IToken
     public int Line { get; set; }
 
     public BaseTerm GetTerm(string name) => Container.GetTerm(name);
+    public TermHolder GetHolder(string name) => Container.GetHolder(name);
     public TermType GetTermType(string name) => Container.GetLibraryManager().GetTermType(name);
     public IFunction GetFunc(string name) => Container.GetFunction(name);
 

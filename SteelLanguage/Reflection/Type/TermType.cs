@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SteelLanguage.Exceptions;
+using SteelLanguage.Extensions;
 using SteelLanguage.Reflection.Library;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
@@ -15,6 +16,10 @@ namespace SteelLanguage.Reflection.Type;
 
 public sealed record TermType
 {
+    /// <summary>
+    /// <see cref="Name"/> except with the type args stripped
+    /// </summary>
+    public string ShortName => Term.ValueType;
     public string Name
     {
         get
@@ -83,12 +88,27 @@ public sealed record TermType
     {
         TermType current = BaseClass;
 
-        while (current != null)
+        if (ContainsType && name.EndsWith(">"))
         {
-            if (current.Name == name)
-                return true;
+            string[] split = name.SanitizedSplit('<', 2, StringSplitOptions.RemoveEmptyEntries);
+            string actualName = split[0].Trim();
 
-            current = current.BaseClass;
+            while (current != null) // TODO: is this how we should do this?
+            {
+                if (current.Name == actualName)
+                    return true;
+                current = current.BaseClass;
+            }
+        }
+        else
+        {
+            while (current != null)
+            {
+                if (current.Name == name)
+                    return true;
+
+                current = current.BaseClass;
+            }
         }
 
         return false;

@@ -23,7 +23,7 @@ public sealed class SteelScript : ITokenHolder
     public ITokenHolder Container { get; }
 
     private readonly Dictionary<string, IFunction> _functions;
-    private Dictionary<string, BaseTerm> _terms;
+    private Dictionary<string, TermHolder> _terms;
     private LibraryManager LibraryManager { get; }
     private readonly List<TokenCall> _tokenCalls;
 
@@ -40,7 +40,13 @@ public sealed class SteelScript : ITokenHolder
 
     public IEnumerable<TokenCall> EnumerateCalls() => _tokenCalls;
 
-    public IEnumerable<BaseTerm> EnumerateTerms() => _terms.Values;
+    public IEnumerable<BaseTerm> EnumerateTerms()
+    {
+        foreach (TermHolder holder in _terms.Values)
+        {
+            yield return holder.GetTerm();
+        }
+    }
 
     #endregion
 
@@ -84,6 +90,14 @@ public sealed class SteelScript : ITokenHolder
         if (!_terms.ContainsKey(name))
             throw new TermNotExistException(0, name);
 
+        return _terms[name].GetTerm();
+    }
+
+    public TermHolder GetHolder(string name)
+    {
+        if (!_terms.ContainsKey(name))
+            throw new TermNotExistException(0, name);
+
         return _terms[name];
     }
 
@@ -93,8 +107,22 @@ public sealed class SteelScript : ITokenHolder
     {
         if (_terms.ContainsKey(term.Name))
             throw new TermAlreadyExistsException(0, term.Name);
-            
-        _terms.Add(term.Name, term);
+
+        TermHolder holder = new TermHolder(term.GetTermType().Name)
+        {
+            Name = term.Name
+        };
+        holder.SetTerm(term);
+        
+        _terms.Add(term.Name, holder);
+    }
+
+    public void AddHolder(TermHolder holder)
+    {
+        if (_terms.ContainsKey(holder.Name))
+            throw new TermAlreadyExistsException(0, holder.Name);
+        
+        _terms.Add(holder.Name, holder);
     }
 
     public LibraryManager GetLibraryManager() => LibraryManager;
@@ -197,7 +225,7 @@ public sealed class SteelScript : ITokenHolder
     public SteelScript()
     {
         _functions = new Dictionary<string, IFunction>();
-        _terms = new Dictionary<string, BaseTerm>();
+        _terms = new Dictionary<string, TermHolder>();
         _tokenCalls = new List<TokenCall>();
         LibraryManager = new LibraryManager();
         new Dictionary<string, object>();

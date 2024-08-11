@@ -15,8 +15,7 @@ public abstract record BaseExecutable : ITokenHolder, IExecutable
 {
     public ITokenHolder Container { get; }
 
-    protected readonly Dictionary<string, BaseTerm> BaseTerms;
-    private readonly Dictionary<string, object> _compiledValues;
+    protected readonly Dictionary<string, TermHolder> BaseTerms;
     protected readonly List<TokenCall> Calls;
 
     #region Token Holder
@@ -36,9 +35,9 @@ public abstract record BaseExecutable : ITokenHolder, IExecutable
             yield return term;
         }
 
-        foreach (BaseTerm term in BaseTerms.Values)
+        foreach (TermHolder term in BaseTerms.Values)
         {
-            yield return term;
+            yield return term.GetTerm();
         }
     }
 
@@ -50,6 +49,14 @@ public abstract record BaseExecutable : ITokenHolder, IExecutable
     {
         if (!BaseTerms.ContainsKey(name))
             return Container.GetTerm(name);
+
+        return BaseTerms[name].GetTerm();
+    }
+
+    public virtual TermHolder GetHolder(string name)
+    {
+        if (!BaseTerms.ContainsKey(name))
+            return Container.GetHolder(name);
 
         return BaseTerms[name];
     }
@@ -71,8 +78,21 @@ public abstract record BaseExecutable : ITokenHolder, IExecutable
     {
         if (HasTerm(term.Name))
             throw new TermAlreadyExistsException(0, term.Name);
+
+        TermHolder holder = new TermHolder(term.GetTermType().Name)
+        {
+            Name = term.Name
+        };
+        holder.SetTerm(term);
+        BaseTerms.Add(term.Name, holder);
+    }
+
+    public void AddHolder(TermHolder holder)
+    {
+        if (HasTerm(holder.Name))
+            throw new TermAlreadyExistsException(0, holder.Name);
         
-        BaseTerms.Add(term.Name, term);
+        BaseTerms.Add(holder.Name, holder);
     }
 
     public LibraryManager GetLibraryManager() => Container.GetLibraryManager();
@@ -98,10 +118,6 @@ public abstract record BaseExecutable : ITokenHolder, IExecutable
 
     public virtual void PreExecution()
     {
-        foreach (BaseTerm term in BaseTerms.Values)
-        {
-            term.SetValue(_compiledValues[term.Name]);
-        }
     }
 
     public virtual void PostExecution()
@@ -119,22 +135,13 @@ public abstract record BaseExecutable : ITokenHolder, IExecutable
         {
             call.PostCompilation();
         }
-        
-        foreach (BaseTerm term in BaseTerms.Values)
-        {
-            if (_compiledValues.ContainsKey(term.Name))
-                continue;
-            
-            _compiledValues.Add(term.Name, term.GetValue());
-        }
     }
 
     #endregion
 
     protected BaseExecutable(ITokenHolder holder)
     {
-        BaseTerms = new Dictionary<string, BaseTerm>();
-        _compiledValues = new Dictionary<string, object>();
+        BaseTerms = new Dictionary<string, TermHolder>();
         Calls = new List<TokenCall>();
         Container = holder;
     }

@@ -232,7 +232,7 @@ public static class CompileUtils
             }
             case TokenKind.Term:
             {
-                return new Input(holder.GetTerm(token));
+                return new Input(holder.GetHolder(token));
             }
             case TokenKind.LocalFunc:
             case TokenKind.Function:
@@ -456,8 +456,10 @@ public static class CompileUtils
 
     public static TermType GetTypeFromTerm(string token, ITokenHolder holder)
     {
-        BaseTerm term = holder.GetTerm(token);
-        return term.GetTermType();
+        TermHolder termHolder = holder.GetHolder(token);
+        TermType type = holder.GetLibraryManager().GetTermType(termHolder.Type);
+        
+        return type;
     }
 
     public static TermType GetTypeFromFunction(string token, ITokenHolder holder)

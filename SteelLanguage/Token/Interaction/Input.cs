@@ -19,7 +19,7 @@ public readonly record struct Input
 {
     public InputType Type { get; }
     private TokenCall Call { get; }
-    private readonly BaseTerm _term;
+    private readonly TermHolder _term;
     private readonly ITokenHolder _container;
 
     public BaseTerm GetValue()
@@ -29,7 +29,7 @@ public readonly record struct Input
             case InputType.Constant:
             case InputType.Term:
             {
-                return _term;
+                return _term.GetTerm();
             }
             case InputType.Call:
             {
@@ -79,7 +79,14 @@ public readonly record struct Input
     public Input(BaseTerm term)
     {
         Type = InputType.Term;
-        _term = term;
+        _term = new TermHolder(term);
+        Call = null;
+    }
+
+    public Input(TermHolder holder)
+    {
+        Type = InputType.Term;
+        _term = holder;
         Call = null;
     }
 }

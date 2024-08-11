@@ -113,6 +113,7 @@
         <Compile Include="Token\Terms\BaseTerm.cs" />
         <Compile Include="Token\Terms\Technical\Term.cs" />
         <Compile Include="Token\Terms\Technical\VoidTerm.cs" />
+        <Compile Include="Token\Terms\TermContainer.cs" />
         <Compile Include="Token\TokenKind.cs" />
         <Compile Include="Utils\CompileUtils.cs" />
     </ItemGroup>

@@ -47,7 +47,9 @@ public class SystemLibrary : ILibrary
             }
 
             return new ReturnValue(str, "string");
-        }, "string", "params term")
+        }, "string", "params term"),
+        // TODO: Remove this! This should instead just be an operator
+        new Function("not", "bool", inputTypes:new []{"bool"}, action: terms => new ReturnValue(!terms[0].CastToBool(), "bool"))
     };
 
     public static string TermToString(BaseTerm term)

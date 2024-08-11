@@ -66,19 +66,22 @@ public class InvalidParametersException : CompilationException
             }
             else
             {
-                if (_strings.Length == 0)
+                switch (_strings.Length)
                 {
-                    return $"The function call at {LineNumber} expects no parameters yet has inputs.";
-                }
-                else
-                {
-                    string error = $"The function call at {LineNumber} param conditions are not met.\nIt expects {_strings.Length} inputs of the following types:";
-                    foreach (string s in _strings)
+                    case 0:
+                        return $"The function call at {LineNumber} expects no parameters yet has inputs.";
+                    case 1:
+                        return $"The function call at {LineNumber} expects a {_strings[0]} as the only input";
+                    default:
                     {
-                        error += $"\n{s}";
-                    }
+                        string error = $"The function call at {LineNumber} param conditions are not met.\nIt expects {_strings.Length} inputs of the following types:";
+                        foreach (string s in _strings)
+                        {
+                            error += $"\n{s}";
+                        }
 
-                    return error;
+                        return error;
+                    }
                 }
             }
         }
@@ -88,7 +91,7 @@ public class InvalidParametersException : CompilationException
     {
     }
 
-    public InvalidParametersException(int lineNumber, string[] ins) : base(lineNumber)
+    public InvalidParametersException(int lineNumber, params string[] ins) : base(lineNumber)
     {
         _strings = ins;
     }

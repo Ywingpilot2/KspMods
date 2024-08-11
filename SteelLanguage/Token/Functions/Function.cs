@@ -314,9 +314,9 @@ public record UserFunction : BaseExecutable, IFunction
 
     public override IEnumerable<BaseTerm> EnumerateTerms()
     {
-        foreach (BaseTerm term in BaseTerms.Values)
+        foreach (TermHolder term in BaseTerms.Values)
         {
-            yield return term;
+            yield return term.GetTerm();
         }
     }
 
@@ -324,6 +324,14 @@ public record UserFunction : BaseExecutable, IFunction
     {
         if (!BaseTerms.ContainsKey(name) && GetLibraryManager().HasGlobalTerm(name))
             return GetLibraryManager().GetGlobalTerm(name);
+            
+        return BaseTerms[name].GetTerm();
+    }
+
+    public override TermHolder GetHolder(string name)
+    {
+        if (!BaseTerms.ContainsKey(name))
+            throw new TermNotExistException(0, name);
             
         return BaseTerms[name];
     }

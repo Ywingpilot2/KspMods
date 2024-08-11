@@ -161,55 +161,49 @@ public sealed class SteelCompiler
         {
             case AssignmentKind.Constant:
             {
-                TermType type = manager.GetTermType(values[0]);
+                string holderType = values[0];
+                TermType type = CompileUtils.GetTypeFromToken(values[2], holder, CompileUtils.GetTokenKind(values[2], holder));
                 BaseTerm term = type.Construct(values[1], CurrentLine, manager);
                 
                 Input constant = CompileUtils.HandleToken(values[2], term.ValueType, holder, this);
-                AssignmentCall call = new AssignmentCall(term, constant, holder, CurrentLine);
+                AssignmentCall call = new AssignmentCall(term.Name, constant, holder, CurrentLine);
 
-                holder.AddTerm(term);
+                TermHolder termHolder = new TermHolder(term, holderType);
+                holder.AddHolder(termHolder);
                 holder.AddCall(call);
             } break;
             case AssignmentKind.Term:
             {
-                TermType type = manager.GetTermType(values[0]);
-                BaseTerm from = holder.GetTerm(values[2]);
-                if (!from.CanImplicitCastToType(type) && !from.GetTermType().IsSubclassOf(type.Name))
-                    throw new InvalidAssignmentException(CurrentLine);
+                string holderType = values[0];
+                TermType type = CompileUtils.GetTypeFromToken(values[2], holder, CompileUtils.GetTokenKind(values[2], holder));
+                TermHolder from = holder.GetHolder(values[2]);
+                BaseTerm term = type.Construct(values[1], CurrentLine, manager);
 
-                BaseTerm term;
-                if (from.GetTermType().IsSubclassOf(type.Name))
-                {
-                    TermType constructType = from.GetTermType();
-                    term = constructType.Construct(values[1], CurrentLine, manager);
-                }
-                else
-                {
-                    term = type.Construct(values[1], CurrentLine, manager);
-                }
                 Input input = new Input(from);
-
-                AssignmentCall assignmentCall = new AssignmentCall(term, input, holder, CurrentLine);
-                _currentScript.TermTokens++;
-                holder.AddTerm(term);
-                holder.AddCall(assignmentCall);
+                AssignmentCall call = new AssignmentCall(term.Name, input, holder, CurrentLine);
+                TermHolder termHolder = new TermHolder(term, holderType);
+                
+                holder.AddHolder(termHolder);
+                holder.AddCall(call);
             } break;
             case AssignmentKind.Function:
             {
-                TermType type = manager.GetTermType(values[0]);
+                string holderType = values[0];
+                TermType type = CompileUtils.GetTypeFromToken(values[2], holder, CompileUtils.GetTokenKind(values[2], holder));
                 BaseTerm term = type.Construct(values[1], CurrentLine, manager);
                 Input input = CompileUtils.HandleToken(values[2], type.Name, holder, this);
-                AssignmentCall call = new AssignmentCall(term, input, holder, CurrentLine);
-                holder.AddTerm(term);
+                AssignmentCall call = new AssignmentCall(term.Name, input, holder, CurrentLine);
+                
+                holder.AddHolder(new TermHolder(term, holderType));
                 holder.AddCall(call);
                 _currentScript.CallTokens++;
             } break;
             case AssignmentKind.Assignment:
             {
-                BaseTerm term = holder.GetTerm(values[0]);
-                string type = term.ValueType;
+                TermHolder term = holder.GetHolder(values[0]);
+                string type = term.Type;
                 Input input = CompileUtils.HandleToken(values[1], type, holder, this);
-                AssignmentCall call = new AssignmentCall(term, input, holder, CurrentLine);
+                AssignmentCall call = new AssignmentCall(term.Name, input, holder, CurrentLine);
                 holder.AddCall(call);
                 _currentScript.CallTokens++;
             } break;
@@ -222,7 +216,7 @@ public sealed class SteelCompiler
                     throw new FieldReadOnlyException(CurrentLine, field.Name);
                 
                 Input input = CompileUtils.HandleToken(values[2], field.Value.Type, holder, this);
-                AssignmentCall call = new AssignmentCall(term, field.Name, input, holder, CurrentLine);
+                AssignmentCall call = new AssignmentCall(term.Name, field.Name, input, holder, CurrentLine);
                 holder.AddCall(call);
                 _currentScript.CallTokens++;
             } break;

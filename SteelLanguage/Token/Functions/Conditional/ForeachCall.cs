@@ -61,7 +61,7 @@ public record ForeachFunc : BaseExecutable
             if (shouldContinue)
                 continue;
 
-            GetTerm(_term).CopyFrom((BaseTerm)enumerator.Current);
+            GetHolder(_term).SetTerm((BaseTerm)enumerator.Current);
             foreach (TokenCall call in Calls)
             {
                 if (call is BreakCall)
