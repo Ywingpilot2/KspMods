@@ -117,15 +117,15 @@
         <Compile Include="Scripting\Terms\Vectors\Vec2Term.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec3dTerm.cs" />
         <Compile Include="Scripting\Terms\Vectors\Vec3Term.cs" />
-        <Compile Include="Scripting\Terms\Vessel\ActionGroups\ActionGroupTerm.cs" />
-        <Compile Include="Scripting\Terms\Vessel\ActionGroups\StagingManager.cs" />
-        <Compile Include="Scripting\Terms\Vessel\ActionGroups\StagingTerm.cs" />
-        <Compile Include="Scripting\Terms\Vessel\Parts\PartField.cs" />
-        <Compile Include="Scripting\Terms\Vessel\Parts\PartTerm.cs" />
-        <Compile Include="Scripting\Terms\Vessel\SAS\SASTerm.cs" />
-        <Compile Include="Scripting\Terms\Vessel\SAS\SASTypeTerm.cs" />
-        <Compile Include="Scripting\Terms\Vessel\Target\TargetTerm.cs" />
-        <Compile Include="Scripting\Terms\Vessel\VesselTerm.cs" />
+        <Compile Include="Scripting\Terms\VesselTerms\ActionGroups\ActionGroupTerm.cs" />
+        <Compile Include="Scripting\Terms\VesselTerms\ActionGroups\StagingManager.cs" />
+        <Compile Include="Scripting\Terms\VesselTerms\ActionGroups\StagingTerm.cs" />
+        <Compile Include="Scripting\Terms\VesselTerms\Parts\PartField.cs" />
+        <Compile Include="Scripting\Terms\VesselTerms\Parts\PartTerm.cs" />
+        <Compile Include="Scripting\Terms\VesselTerms\SAS\SASTerm.cs" />
+        <Compile Include="Scripting\Terms\VesselTerms\SAS\SASTypeTerm.cs" />
+        <Compile Include="Scripting\Terms\VesselTerms\Target\TargetTerm.cs" />
+        <Compile Include="Scripting\Terms\VesselTerms\VesselTerm.cs" />
         <Compile Include="SuperComputer.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

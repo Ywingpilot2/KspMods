@@ -2,22 +2,22 @@
 using SteelLanguage.Exceptions;
 using UniLinq;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
+namespace ProgrammableMod.Scripting.Terms.VesselTerms.ActionGroups;
 
 /// <summary>
 /// Util class used for managing vessel stages
 /// </summary>
 internal class MylStagingManager
 {
-    private readonly BaseComputer _computer;
+    private readonly Vessel _vessel;
 
     #region Current stage info
 
-    public double CurrentStageMass() => GetStageMass(_computer.vessel.currentStage);
-    public double CurrentDryMass() => GetStageDryMass(_computer.vessel.currentStage);
+    public double CurrentStageMass() => GetStageMass(_vessel.currentStage);
+    public double CurrentDryMass() => GetStageDryMass(_vessel.currentStage);
 
-    public float GetCurrentDeltaV() => GetStageDeltaV(_computer.vessel.currentStage);
-    public double GetCurrentBurnTime() => GetStageBurnTime(_computer.vessel.currentStage);
+    public float GetCurrentDeltaV() => GetStageDeltaV(_vessel.currentStage);
+    public double GetCurrentBurnTime() => GetStageBurnTime(_vessel.currentStage);
 
     #endregion
 
@@ -28,7 +28,7 @@ internal class MylStagingManager
         if (!ValidateStage(stage))
             stage = 0;
 
-        return _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
+        return _vessel.VesselDeltaV.OperatingStageInfo[stage];
     }
 
     private double GetStageBurnTime(int stage)
@@ -36,7 +36,7 @@ internal class MylStagingManager
         if (!ValidateStage(stage))
             stage = 0;
         
-        DeltaVStageInfo info = _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
+        DeltaVStageInfo info = _vessel.VesselDeltaV.OperatingStageInfo[stage];
         if (info == null)
             return 0.0f;
         
@@ -48,7 +48,7 @@ internal class MylStagingManager
         if (!ValidateStage(stage))
             stage = 0;
         
-        DeltaVStageInfo info = _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
+        DeltaVStageInfo info = _vessel.VesselDeltaV.OperatingStageInfo[stage];
         if (info == null)
             return 0.0f;
 
@@ -60,9 +60,9 @@ internal class MylStagingManager
         if (!ValidateStage(stage))
             stage = 0;
         
-        DeltaVStageInfo info = _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
+        DeltaVStageInfo info = _vessel.VesselDeltaV.OperatingStageInfo[stage];
         if (info == null)
-            return _computer.vessel.totalMass;
+            return _vessel.totalMass;
 
         return info.stageMass;
     }
@@ -72,9 +72,9 @@ internal class MylStagingManager
         if (!ValidateStage(stage))
             stage = 0;
         
-        DeltaVStageInfo info = _computer.vessel.VesselDeltaV.OperatingStageInfo[stage];
+        DeltaVStageInfo info = _vessel.VesselDeltaV.OperatingStageInfo[stage];
         if (info == null)
-            return _computer.vessel.totalMass;
+            return _vessel.totalMass;
 
         return info.dryMass;
     }
@@ -83,10 +83,10 @@ internal class MylStagingManager
 
     public DeltaVStageInfo NextStage()
     {
-        DeltaVStageInfo info = GetStage(_computer.vessel.currentStage - 1);
+        DeltaVStageInfo info = GetStage(_vessel.currentStage - 1);
         
-        int current = _computer.vessel.currentStage - 1;
-        foreach (Part part in _computer.vessel.parts)
+        int current = _vessel.currentStage - 1;
+        foreach (Part part in _vessel.parts)
         {
             if (part.inverseStage == current)
                 part.force_activate();
@@ -100,19 +100,19 @@ internal class MylStagingManager
         if (stage == -1)
             return false;
 
-        if (_computer.vessel.VesselDeltaV.OperatingStageInfo.ElementAtOrDefault(stage) == null)
+        if (_vessel.VesselDeltaV.OperatingStageInfo.ElementAtOrDefault(stage) == null)
         {
             return false;
         }
 
-        if (_computer.vessel.VesselDeltaV.OperatingStageInfo.Count == 0)
+        if (_vessel.VesselDeltaV.OperatingStageInfo.Count == 0)
             throw new InvalidActionException(0, "Vessel has no stages");
 
         return true;
     }
 
-    public MylStagingManager(BaseComputer computer)
+    public MylStagingManager(Vessel vessel)
     {
-        _computer = computer;
+        _vessel = vessel;
     }
 }

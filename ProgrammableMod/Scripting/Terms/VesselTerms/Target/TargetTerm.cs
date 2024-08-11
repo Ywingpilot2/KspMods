@@ -3,7 +3,7 @@ using SteelLanguage.Library.System.Terms.Literal;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Terms;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel.Target;
+namespace ProgrammableMod.Scripting.Terms.VesselTerms.Target;
 
 internal class TargetTerm : BaseTerm
 {

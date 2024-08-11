@@ -10,7 +10,7 @@ namespace SteelLanguage.Reflection.Library;
 /// <summary>
 /// Centralized class for handling <see cref="ILibrary"/>s
 /// </summary>
-public class LibraryManager
+public record LibraryManager
 {
     private readonly Dictionary<string, ILibrary> _libraries;
     private readonly Dictionary<string, IKeyword> _keywords;

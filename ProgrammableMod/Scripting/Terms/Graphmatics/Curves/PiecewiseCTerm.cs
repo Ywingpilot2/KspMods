@@ -31,7 +31,7 @@ internal class PiecewiseCTerm : BaseTerm
             }
 
             return new ReturnValue(new PiecewiseCurve(vecs), "piecewise");
-        }, "array<vec2>");
+        }, "params vec2");
     }
 
     public override IEnumerable<IFunction> GetFunctions()

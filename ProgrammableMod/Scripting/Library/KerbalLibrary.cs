@@ -22,7 +22,6 @@ namespace ProgrammableMod.Scripting.Library;
 public class KerbalLibrary : ILibrary
 {
     public string Name => "kerbnet";
-    private readonly BaseComputer _computer;
 
     public IEnumerable<IFunction> GlobalFunctions { get; }
     public IEnumerable<GlobalTerm> GlobalTerms { get; }
@@ -31,7 +30,6 @@ public class KerbalLibrary : ILibrary
 
     public KerbalLibrary(BaseComputer computer) : this()
     {
-        _computer = computer;
         GlobalTerms = new[]
         {
             new GlobalTerm(new KerbNetTerm
@@ -44,7 +42,7 @@ public class KerbalLibrary : ILibrary
         
         GlobalFunctions = new IFunction[]
         {
-            new Function("has_access", "bool", () => new ReturnValue(_computer.vessel.Connection.IsConnected, "bool"))
+            new Function("has_access", "bool", () => new ReturnValue(computer.vessel.Connection.IsConnected, "bool"))
         };
     }
 

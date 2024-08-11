@@ -26,7 +26,7 @@ internal class KerbNetTerm : BaseComputerTerm
         }
 
         yield return new TermField("time", "float", HighLogic.CurrentGame.UniversalTime);
-        yield return new TermField("super_computer", "kerfur", _kerfer);
+        yield return new TermField("super_computer", "SuperComputer", _kerfer);
     }
 
     public override IEnumerable<IFunction> GetFunctions()

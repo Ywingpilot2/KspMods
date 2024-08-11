@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SteelLanguage.Exceptions;
 using SteelLanguage.Reflection.Type;
+using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions.Operator;
 using SteelLanguage.Token.Functions.Single;
 using SteelLanguage.Token.Interaction;
@@ -22,6 +23,17 @@ public class Vec2Term : BaseTerm, IStashableTerm
 
         yield return new TermConstructor(terms => new ReturnValue(new Vector2(terms[0].CastToFloat(), terms[1].CastToFloat()), "vec2"), 
             "float", "float");
+    }
+
+    public override IEnumerable<TermField> GetFields()
+    {
+        foreach (TermField field in base.GetFields())
+        {
+            yield return field;
+        }
+
+        yield return new TermField("x", "float", _value.x);
+        yield return new TermField("y", "float", _value.y);
     }
 
     private Vector2 _value;

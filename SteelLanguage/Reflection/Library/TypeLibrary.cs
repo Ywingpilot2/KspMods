@@ -8,7 +8,7 @@ using SteelLanguage.Utils;
 
 namespace SteelLanguage.Reflection.Library;
 
-public class TypeLibrary
+public sealed record TypeLibrary
 {
     public Dictionary<string, TermType> Types { get; }
 

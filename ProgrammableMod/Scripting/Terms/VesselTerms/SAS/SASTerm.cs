@@ -4,7 +4,7 @@ using SteelLanguage.Exceptions;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel.SAS;
+namespace ProgrammableMod.Scripting.Terms.VesselTerms.SAS;
 
 internal class SASTerm : BaseComputerTerm
 {

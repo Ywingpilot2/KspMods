@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using JetBrains.Annotations;
 using ProgrammableMod.Scripting.Exceptions;
-using ProgrammableMod.Scripting.Terms.Vessel;
-using ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
+using ProgrammableMod.Scripting.Terms.VesselTerms.ActionGroups;
 using SteelLanguage;
 using UnityEngine;
 
@@ -243,7 +242,7 @@ public class ComputerModule : BaseComputer, IResourceConsumer
                     } break;
                     case 1:
                     {
-                        MylStagingManager stagingManager = new MylStagingManager(this);
+                        MylStagingManager stagingManager = new MylStagingManager(vessel);
                         stagingManager.NextStage();
                     } break;
                     case 2:

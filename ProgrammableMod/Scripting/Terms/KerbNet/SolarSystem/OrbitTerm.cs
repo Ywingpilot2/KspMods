@@ -32,9 +32,9 @@ internal class OrbitTerm : BaseTerm
         yield return new TermField("velocity", "vec3d", _orbit?.vel);
         yield return new TermField("pe_arg", "double", _orbit?.argumentOfPeriapsis);
         yield return new TermField("eccentricity", "double", _orbit?.eccentricity);
-        yield return new TermField("since_pe", "double", _orbit?.ObT);
-        yield return new TermField("to_pe", "double", _orbit?.timeToPe);
-        yield return new TermField("to_ap", "double", _orbit?.timeToAp);
+        yield return new TermField("time_since_pe", "double", _orbit?.ObT);
+        yield return new TermField("time_to_pe", "double", _orbit?.timeToPe);
+        yield return new TermField("time_to_ap", "double", _orbit?.timeToAp);
         yield return new TermField("inclination", "double", _orbit?.inclination);
     }
 

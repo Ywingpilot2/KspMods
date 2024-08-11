@@ -4,7 +4,7 @@ using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
+namespace ProgrammableMod.Scripting.Terms.VesselTerms.ActionGroups;
 
 internal class StagingTerm : BaseTerm
 {

@@ -1,6 +1,6 @@
 ﻿using SteelLanguage.Library.System.Terms.Complex;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
+namespace ProgrammableMod.Scripting.Terms.VesselTerms.ActionGroups;
 
 internal class ActionGroupTerm : EnumTerm
 {

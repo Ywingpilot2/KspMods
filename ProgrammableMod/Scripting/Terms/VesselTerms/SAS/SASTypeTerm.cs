@@ -1,6 +1,6 @@
 ﻿using SteelLanguage.Library.System.Terms.Complex;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel.SAS;
+namespace ProgrammableMod.Scripting.Terms.VesselTerms.SAS;
 
 internal class SASTypeTerm : EnumTerm
 {

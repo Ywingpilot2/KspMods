@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using CommNet;
+﻿using System.Collections.Generic;
 using ProgrammableMod.Modules;
-using ProgrammableMod.Modules.Computers;
 using ProgrammableMod.Scripting.Exceptions;
-using ProgrammableMod.Scripting.Terms.Vessel.ActionGroups;
+using ProgrammableMod.Scripting.Terms.VesselTerms.ActionGroups;
 using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
-using UnityEngine;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel;
+namespace ProgrammableMod.Scripting.Terms.VesselTerms;
 
 internal class VesselTerm : BaseComputerTerm
 {
@@ -181,7 +177,7 @@ internal class VesselTerm : BaseComputerTerm
         bool t = base.CopyFrom(term);
         if (t)
         {
-            _manager = new MylStagingManager(Computer);
+            _manager = new MylStagingManager(Computer.vessel);
         }
 
         return t;

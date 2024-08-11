@@ -12,7 +12,7 @@ namespace ProgrammableMod.Scripting.Terms.KerbNet;
 [SuppressMessage("ReSharper", "HeapView.BoxingAllocation")]
 internal class SuperComputerTerm : BaseTerm
 {
-    public override string ValueType => "kerfur";
+    public override string ValueType => "SuperComputer";
 
     public override IEnumerable<IFunction> GetFunctions()
     {

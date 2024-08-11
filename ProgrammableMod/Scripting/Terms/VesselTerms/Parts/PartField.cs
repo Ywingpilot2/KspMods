@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using SteelLanguage.Token.Fields;
-using SteelLanguage.Token.Terms;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel.Parts;
+namespace ProgrammableMod.Scripting.Terms.VesselTerms.Parts;
 
 internal readonly record struct PartField
 {

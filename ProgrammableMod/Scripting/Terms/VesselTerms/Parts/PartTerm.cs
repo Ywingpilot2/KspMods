@@ -7,9 +7,8 @@ using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
-using SteelLanguage.Utils;
 
-namespace ProgrammableMod.Scripting.Terms.Vessel.Parts;
+namespace ProgrammableMod.Scripting.Terms.VesselTerms.Parts;
 
 internal class PartTerm : BaseTerm
 {
@@ -124,7 +123,7 @@ internal class PartTerm : BaseTerm
 
         yield return new TermField("name", "string", name);
         yield return new TermField("part_name", "string", _value != null ? _value.protoPartSnapshot.partInfo.title : null);
-        yield return new TermField("mass", "string", _value != null ? _value.mass : null);
+        yield return new TermField("mass", "float", _value != null ? _value.mass : null);
         yield return new TermField("author", "string", _value != null ? _value.protoPartSnapshot.partInfo.author : null);
         yield return new TermField("description", "string", _value != null ? _value.protoPartSnapshot.partInfo.description : null);
         yield return new TermField("manufacturer", "string", _value != null ? _value.protoPartSnapshot.partInfo.manufacturer : null);

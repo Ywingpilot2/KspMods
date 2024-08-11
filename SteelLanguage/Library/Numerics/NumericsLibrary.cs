@@ -17,34 +17,6 @@ public class NumericsLibrary : ILibrary
 
     public IEnumerable<IFunction> GlobalFunctions => new IFunction[]
     {
-        new Function("greater", "bool", terms =>
-        {
-            // We use doubles since those are most likely to give us accurate results(everything can cast to them without losing data)
-            double a = terms[0].CastToDouble();
-            double b = terms[1].CastToDouble();
-            return new ReturnValue(a > b, "bool");
-        }, "number", "number"),
-        new Function("greater_equal", "bool", terms =>
-        {
-            // We use doubles since those are most likely to give us accurate results(everything can cast to them without losing data)
-            double a = terms[0].CastToDouble();
-            double b = terms[1].CastToDouble();
-            return new ReturnValue(a >= b, "bool");
-        }, "number", "number"),
-        new Function("lesser", "bool", terms =>
-        {
-            // We use doubles since those are most likely to give us accurate results(everything can cast to them without losing data)
-            double a = terms[0].CastToDouble();
-            double b = terms[1].CastToDouble();
-            return new ReturnValue(a < b, "bool");
-        }, "number", "number"),
-        new Function("lesser_equal", "bool", terms =>
-        {
-            // We use doubles since those are most likely to give us accurate results(everything can cast to them without losing data)
-            double a = terms[0].CastToDouble();
-            double b = terms[1].CastToDouble();
-            return new ReturnValue(a <= b, "bool");
-        }, "number", "number"),
         new Function("random", "int", () => new ReturnValue(Rng.Next(), "int")),
         new Function("random_max", "int", inputTypes: new[] { "int" },
             action: terms => new ReturnValue(Rng.Next(terms[0].CastToInt()), "int")),
