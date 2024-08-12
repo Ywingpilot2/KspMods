@@ -95,6 +95,9 @@ public sealed class SteelScript : ITokenHolder
 
     public TermHolder GetHolder(string name)
     {
+        if (LibraryManager.HasGlobalTerm(name))
+            return LibraryManager.GetGlobalHolder(name);
+        
         if (!_terms.ContainsKey(name))
             throw new TermNotExistException(0, name);
 

@@ -55,7 +55,7 @@ internal abstract class BaseComputerTerm : BaseTerm
     /// </summary>
     protected void EstablishConnection()
     {
-        if (!Computer.vessel.Connection.IsConnected && !Computer.compiling)
+        if (Computer != null && !Computer.compiling && !Computer.vessel.Connection.IsConnected)
             throw new KerbnetLostException(0);
     }
 }

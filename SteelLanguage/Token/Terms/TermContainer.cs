@@ -6,12 +6,16 @@ namespace SteelLanguage.Token.Terms;
 public record TermHolder(string Type)
 {
     public string Name { get; set; }
+    public bool ReadOnly { get; set; }
     public string Type { get; } = Type;
 
     private BaseTerm _term;
 
     public void SetTerm(BaseTerm term)
     {
+        if (ReadOnly)
+            throw new InvalidActionException(0, $"Term {Name} is read only");
+        
         TermType type = term.GetTermType();
         if (type.Name != Type && !type.IsSubclassOf(Type))
             throw new InvalidAssignmentException(0, Name, Type);

@@ -24,8 +24,9 @@ internal class KerbNetTerm : BaseComputerTerm
         {
             EstablishConnection();
         }
-
-        yield return new TermField("time", "float", HighLogic.CurrentGame.UniversalTime);
+        
+        
+        yield return new TermField("time", "float", Planetarium.GetUniversalTime());
         yield return new TermField("super_computer", "SuperComputer", _kerfer);
     }
 

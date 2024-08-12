@@ -170,6 +170,7 @@ public static class CompileUtils
             TokenKind.LocalFunc => AssignmentKind.Function,
             TokenKind.SpecialFunc => AssignmentKind.Function,
             TokenKind.Operator => AssignmentKind.Function,
+            TokenKind.Invalid => throw new InvalidCompilationException(0, $"The token {split[1].Trim()} was invalid"),
             _ => throw new InvalidCompilationException(0, $"{kind} is not valid here")
         };
     }

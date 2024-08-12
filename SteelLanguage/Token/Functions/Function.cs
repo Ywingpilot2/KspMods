@@ -324,12 +324,18 @@ public record UserFunction : BaseExecutable, IFunction
     {
         if (!BaseTerms.ContainsKey(name) && GetLibraryManager().HasGlobalTerm(name))
             return GetLibraryManager().GetGlobalTerm(name);
+        
+        if (!BaseTerms.ContainsKey(name))
+            throw new TermNotExistException(0, name);
             
         return BaseTerms[name].GetTerm();
     }
 
     public override TermHolder GetHolder(string name)
     {
+        if (!BaseTerms.ContainsKey(name) && GetLibraryManager().HasGlobalTerm(name))
+            return GetLibraryManager().GetGlobalHolder(name);
+        
         if (!BaseTerms.ContainsKey(name))
             throw new TermNotExistException(0, name);
             

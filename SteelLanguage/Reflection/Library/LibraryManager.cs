@@ -15,11 +15,19 @@ public record LibraryManager
     private readonly Dictionary<string, ILibrary> _libraries;
     private readonly Dictionary<string, IKeyword> _keywords;
     private readonly Dictionary<string, IFunction> _functions;
-    private Dictionary<string, BaseTerm> _globals;
+    private readonly Dictionary<string, TermHolder> _globals;
     
     public bool HasGlobalTerm(string name) => _globals.ContainsKey(name);
 
     public BaseTerm GetGlobalTerm(string name)
+    {
+        if (!HasGlobalTerm(name))
+            throw new TermNotExistException(0, name);
+
+        return _globals[name].GetTerm();
+    }
+
+    public TermHolder GetGlobalHolder(string name)
     {
         if (!HasGlobalTerm(name))
             throw new TermNotExistException(0, name);
@@ -29,22 +37,10 @@ public record LibraryManager
 
     public IEnumerable<BaseTerm> EnumerateGlobalTerms()
     {
-        foreach (BaseTerm globalsValue in _globals.Values)
+        foreach (TermHolder globalsValue in _globals.Values)
         {
-            yield return globalsValue;
+            yield return globalsValue.GetTerm();
         }
-    }
-
-    public void RemakeGlobals()
-    {
-        Dictionary<string, BaseTerm> globals = new Dictionary<string, BaseTerm>();
-        foreach (KeyValuePair<string,BaseTerm> valuePair in _globals)
-        {
-            BaseTerm copy = valuePair.Value.GetTermType().Construct(valuePair.Value.Name, valuePair.Value.Line, this);
-            globals.Add(valuePair.Key, copy);
-        }
-
-        _globals = globals;
     }
 
     public bool HasFunction(string name) => _functions.ContainsKey(name);
@@ -131,7 +127,7 @@ public record LibraryManager
                 if (globalTerm.Source != null)
                     term.CopyFrom(globalTerm.Source);
                 
-                _globals.Add(globalTerm.Name, term);
+                _globals.Add(globalTerm.Name, new TermHolder(term){ReadOnly = true});
             }
         }
     }
@@ -151,6 +147,6 @@ public record LibraryManager
         _libraries = new Dictionary<string, ILibrary>();
         _keywords = new Dictionary<string, IKeyword>();
         _functions = new Dictionary<string, IFunction>();
-        _globals = new Dictionary<string, BaseTerm>();
+        _globals = new Dictionary<string, TermHolder>();
     }
 }
