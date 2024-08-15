@@ -6,6 +6,7 @@ using SteelLanguage.Token.Fields;
 using SteelLanguage.Token.Functions;
 using SteelLanguage.Token.Interaction;
 using SteelLanguage.Token.Terms;
+using UnityEngine;
 
 namespace ProgrammableMod.Scripting.Terms.VesselTerms;
 
@@ -42,6 +43,10 @@ internal class VesselTerm : BaseComputerTerm
         yield return new TermField("rcs_x", "float", Computer.State.X, true);
         yield return new TermField("rcs_y", "float", Computer.State.Y, true);
         yield return new TermField("rcs_z", "float", Computer.State.Z, true);
+        
+        // wheels
+        yield return new TermField("wheels_steer", "float", Computer.State.wheelSteer, true);
+        yield return new TermField("wheels_gas", "float", Computer.State.wheelThrottle, true);
 
         yield return new TermField("position", "vec3", Computer.vessel != null ? Computer.vessel.GetTransform().position : null);
         yield return new TermField("target", "target", Computer.vessel != null ? Computer.vessel.targetObject : null);
@@ -57,37 +62,56 @@ internal class VesselTerm : BaseComputerTerm
         {
             case "throttle":
             {
-                Computer.State.mainThrottle = (float)value;
+                float clamped = Mathf.Clamp((float)value, 0, 1);
+                Computer.State.mainThrottle = clamped;
                 return true;
             }
             case "yaw":
             {
-                Computer.State.yaw = (float)value;
+                float clamped = Mathf.Clamp((float)value, -1, 1);
+                Computer.State.yaw = clamped;
                 return true;
             }
             case "pitch":
             {
-                Computer.State.pitch = (float)value;
+                float clamped = Mathf.Clamp((float)value, -1, 1);
+                Computer.State.pitch = clamped;
                 return true;
             }
             case "roll":
             {
-                Computer.State.roll = (float)value;
+                float clamped = Mathf.Clamp((float)value, -1, 1);
+                Computer.State.roll = clamped;
                 return true;
             }
             case "rcs_x":
             {
-                Computer.State.X = (float)value;
+                float clamped = Mathf.Clamp((float)value, -1, 1);
+                Computer.State.X = clamped;
                 return true;
             }
             case "rcs_y":
             {
-                Computer.State.Y = (float)value;
+                float clamped = Mathf.Clamp((float)value, -1, 1);
+                Computer.State.Y = clamped;
                 return true;
             }
             case "rcs_z":
             {
-                Computer.State.Z = (float)value;
+                float clamped = Mathf.Clamp((float)value, -1, 1);
+                Computer.State.Z = clamped;
+                return true;
+            }
+            case "wheels_steer":
+            {
+                float clamped = Mathf.Clamp((float)value, -1, 1);
+                Computer.State.wheelSteer = clamped;
+                return true;
+            }
+            case "wheels_gas":
+            {
+                float clamped = Mathf.Clamp((float)value, -1, 1);
+                Computer.State.wheelThrottle = clamped;
                 return true;
             }
         }

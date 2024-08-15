@@ -84,7 +84,7 @@ public abstract class BaseComputer : PartModule
             ThrowException("Script is not compiled!");
             return;
         }
-            
+        
         State = state;
         if (ShouldSkipCycle())
             return;
