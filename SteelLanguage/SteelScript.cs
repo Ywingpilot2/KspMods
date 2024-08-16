@@ -155,7 +155,7 @@ public sealed class SteelScript : ITokenHolder
 #if DEBUG
             finally{} // I am too lazy to remove the try catch entirely when on debug
 #else
-            catch (ActionException e)
+            catch (SteelException e)
             {
                 if (e.LineNumber == 0)
                 {

@@ -80,7 +80,7 @@ public sealed class SteelCompiler
                 }
             }
 #if !DEBUG
-            catch (ActionException e)
+            catch (SteelException e)
             {
                 if (e.LineNumber == 0)
                     e.LineNumber = CurrentLine;
