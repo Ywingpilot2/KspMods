@@ -348,17 +348,7 @@ public abstract class BaseTerm : IToken
             object b = terms[1].GetValue();
             return new ReturnValue(a.Equals(b), "bool");
         });
-        yield return new Function("to_string", "string", () =>
-        {
-            if (CanImplicitCastToStr)
-            {
-                return new ReturnValue(CastToStr(), "string");
-            }
-            else
-            {
-                return new ReturnValue(GetValue().ToString(), "string");
-            }
-        });
+        yield return new Function("to_string", "string", () => new ReturnValue(ToString(), "string"));
     }
 
     /// <summary>
@@ -395,6 +385,11 @@ public abstract class BaseTerm : IToken
         }
 
         return false;
+    }
+
+    public override string ToString()
+    {
+        return GetTermType().Name;
     }
 
     #endregion

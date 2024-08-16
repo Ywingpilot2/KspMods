@@ -42,13 +42,9 @@ public class ComputerLibrary : ILibrary
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 
-    public ComputerLibrary(BaseComputer computer) : this()
+    public ComputerLibrary(BaseComputer computer)
     {
         _computer = computer;
-    }
-
-    public ComputerLibrary()
-    {
         TypeLibrary = new TypeLibrary();
         
         TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term");

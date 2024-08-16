@@ -22,6 +22,7 @@ public class NumericsLibrary : ILibrary
             action: terms => new ReturnValue(Rng.Next(terms[0].CastToInt()), "int")),
         new Function("random_interval", "int", inputTypes: new[] { "int", "int" },
             action: terms => new ReturnValue(Rng.Next(terms[0].CastToInt(), terms[1].CastToInt()), "int")),
+        new Function("random_double", "double", () => new ReturnValue(Rng.NextDouble(), "double")),
         new Function("abs", "double", terms => new ReturnValue(Math.Abs(terms[0].CastToDouble()), "double"), "number"),
     };
     public IEnumerable<GlobalTerm> GlobalTerms { get; }

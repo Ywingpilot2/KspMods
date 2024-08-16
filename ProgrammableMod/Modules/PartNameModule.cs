@@ -11,7 +11,7 @@ public class PartNameModule : PartModule
 
     private PartRenameControl _renameControl;
 
-    [KSPEvent(groupName = "VesselNaming", groupDisplayName = "#autoLOC_8003391", guiActive = true, guiActiveEditor = true, guiName = "Configure Part Name")]
+    [KSPEvent(groupName = "VesselNaming", groupDisplayName = "#autoLOC_8003391", guiActive = true, guiActiveEditor = true, guiName = "Configure Part Naming")]
     public void SetPartName()
     {
         _renameControl.Show(partName);

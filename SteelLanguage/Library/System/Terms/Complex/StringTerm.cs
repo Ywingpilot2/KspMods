@@ -307,4 +307,12 @@ public sealed class StringTerm : BaseTerm
     }
 
     #endregion
+
+    public override string ToString()
+    {
+        if (_value == null)
+            return "";
+
+        return _value;
+    }
 }

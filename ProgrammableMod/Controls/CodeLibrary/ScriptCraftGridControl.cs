@@ -12,7 +12,7 @@ internal sealed class ScriptCraftGridControl : Control
 {
     public int Selected = 0;
 
-    internal sealed class ScriptCraftControl : Control
+    private sealed class ScriptCraftControl : Control
     {
         public bool Selected;
         public override string Style => "ButtonBase";
@@ -48,7 +48,7 @@ internal sealed class ScriptCraftGridControl : Control
                 FontSize = 14,
                 TextAlignment = TextAnchor.MiddleCenter,
                 FontStyle = FontStyle.Bold,
-                ExpandWidth = true,
+                ExpandWidth = true
             });
 
             Add(new LabelControl(rng.Next(), content)
@@ -56,6 +56,8 @@ internal sealed class ScriptCraftGridControl : Control
                 FixedHeight = 150,
                 WordWrap = false,
                 FontSize = 8,
+                ExpandWidth = false,
+                FixedWidth = 150
             });
         }
     }
@@ -119,7 +121,21 @@ internal sealed class ScriptCraftGridControl : Control
     private string StripScriptText(string scriptText)
     {
         string[] lines = scriptText.Split('\n');
-        return lines.Length > 15 ? string.Join("\n", lines.Take(14)) + "\n..." : scriptText;
+        string[] shortLines = new string[15];
+        for (int i = 0; i < 15; i++)
+        {
+            string line = lines[i];
+            if (line.Length >= 56)
+                line = line.Remove(55) + "...";
+            
+            shortLines.SetValue(line, i);
+        }
+
+        string final = string.Join("\n", shortLines);
+        if (lines.Length > 15)
+            final += "\n...";
+
+        return final;
     }
     
     public ScriptCraftGridControl(int id) : base(id)

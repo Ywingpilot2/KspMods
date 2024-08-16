@@ -27,17 +27,9 @@ public class KerbinSuperComputer : MonoBehaviour
 
     public static ValueStasher CurrentStasher => Instance.stasher;
     public static KerbinSuperComputer Instance { get; private set; }
-    private static ILibrary[] Libraries { get; set; }
 
     private void Awake()
     {
-        Libraries = new ILibrary[]
-        {
-            new KerbalLibrary(),
-            new VesselLibrary(),
-            new ComputerLibrary()
-        };
-        
         stasher = new ValueStasher();
         
         GameEvents.onGameStateLoad.Add(Load);

@@ -149,7 +149,7 @@ public class FunctionNotExistException : CompilationException
     {
         get
         {
-            if (_name != null)
+            if (_name == null)
             {
                 return $"Function called at line {LineNumber} does not exist!";
             }

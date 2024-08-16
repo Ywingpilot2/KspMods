@@ -33,7 +33,7 @@ public class SystemLibrary : ILibrary
 
             return new ReturnValue(Equals(a, b), "bool");
         }),
-        new Function("to_string", "string", inputTypes: "term", action: terms => new ReturnValue(TermToString(terms[0]), "string")),
+        new Function("to_string", "string", inputTypes: "term", action: terms => new ReturnValue(terms[0].ToString(), "string")),
         new Function("concat", "string", terms =>
         {
             string str = terms[0].CastToStr();
@@ -43,7 +43,7 @@ public class SystemLibrary : ILibrary
             {
                 BaseTerm term = array.GetValue(i);
 
-                str = str.Replace($"{{{i}}}", TermToString(term));
+                str = str.Replace($"{{{i}}}", term.ToString());
             }
 
             return new ReturnValue(str, "string");
@@ -51,28 +51,6 @@ public class SystemLibrary : ILibrary
         // TODO: Remove this! This should instead just be an operator
         new Function("not", "bool", inputTypes:new []{"bool"}, action: terms => new ReturnValue(!terms[0].CastToBool(), "bool"))
     };
-
-    public static string TermToString(BaseTerm term)
-    {
-        TermType strType = SteelCompiler.Library.TypeLibrary.GetTermType("string");
-        if (term.CanImplicitCastToType(strType))
-        {
-            return term.CastToStr();
-        }
-
-        try
-        {
-            string str = term.GetValue().ToString();
-            if (str == term.GetValue().GetType().FullName)
-                return term.GetTermType().Name;
-
-            return str;
-        }
-        catch (Exception)
-        {
-            return term.GetTermType().Name;
-        }
-    }
 
     public IEnumerable<GlobalTerm> GlobalTerms => new[]
     {

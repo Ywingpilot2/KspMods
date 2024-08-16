@@ -28,8 +28,14 @@ public class KerbalLibrary : ILibrary
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 
-    public KerbalLibrary(BaseComputer computer) : this()
+    public KerbalLibrary(BaseComputer computer)
     {
+        TypeLibrary = new TypeLibrary();
+        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term");
+        
+        TypeLibrary.AddTermType(new TermType(new KerbNetTerm {Computer = computer}, baseType));
+        TypeLibrary.AddTermType(new TermType(new SuperComputerTerm(), baseType));
+        
         GlobalTerms = new[]
         {
             new GlobalTerm(new KerbNetTerm
@@ -44,14 +50,5 @@ public class KerbalLibrary : ILibrary
         {
             new Function("has_access", "bool", () => new ReturnValue(computer.vessel.Connection.IsConnected, "bool"))
         };
-    }
-
-    public KerbalLibrary()
-    {
-        TypeLibrary = new TypeLibrary();
-        TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term");
-        
-        TypeLibrary.AddTermType(new TermType(new KerbNetTerm(), baseType));
-        TypeLibrary.AddTermType(new TermType(new SuperComputerTerm(), baseType));
     }
 }

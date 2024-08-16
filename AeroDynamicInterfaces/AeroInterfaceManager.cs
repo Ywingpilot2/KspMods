@@ -13,7 +13,10 @@ namespace AeroDynamicKerbalInterfaces;
 public class AeroInterfaceManager : MonoBehaviour
 {
     private static readonly Dictionary<int, Control> Controls;
+    private static readonly List<int> RemovalQueue;
+    private static readonly List<Control> AddQueue;
     private static bool _hide;
+    private static bool _drawing;
 
     #region GUI
 
@@ -22,6 +25,27 @@ public class AeroInterfaceManager : MonoBehaviour
         if (_hide)
             return;
 
+        if (RemovalQueue.Count != 0)
+        {
+            foreach (int i in RemovalQueue)
+            {
+                RemoveControl(i);
+            }
+            
+            RemovalQueue.Clear();
+        }
+
+        if (AddQueue.Count != 0)
+        {
+            foreach (Control control in AddQueue)
+            {
+                AddControl(control);
+            }
+            
+            AddQueue.Clear();
+        }
+        
+        _drawing = true;
         GUI.skin = ThemesDictionary.Skin;
         foreach (Control control in Controls.Values)
         {
@@ -29,6 +53,7 @@ public class AeroInterfaceManager : MonoBehaviour
         }
         
         GUI.skin = null;
+        _drawing = false;
     }
 
     public static void Hide()
@@ -100,6 +125,12 @@ public class AeroInterfaceManager : MonoBehaviour
     {
         if (HasControl(control.Id))
             return false;
+
+        if (_drawing)
+        {
+            AddQueue.Add(control);
+            return true;
+        }
         
         Controls.Add(control.Id, control);
         control.OnCreation();
@@ -110,6 +141,12 @@ public class AeroInterfaceManager : MonoBehaviour
     {
         if (!HasControl(id))
             return;
+        
+        if (_drawing)
+        {
+            RemovalQueue.Add(id);
+            return;
+        }
         
         Controls[id].OnDestruction();
         Controls.Remove(id);
@@ -155,5 +192,7 @@ public class AeroInterfaceManager : MonoBehaviour
     static AeroInterfaceManager()
     {
         Controls = new Dictionary<int, Control>();
+        RemovalQueue = new List<int>();
+        AddQueue = new List<Control>();
     }
 }

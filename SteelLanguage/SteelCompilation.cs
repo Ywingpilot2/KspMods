@@ -129,15 +129,15 @@ public sealed class SteelCompiler
         }
         else
         {
-            string[] split = token.SanitizedSplit('=', 2, StringSplitOptions.RemoveEmptyEntries);
-            if (split.Length == 1)
+            string[] split = token.SanitizedSplit(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+            if (split.Length == 2 && CompileUtils.GetTokenKind(split[0], holder) != TokenKind.Invalid)
+            {
+                ParseTerm(token, holder);
+            }
+            else if (CompileUtils.GetTokenKind(token, holder) is TokenKind.Function or TokenKind.LocalFunc)
             {
                 TokenCall call = ParseFunctionCall(token, holder);
                 holder.AddCall(call);
-            }
-            else if (split.Length == 2)
-            {
-                ParseTerm(token, holder);
             }
             else // TODO: More in depth error logging for this. Should tell them if it was an issue with a function call or type not being found
             {

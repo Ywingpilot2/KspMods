@@ -207,6 +207,14 @@ public class NumberTerm : BaseTerm
     {
         return Number;
     }
+
+    public override string ToString()
+    {
+        if (Number == null)
+            return "NULL";
+
+        return Number.ToString();
+    }
 }
 
 public class TermI : NumberTerm

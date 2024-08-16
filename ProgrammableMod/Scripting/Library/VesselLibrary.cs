@@ -31,28 +31,25 @@ public class VesselLibrary : ILibrary
     public IEnumerable<IKeyword> Keywords { get; }
     public TypeLibrary TypeLibrary { get; }
 
-    public VesselLibrary(BaseComputer computer) : this()
-    {
-        GlobalTerms = new[]
-        {
-            new GlobalTerm(new VesselTerm { Name = "VESSEL", Computer = computer, Kind = TermKind.Class })
-        };
-    }
-
-    public VesselLibrary()
+    public VesselLibrary(BaseComputer computer)
     {
         TypeLibrary = new TypeLibrary();
 
         TermType baseType = SteelCompiler.Library.TypeLibrary.GetTermType("term");
         TermType enumType = SteelCompiler.Library.TypeLibrary.GetTermType("enum");
         
-        TypeLibrary.AddTermType(new TermType(new VesselTerm(), baseType));
+        TypeLibrary.AddTermType(new TermType(new VesselTerm {Computer = computer}, baseType));
         TypeLibrary.AddTermType(new TermType(new StagingTerm(), baseType));
         TypeLibrary.AddTermType(new TermType(new StageInfoTerm(), baseType));
-        TypeLibrary.AddTermType(new TermType(new SASTerm(), baseType));
+        TypeLibrary.AddTermType(new TermType(new SASTerm{Computer = computer}, baseType));
         TypeLibrary.AddTermType(new TermType(new SASTypeTerm(), enumType));
         TypeLibrary.AddTermType(new TermType(new ActionGroupTerm(), enumType));
         TypeLibrary.AddTermType(new TermType(new TargetTerm(), baseType, isNullable:true));
         TypeLibrary.AddTermType(new TermType(new PartTerm(), baseType, isNullable:true));
+        
+        GlobalTerms = new[]
+        {
+            new GlobalTerm(new VesselTerm { Name = "VESSEL", Computer = computer, Kind = TermKind.Class })
+        };
     }
 }

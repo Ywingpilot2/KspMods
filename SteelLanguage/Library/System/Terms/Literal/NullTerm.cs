@@ -34,4 +34,9 @@ public class NullTerm : BaseTerm
     {
         return null;
     }
+
+    public override string ToString()
+    {
+        return "NULL";
+    }
 }
