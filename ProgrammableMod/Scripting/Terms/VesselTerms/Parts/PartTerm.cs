@@ -157,7 +157,7 @@ internal class PartTerm : BaseTerm
             if (!_actions.ContainsKey(value))
                 throw new ActionNotFoundException(0, value);
 
-            _actions[value].Invoke(terms[1].CastToBool() ? ActiveParams : DeactiveParams);
+            _actions[value].Invoke(ActiveParams);
         }, "string", "bool");
         yield return new Function("toggle_action", terms =>
         {
@@ -169,6 +169,16 @@ internal class PartTerm : BaseTerm
         }, "string");
         yield return new Function("has_action", "bool",
             terms => new ReturnValue(_actions.ContainsKey(terms[0].CastToStr()), "bool"), "string");
+        yield return new Function("has_module", "bool", terms =>
+        {
+            foreach (PartModule module in _value.Modules)
+            {
+                if (module.GetModuleDisplayName() == terms[0].CastToStr())
+                    return new ReturnValue(true, "bool");
+            }
+
+            return new ReturnValue(false, "bool");
+        }, "string");
     }
 
     #endregion

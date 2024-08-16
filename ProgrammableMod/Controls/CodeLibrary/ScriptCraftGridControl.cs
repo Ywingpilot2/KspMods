@@ -124,6 +124,12 @@ internal sealed class ScriptCraftGridControl : Control
         string[] shortLines = new string[15];
         for (int i = 0; i < 15; i++)
         {
+            if (lines.Length <= i)
+            {
+                shortLines.SetValue("", i);
+                continue;
+            }
+            
             string line = lines[i];
             if (line.Length >= 56)
                 line = line.Remove(55) + "...";

@@ -94,11 +94,18 @@ public abstract class BaseComputer : PartModule
             PreExecute();
 
             CancellationTokenSource cancel = new CancellationTokenSource();
+#if true
+            // if you're debugging longer then a day you have bigger problems
+            cancel.CancelAfter(new TimeSpan(1,0,0,0));
+#else
             cancel.CancelAfter(150);
+#endif
 
             Parallel.Invoke(new ParallelOptions { CancellationToken = cancel.Token, MaxDegreeOfParallelism = 2 },
                 Script.Execute);
+#if !DEBUG
             cancel.Token.ThrowIfCancellationRequested();
+#endif
 
             PostExecute();
         }

@@ -46,7 +46,6 @@ public record ForeachFunc : BaseExecutable
     public override ReturnValue Execute()
     {
         bool shouldBreak = false;
-        bool shouldContinue = false;
         EnumeratorTerm term = (EnumeratorTerm)_enumerator.GetValue();
 
         IEnumerator enumerator = term.GetEnumerableValue().GetEnumerator();
@@ -57,9 +56,6 @@ public record ForeachFunc : BaseExecutable
                 enumerator.Reset();
                 break;
             }
-            
-            if (shouldContinue)
-                continue;
 
             GetHolder(_term).SetTerm((BaseTerm)enumerator.Current);
             foreach (TokenCall call in Calls)
@@ -72,7 +68,6 @@ public record ForeachFunc : BaseExecutable
                 
                 if (call is ContinueCall)
                 {
-                    shouldContinue = true;
                     break;
                 }
 
@@ -94,7 +89,6 @@ public record ForeachFunc : BaseExecutable
                 
                     if (returnValue.Value is ContinueCall)
                     {
-                        shouldContinue = true;
                         break;
                     }
 
