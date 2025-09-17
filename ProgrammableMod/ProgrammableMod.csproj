@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <Import Project="$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props')" />
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -12,7 +12,7 @@
         <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <DefineConstants>DEBUG;TRACE;ENABLE_PROFILER</DefineConstants>
-        <OutputPath>bin\GameData\Plugins</OutputPath>
+        <OutputPath>bin/GameData/Plugins</OutputPath>
         <LangVersion>11</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -34,11 +34,11 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
-            <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+            <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/Assembly-CSharp.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="KSPAssets">
-          <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\KSPAssets.dll</HintPath>
+          <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/KSPAssets.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="System" />
@@ -46,100 +46,100 @@
         <Reference Include="System.Data" />
         <Reference Include="System.Xml" />
         <Reference Include="UnityEngine">
-            <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+            <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/UnityEngine.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.AudioModule">
-          <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+          <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/UnityEngine.AudioModule.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule">
-          <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+          <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/UnityEngine.IMGUIModule.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.PhysicsModule">
-            <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+            <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/UnityEngine.PhysicsModule.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.TextRenderingModule">
-          <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+          <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/UnityEngine.TextRenderingModule.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.UI">
-          <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+          <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/UnityEngine.UI.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.UIElementsModule">
-          <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
+          <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/UnityEngine.UIElementsModule.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.UIModule">
-          <HintPath>D:\Y wing steam games\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+          <HintPath>/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/KSP_x64_Data/Managed/UnityEngine.UIModule.dll</HintPath>
             <Private>false</Private>
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Controls\CodeEditor\CodeEditorControl.cs" />
-        <Compile Include="Controls\CodeEditor\CodeHighlightAreaControl.cs" />
-        <Compile Include="Controls\CodeLibrary\CodeLibraryControl.cs" />
-        <Compile Include="Controls\CodeLibrary\ScriptCraftGridControl.cs" />
-        <Compile Include="Controls\ExceptionBox.cs" />
-        <Compile Include="Controls\LogControl.cs" />
-        <Compile Include="Controls\PartRenameControl.cs" />
-        <Compile Include="Extensions\StringExtension.cs" />
-        <Compile Include="Modules\Computers\BaseComputer.cs" />
-        <Compile Include="Modules\Computers\ComputerModule.cs" />
-        <Compile Include="Modules\ComputerTemp\ModuleComputerTemp.cs" />
-        <Compile Include="Modules\PartNameModule.cs" />
-        <Compile Include="Modules\Test\GuiTestModule.cs" />
-        <Compile Include="Modules\Test\ThrottleTest.cs" />
-        <Compile Include="Scripting\Config\ScriptLibrary\ScriptLibrary.cs" />
-        <Compile Include="Scripting\Config\ValueStasher\ProtoStash.cs" />
-        <Compile Include="Scripting\Config\ValueStasher\ValueStasher.cs" />
-        <Compile Include="Scripting\Exceptions\ExecutionException.cs" />
-        <Compile Include="Scripting\Library\ComputerLibrary.cs" />
-        <Compile Include="Scripting\Library\KerbalLibrary.cs" />
-        <Compile Include="Scripting\Library\VesselLibrary.cs" />
-        <Compile Include="Scripting\Terms\BaseVesselTerm.cs" />
-        <Compile Include="Scripting\Terms\Graphmatics\Curves\IPiecewise.cs" />
-        <Compile Include="Scripting\Terms\Graphmatics\Curves\PiecewiseCTerm.cs" />
-        <Compile Include="Scripting\Terms\Graphmatics\Curves\PiecewiseCurve.cs" />
-        <Compile Include="Scripting\Terms\Graphmatics\Curves\PiecewiseLinear.cs" />
-        <Compile Include="Scripting\Terms\IStashableTerm.cs" />
-        <Compile Include="Scripting\Terms\KerbNet\KerbNetTerm.cs" />
-        <Compile Include="Scripting\Terms\KerbNet\SolarSystem\CelestialBody.cs" />
-        <Compile Include="Scripting\Terms\KerbNet\SolarSystem\OrbitTerm.cs" />
-        <Compile Include="Scripting\Terms\KerbNet\SuperComputerTerm.cs" />
-        <Compile Include="Scripting\Terms\Vectors\Vec2Term.cs" />
-        <Compile Include="Scripting\Terms\Vectors\Vec3dTerm.cs" />
-        <Compile Include="Scripting\Terms\Vectors\Vec3Term.cs" />
-        <Compile Include="Scripting\Terms\VesselTerms\ActionGroups\ActionGroupTerm.cs" />
-        <Compile Include="Scripting\Terms\VesselTerms\ActionGroups\StagingManager.cs" />
-        <Compile Include="Scripting\Terms\VesselTerms\ActionGroups\StagingTerm.cs" />
-        <Compile Include="Scripting\Terms\VesselTerms\Parts\PartField.cs" />
-        <Compile Include="Scripting\Terms\VesselTerms\Parts\PartTerm.cs" />
-        <Compile Include="Scripting\Terms\VesselTerms\SAS\SASTerm.cs" />
-        <Compile Include="Scripting\Terms\VesselTerms\SAS\SASTypeTerm.cs" />
-        <Compile Include="Scripting\Terms\VesselTerms\Target\TargetTerm.cs" />
-        <Compile Include="Scripting\Terms\VesselTerms\VesselTerm.cs" />
+        <Compile Include="Controls/CodeEditor/CodeEditorControl.cs" />
+        <Compile Include="Controls/CodeEditor/CodeHighlightAreaControl.cs" />
+        <Compile Include="Controls/CodeLibrary/CodeLibraryControl.cs" />
+        <Compile Include="Controls/CodeLibrary/ScriptCraftGridControl.cs" />
+        <Compile Include="Controls/ExceptionBox.cs" />
+        <Compile Include="Controls/LogControl.cs" />
+        <Compile Include="Controls/PartRenameControl.cs" />
+        <Compile Include="Extensions/StringExtension.cs" />
+        <Compile Include="Modules/Computers/BaseComputer.cs" />
+        <Compile Include="Modules/Computers/ComputerModule.cs" />
+        <Compile Include="Modules/ComputerTemp/ModuleComputerTemp.cs" />
+        <Compile Include="Modules/PartNameModule.cs" />
+        <Compile Include="Modules/Test/GuiTestModule.cs" />
+        <Compile Include="Modules/Test/ThrottleTest.cs" />
+        <Compile Include="Scripting/Config/ScriptLibrary/ScriptLibrary.cs" />
+        <Compile Include="Scripting/Config/ValueStasher/ProtoStash.cs" />
+        <Compile Include="Scripting/Config/ValueStasher/ValueStasher.cs" />
+        <Compile Include="Scripting/Exceptions/ExecutionException.cs" />
+        <Compile Include="Scripting/Library/ComputerLibrary.cs" />
+        <Compile Include="Scripting/Library/KerbalLibrary.cs" />
+        <Compile Include="Scripting/Library/VesselLibrary.cs" />
+        <Compile Include="Scripting/Terms/BaseVesselTerm.cs" />
+        <Compile Include="Scripting/Terms/Graphmatics/Curves/IPiecewise.cs" />
+        <Compile Include="Scripting/Terms/Graphmatics/Curves/PiecewiseCTerm.cs" />
+        <Compile Include="Scripting/Terms/Graphmatics/Curves/PiecewiseCurve.cs" />
+        <Compile Include="Scripting/Terms/Graphmatics/Curves/PiecewiseLinear.cs" />
+        <Compile Include="Scripting/Terms/IStashableTerm.cs" />
+        <Compile Include="Scripting/Terms/KerbNet/KerbNetTerm.cs" />
+        <Compile Include="Scripting/Terms/KerbNet/SolarSystem/CelestialBody.cs" />
+        <Compile Include="Scripting/Terms/KerbNet/SolarSystem/OrbitTerm.cs" />
+        <Compile Include="Scripting/Terms/KerbNet/SuperComputerTerm.cs" />
+        <Compile Include="Scripting/Terms/Vectors/Vec2Term.cs" />
+        <Compile Include="Scripting/Terms/Vectors/Vec3dTerm.cs" />
+        <Compile Include="Scripting/Terms/Vectors/Vec3Term.cs" />
+        <Compile Include="Scripting/Terms/VesselTerms/ActionGroups/ActionGroupTerm.cs" />
+        <Compile Include="Scripting/Terms/VesselTerms/ActionGroups/StagingManager.cs" />
+        <Compile Include="Scripting/Terms/VesselTerms/ActionGroups/StagingTerm.cs" />
+        <Compile Include="Scripting/Terms/VesselTerms/Parts/PartField.cs" />
+        <Compile Include="Scripting/Terms/VesselTerms/Parts/PartTerm.cs" />
+        <Compile Include="Scripting/Terms/VesselTerms/SAS/SASTerm.cs" />
+        <Compile Include="Scripting/Terms/VesselTerms/SAS/SASTypeTerm.cs" />
+        <Compile Include="Scripting/Terms/VesselTerms/Target/TargetTerm.cs" />
+        <Compile Include="Scripting/Terms/VesselTerms/VesselTerm.cs" />
         <Compile Include="SuperComputer.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Properties/AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\SteelLanguage\SteelLanguage.csproj">
+      <ProjectReference Include="../SteelLanguage/SteelLanguage.csproj">
         <Project>{c12fe528-ce49-4194-bed0-7e1064622a12}</Project>
         <Name>SteelLanguage</Name>
       </ProjectReference>
-      <ProjectReference Include="..\AeroDynamicInterfaces\AeroDynamicInterfaces.csproj">
+      <ProjectReference Include="../AeroDynamicInterfaces/AeroDynamicInterfaces.csproj">
         <Project>{0aef6641-0fa8-43b3-9e25-56a47ad3ba3e}</Project>
         <Name>AeroDynamicInterfaces</Name>
       </ProjectReference>
     </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <Import Project="$(MSBuildToolsPath)/Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
@@ -149,8 +149,8 @@
     -->
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="del &quot;D:\Y wing steam games\steamapps\common\Kerbal Space Program\GameData\ProgrammableModules&quot; /S /Q" />
-        <Exec Command="xcopy &quot;$(ProjectDir)bin\GameData\*.*&quot; &quot;D:\Y wing steam games\steamapps\common\Kerbal Space Program\GameData\ProgrammableModules&quot; /Y /I /E" />
+        <Exec Command="del &quot;/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/GameData/ProgrammableModules&quot; /S /Q" />
+        <Exec Command="xcopy &quot;$(ProjectDir)bin/GameData/*.*&quot; &quot;/mnt/ExtraSpace/SteamLibrary/steamapps/common/Kerbal Space Program/GameData/ProgrammableModules&quot; /Y /I /E" />
     </Target>
 
 </Project>

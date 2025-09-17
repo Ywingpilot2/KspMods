@@ -132,6 +132,32 @@ public static class ThemesDictionary
         };
         AddStyle("LabelPlain", style);
 
+        style = new GUIStyle(HighLogic.Skin.textArea)
+        {
+            normal = new GUIStyleState
+            {
+                background = AssetBase.GetTexture("rect_round_flat_up")
+            },
+            active = new GUIStyleState
+            {
+                background = AssetBase.GetTexture("rect_round_flat_down")
+            }
+        };
+        AddStyle("FlatArea", style);
+
+        style = new GUIStyle(HighLogic.Skin.textArea)
+        {
+            normal = new GUIStyleState
+            {
+                background = AssetBase.GetTexture("rect_round_dark")
+            },
+            active = new GUIStyleState
+            {
+                background = AssetBase.GetTexture("rect_round_down_dark")
+            }
+        };
+        AddStyle("DarkArea", style);
+
         #endregion
 
         #region Custom Style

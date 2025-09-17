@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using AeroDynamicKerbalInterfaces.Exceptions;
 using AeroDynamicKerbalInterfaces.Themes;
+using KSPAssets.Loaders;
 using UniLinq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace AeroDynamicKerbalInterfaces.Controls;
 

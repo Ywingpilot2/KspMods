@@ -57,7 +57,8 @@ public class PartRenameControl : HeaderWindow
         _field = new TextFieldControl(rng.Next(), name)
         {
             ExpandWidth = true,
-            WordWrap = false
+            WordWrap = false,
+            Style = "FlatArea"
         };
 
         Add(_field);
